@@ -6,7 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
+using System.IO;
+using Puppet.Common.Configuration;
 
 namespace Puppet.Common.Services
 {
@@ -18,9 +21,15 @@ namespace Puppet.Common.Services
 
         public Hubitat()
         {
-            // TODO: Move to configuration
-            _baseAddress = "http://192.168.15.137/apps/api/143/devices";
-            _accessToken = "133adfd3-675c-4ca6-a7cb-7220aa4e75b4";
+            IConfiguration configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory()) // Directory where the json files are located
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
+            var hubitatOptions = configuration.GetSection("Hubitat").Get<HubitatOptions>();
+            
+            _baseAddress = hubitatOptions.BaseUrl;
+            _accessToken = hubitatOptions.AccessToken;
 
             _client = new HttpClient();
 

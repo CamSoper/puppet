@@ -12,13 +12,15 @@ namespace Puppet.Automation
 {
     public class SafetyAlert : IAutomation
     {
-        Speaker _speaker;
+        List<Speaker> _speakers;
         HomeAutomationPlatform _hub;
 
         public SafetyAlert(HomeAutomationPlatform hub)
         {
             _hub = hub;
-            _speaker = new Speaker(hub, DeviceMap.Speaker.KitchenSpeaker);
+            _speakers = new List<Speaker>();
+            _speakers.Add(new Speaker(hub, DeviceMap.Speaker.KitchenSpeaker));
+            _speakers.Add(new Speaker(hub, DeviceMap.Speaker.WebhookNotifier));
         }
 
         public void Handle(HubEvent evt, CancellationToken token)
@@ -40,7 +42,7 @@ namespace Puppet.Automation
                     return;
             }
 
-            _speaker.Speak($"{message} Please investigate.");
+            _speakers.Speak($"{message} Please investigate.");
 
             int count = 1;
             while (true)
@@ -50,12 +52,12 @@ namespace Puppet.Automation
                 string reminderMessage = $"Reminder from {count} hour{((count == 1) ? "" : "s")} ago: {message}";
                 if (count > 5)
                 {
-                    _speaker.Speak($"{reminderMessage} This will be your final reminder.");
+                    _speakers.Speak($"{reminderMessage} This will be your final reminder.");
                     return;
                 }
                 else
                 {
-                    _speaker.Speak(reminderMessage);
+                    _speakers.Speak(reminderMessage);
                 }
                 count++;
             }                

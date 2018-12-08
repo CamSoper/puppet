@@ -17,12 +17,6 @@ namespace Puppet.Automation.DeviceMap
     public sealed class Speaker
     {
         public const string KitchenSpeaker = "65";
-        public const string BedroomEcho = "197";
-        public const string DenEcho = "200";
-        public const string CadeEcho = "202";
-        public const string CollinEcho = "201";
-        public const string KitchenEcho = "199";
-        public const string LivingRoomEcho = "203";
-        public const string OfficeEcho = "198";
+        public const string WebhookNotifier = "401";
     }
 }

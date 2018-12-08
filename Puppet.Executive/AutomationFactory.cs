@@ -30,6 +30,9 @@ namespace Puppet.Executive
                 case "octoprint_done":
                     return new OctoprintDoneAutomation(hub);
 
+                case "notifyondoorunlock":
+                    return new NotifyOnDoorUnlock(hub);
+
                 default:
                     return null;
             }
