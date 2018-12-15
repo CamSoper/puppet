@@ -30,6 +30,10 @@ The reason for this is because each time an automation is executed, a cancellati
 
 Plus, it's an efficient way of ensuring that the Hubitat only sends events for devices you want to hear from.
 
+## Setup the Maker API app
+
+It's built-in. Make sure you've turned it on.
+
 ## Running
 
 I've not tried to run the web app in IIS. I just run it with the self-contained web server, Kestrel.
