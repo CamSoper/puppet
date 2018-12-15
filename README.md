@@ -32,7 +32,7 @@ Plus, it's an efficient way of ensuring that the Hubitat only sends events for d
 
 ## Setup the Maker API app
 
-It's built-in. Make sure you've turned it on.
+It's built-in to the Hubitat. Make sure you've turned it on.
 
 ## Running
 
