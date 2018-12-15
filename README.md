@@ -78,4 +78,12 @@ It'll run fine on Windows, but I've not done it. I use a Raspberry Pi running Ra
 
 ## Enjoy!
 
-- Cam
+I hope you like my work here. If you're having trouble, that's understandable - I wrote it for *me*, and sometimes that means that I don't think through usability stuff. Create an issue in this repo, or, better yet, send me a PR!
+
+Lastly, please check out my social media presences!
+
+[Twitter](https://twitter.com/camsoper)
+[Twitch](https://twitch.tv/CamDoesCoolStuff) (I stream programming stuff)
+[My Twitch Archive on YouTube](https://www.youtube.com/playlist?list=PL7390OIw2znaTPK4GGCtRnoJe1scVl5ZT)
+
+\- Cam
