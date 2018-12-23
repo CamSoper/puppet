@@ -12,7 +12,7 @@ A .NET Core framework for automating Hubitat Elevate and SmartThings.
 
 3. The web app handles the request by passing the event information to the Puppet Executive app, which runs in a separate process that manages task state.
 
-4. The Puppet Executive passes the name of the automation to the `AutomationFactory` to get the appropriate `IAutomation`. The `AutomationFactory` class instantiates the correct implementation of `IAutomation`, in this case and returns it to the Executive.
+4. The Puppet Executive passes the name of the automation to the `AutomationFactory`. The `AutomationFactory` class instantiates the correct implementation of `IAutomation` and returns it to the Executive.
     Example: The Executive asks `AutomationFactory` for an object to handle the automation named `pantry_door`. It returns an instance of `Puppet.Automation.PantryLightAutomation`.
 
 5. The Executive executes the `Handle()` method on the IAutomation object. The object can manipulate other devices via the `HomeAutomationPlatform` class, of which an instance can be passed in by the Executive.
@@ -29,6 +29,10 @@ Create a new instance of the Webhooks app in your Hubitat for each automation, a
 The reason for this is because each time an automation is executed, a cancellation token is sent to all the currently running instances.  So if you have 5 automations in your Puppet system, you will likewise want to have 5 installed instances of the Webhooks Hubitat app.
 
 Plus, it's an efficient way of ensuring that the Hubitat only sends events for devices you want to hear from.
+
+## Setup the Maker API app
+
+It's built-in to the Hubitat. Make sure you've turned it on.
 
 ## Running
 
@@ -78,4 +82,12 @@ It'll run fine on Windows, but I've not done it. I use a Raspberry Pi running Ra
 
 ## Enjoy!
 
-- Cam
+I hope you like my work here. If you're having trouble, that's understandable - I wrote it for *me*, and sometimes that means that I don't think through usability stuff. Create an issue in this repo, or, better yet, send me a PR!
+
+Lastly, please check out my social media presences!
+
+* [Twitter](https://twitter.com/camsoper)
+* [Twitch](https://twitch.tv/CamDoesCoolStuff) (I stream programming stuff)
+* [My Twitch Archive on YouTube](https://www.youtube.com/playlist?list=PL7390OIw2znaTPK4GGCtRnoJe1scVl5ZT)
+
+\- Cam
