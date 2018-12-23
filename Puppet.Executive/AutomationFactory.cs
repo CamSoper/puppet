@@ -24,6 +24,9 @@ namespace Puppet.Executive
                 case "garageentrypowerallowance":
                     return new GarageEntryPowerAllowance(hub);
 
+                case "livingroomxmas":
+                    return new LivingRoomHolidayAutomation(hub);
+
                 case "safetyalert":
                     return new SafetyAlert(hub);
 

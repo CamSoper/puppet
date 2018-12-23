@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Puppet.Automation
 {
-    class LivingRoomHolidayAutomation : IAutomation
+    public class LivingRoomHolidayAutomation : IAutomation
     {
         private readonly HomeAutomationPlatform _hub;
 
