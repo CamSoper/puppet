@@ -40,7 +40,8 @@ namespace Puppet.Executive
 
                 if (automation != null)
                 {
-                    // Start a task to handle the automation
+                    // Start a task to handle the automation and a CancellationToken Source
+                    // so we can cancel it later.
                     var cts = new CancellationTokenSource();
                     Action action = () =>
                     {
