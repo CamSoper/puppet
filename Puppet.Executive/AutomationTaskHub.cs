@@ -11,6 +11,12 @@ namespace Puppet.Executive
 {
     public class AutomationTaskHub
     {
+        /// <summary>
+        /// Binds the events received from the SignalR hub.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="hub"></param>
+        /// <param name="taskManager"></param>
         public static void SetUpConnectionEvents(HubConnection connection, 
             HomeAutomationPlatform hub, AutomationTaskManager taskManager)
         {
@@ -26,7 +32,7 @@ namespace Puppet.Executive
             {
                 Console.WriteLine($"{DateTime.Now} {automationName} event received. {evt?.description}");
 
-                // If this automation is already running, cancel all instances
+                // If this automation is already running, cancel all running instances
                 taskManager.CancelAllTasks(automationName);
 
                 // Get a reference to the automation
@@ -49,6 +55,12 @@ namespace Puppet.Executive
                 }
             });
         }
+
+        /// <summary>
+        /// Starts the connection the the SignalR hub in the web project.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <returns></returns>
         public static async Task ConnectToWebApi(HubConnection connection)
         {
             try

@@ -1,33 +1,12 @@
-﻿using Puppet.Common.Devices;
-using Puppet.Common.Events;
-using Puppet.Common.Models.Automation;
-using Puppet.Common.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Puppet.Common.Services;
 
 namespace Puppet.Automation
 {
-    public class BasementStairwayPowerAllowance : IAutomation
+    public class BasementStairwayPowerAllowance : PowerAllowanceBase
     {
-        HomeAutomationPlatform _hub;
-
-        public BasementStairwayPowerAllowance(HomeAutomationPlatform hub)
+        public BasementStairwayPowerAllowance(HomeAutomationPlatform hub) : base(hub)
         {
-            _hub = hub;
-        }
-        public void Handle(HubEvent evt, CancellationToken token)
-        {
-            if(evt.value == "on")
-            {
-                Task.Delay(TimeSpan.FromMinutes(5)).Wait();
-                if (token.IsCancellationRequested) return;
-                SwitchRelay relay = new SwitchRelay(_hub, DeviceMap.SwitchRelay.BasementStairwayLight);
-                relay.Off();
-            }
-
+            this.Minutes = 5;
         }
     }
 }
