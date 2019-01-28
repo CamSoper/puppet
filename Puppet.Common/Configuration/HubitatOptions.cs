@@ -8,5 +8,6 @@ namespace Puppet.Common.Configuration
     {
         public string BaseUrl { get; set; }
         public string AccessToken { get; set; }
+        public string EventWebsocketUrl { get; set; }
     }
 }
