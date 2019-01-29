@@ -8,7 +8,6 @@ namespace Puppet.Common.Services
 {
     class SmartThings : HomeAutomationPlatform
     {
-
         public override void DoAction(IDevice device, string action, string[] args = null)
         {
             throw new NotImplementedException();

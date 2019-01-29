@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using Puppet.Common.Devices;
+using Puppet.Common.Events;
 
 namespace Puppet.Common.Services
 {
@@ -11,5 +12,11 @@ namespace Puppet.Common.Services
         public ConcurrentDictionary<string, object> StateBag { get; set; }
         public abstract void DoAction(IDevice device, string action, string[] args = null);
         public abstract IDevice GetDevice();
+
+        public event EventHandler<AutomationEventEventArgs> AutomationEvent;
+        protected virtual void OnAutomationEvent(AutomationEventEventArgs e)
+        {
+            AutomationEvent?.Invoke(this, e);
+        }
     }
 }

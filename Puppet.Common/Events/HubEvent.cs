@@ -8,8 +8,9 @@ namespace Puppet.Common.Events
     {
         public string deviceId { get; set; }
         public string value { get; set; }
-        public string display_name { get; set; }
-        public string description { get; set; }
+        public string name { get; set; }
+        public string displayName { get; set; }
+        public string descriptionText { get; set; }
         public string source { get; set; }
     }
 }

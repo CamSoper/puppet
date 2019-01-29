@@ -1,6 +1,6 @@
 ﻿using Puppet.Common.Devices;
 using Puppet.Common.Events;
-using Puppet.Common.Models.Automation;
+using Puppet.Common.Automation;
 using Puppet.Common.Services;
 using System;
 using System.Collections.Generic;
@@ -10,28 +10,30 @@ using System.Threading.Tasks;
 
 namespace Puppet.Automation
 {
-    public class SafetyAlert : IAutomation
+    public class SafetyAlert : AutomationBase
     {
         List<Speaker> _speakers;
         HomeAutomationPlatform _hub;
+        HubEvent _evt;
 
-        public SafetyAlert(HomeAutomationPlatform hub)
+        public SafetyAlert(HomeAutomationPlatform hub, HubEvent evt) : base (hub, evt)
         {
             _hub = hub;
+            _evt = evt;
             _speakers = new List<Speaker>();
             _speakers.Add(new Speaker(hub, DeviceMap.Speaker.KitchenSpeaker));
             _speakers.Add(new Speaker(hub, DeviceMap.Speaker.WebhookNotifier));
         }
 
-        public void Handle(HubEvent evt, CancellationToken token)
+        public override void Handle(CancellationToken token)
         {
             string message = "";
             DateTime when = DateTime.Now;
 
-            switch(evt.value)
+            switch(_evt.value)
             {
                 case "wet":  //water sensor positive
-                    message = $"Water has been detected by the {evt.display_name}.";
+                    message = $"Water has been detected by the {_evt.displayName}.";
                     break;
 
                 case "detected":  //smoke alarm positive

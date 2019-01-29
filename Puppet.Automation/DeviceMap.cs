@@ -31,6 +31,7 @@ namespace Puppet.Automation.DeviceMap
     public sealed class ContactSensor
     {
         public const string FrontDoor = "339";
+        public const string PantryDoor = "224";
     }
 
     public sealed class Lock

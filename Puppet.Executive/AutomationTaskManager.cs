@@ -48,12 +48,12 @@ namespace Puppet.Executive
         /// <summary>
         /// Cancels all existing automation tasks with the given name.
         /// </summary>
-        /// <param name="automationName">The name of the automation to cancel.</param>
-        public void CancelAllTasks(string automationName)
+        /// <param name="automationType">The type of the automation to cancel.</param>
+        public void CancelAllTasks(Type automationType)
         {
             lock (TaskList)
             {
-                foreach (var i in TaskList.Where(t => t.Task.AutomationName == automationName && 
+                foreach (var i in TaskList.Where(t => t.Task.AutomationType == automationType && 
                     !t.Task.IsCompleted && !t.CTS.IsCancellationRequested))
                 {
                     i.CTS.Cancel();

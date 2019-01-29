@@ -1,46 +1,31 @@
 ﻿using Puppet.Automation;
-using Puppet.Common.Models;
-using Puppet.Common.Models.Automation;
+using Puppet.Common.Automation;
+using Puppet.Common.Events;
 using Puppet.Common.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Puppet.Executive
 {
     public class AutomationFactory
     {
         /// <summary>
-        /// Figures out the appropriate implementation of IAutomation and returns it.
+        /// Figures out the appropriate implementation of IAutomation based in the data in the event and returns it.
         /// </summary>
-        /// <param name="automationName"></param>
+        /// <param name="evt"></param>
         /// <param name="hub"></param>
-        /// <returns></returns>
-        public static IAutomation GetAutomation(string automationName, HomeAutomationPlatform hub)
+        /// <returns>An IEnumberable<IAutomation> containing automations to be run for this event.</returns>
+        public static IEnumerable<IAutomation> GetAutomations(HubEvent evt, HomeAutomationPlatform hub)
         {
-            // TODO: Find type dynamically from the Automation DLL at runtime, match by automationName
-            switch (automationName)
+            foreach(var automation in Assembly.LoadFrom("Puppet.Automation.dll").GetTypes()
+                      .Where(t => typeof(IAutomation).IsAssignableFrom(t))
+                      .Where(t => t.GetCustomAttributes<TriggerDeviceAttribute>()
+                        .Where(a => a.TriggerDeviceId == evt.deviceId)
+                        .Count() > 0))
             {
-                case "basementstairwaypowerallowance":
-                    return new BasementStairwayPowerAllowance(hub);
-
-                case "garageentrypowerallowance":
-                    return new GarageEntryPowerAllowance(hub);
-
-                case "livingroomxmas":
-                    return new LivingRoomHolidayAutomation(hub);
-
-                case "safetyalert":
-                    return new SafetyAlert(hub);
-
-                case "pantry_light":
-                    return new PantryLightAutomation(hub);
-
-                case "octoprint_done":
-                    return new OctoprintDoneAutomation(hub);
-
-                case "notifyondoorunlock":
-                    return new NotifyOnDoorUnlock(hub);
-
-                default:
-                    return null;
+                yield return (IAutomation)Activator.CreateInstance(automation, new Object[] { hub, evt });
             }
         }
     }

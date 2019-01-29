@@ -1,27 +1,28 @@
 ﻿using Puppet.Common.Devices;
 using Puppet.Common.Events;
-using Puppet.Common.Models.Automation;
 using Puppet.Common.Services;
+using Puppet.Common.Automation;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 
 namespace Puppet.Automation
 {
-    public class PantryLightAutomation : IAutomation
+    [TriggerDevice(DeviceMap.ContactSensor.PantryDoor)]
+    public class PantryLightAutomation : AutomationBase
     {
         SwitchRelay _pantryLight;
         Speaker _kitchenSpeaker;
         HomeAutomationPlatform _hub;
+        HubEvent _evt;
 
-        public PantryLightAutomation(HomeAutomationPlatform hub)
+        public PantryLightAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             _pantryLight = new SwitchRelay(hub, DeviceMap.SwitchRelay.PantryLight);
             _kitchenSpeaker = new Speaker(hub, DeviceMap.Speaker.KitchenSpeaker);
             _hub = hub;
+            _evt = evt;
         }
 
         /// <summary>
@@ -30,9 +31,9 @@ namespace Puppet.Automation
         /// <param name="evt">The event passed from the automation controller.
         /// In this case, the pantry door opening/closing.</param>
         /// <param name="token">A .NET cancellation token received if this handler is to be cancelled. </param>
-        public void Handle(HubEvent evt, CancellationToken token)
+        public override void Handle(CancellationToken token)
         {
-            if(evt.value == "open")
+            if(_evt.value == "open")
             {
                 // Turn on the light
                 _pantryLight.On();
@@ -60,7 +61,8 @@ namespace Puppet.Automation
             else
             {
                 // Has the door been open five minutes?
-                DateTime PantryOpenTime = (DateTime)_hub.StateBag["PantryOpened"];
+                DateTime PantryOpenTime = 
+                    _hub.StateBag.ContainsKey("PantryOpened") ? (DateTime)_hub.StateBag["PantryOpened"] : DateTime.Now;
                 if(DateTime.Now - PantryOpenTime > TimeSpan.FromMinutes(5))
                 {
                     // It's been open five minutes, so we've nagged by now.

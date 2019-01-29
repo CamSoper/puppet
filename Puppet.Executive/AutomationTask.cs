@@ -8,10 +8,10 @@ namespace Puppet.Executive
 {
     public class AutomationTask : Task
     {
-        public string AutomationName { get; }
-        public AutomationTask(Action action, CancellationToken token, string automationName) : base(action, token)
+        public Type AutomationType { get; }
+        public AutomationTask(Action action, CancellationToken token, Type automationType) : base(action, token)
         {
-            this.AutomationName = automationName;
+            this.AutomationType = automationType;
         }
     }
 }
