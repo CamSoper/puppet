@@ -22,7 +22,8 @@ namespace Puppet.Executive
             foreach(var automation in Assembly.LoadFrom("Puppet.Automation.dll").GetTypes()
                       .Where(t => typeof(IAutomation).IsAssignableFrom(t))
                       .Where(t => t.GetCustomAttributes<TriggerDeviceAttribute>()
-                        .Where(a => a.TriggerDeviceId == evt.deviceId)
+                        .Where(a => a.TriggerDeviceId == evt.deviceId
+                            && a.Capability.ToString().ToLower() == evt.name)
                         .Count() > 0))
             {
                 yield return (IAutomation)Activator.CreateInstance(automation, new Object[] { hub, evt });

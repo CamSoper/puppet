@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace Puppet.Automation
 {
-    [TriggerDevice(DeviceMap.Lock.FrontDoorDeadbolt)]
+    [TriggerDevice(DeviceMap.Lock.FrontDoorDeadbolt, Capability.Lock)]
     public class NotifyOnDoorUnlock : AutomationBase
     {
         HomeAutomationPlatform _hub;

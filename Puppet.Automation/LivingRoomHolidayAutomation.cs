@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Puppet.Automation
 {
-    [TriggerDevice(DeviceMap.SwitchRelay.LivingRoomXmasVSwitch)]
+    [TriggerDevice(DeviceMap.SwitchRelay.LivingRoomXmasVSwitch, Capability.Switch)]
     public class LivingRoomHolidayAutomation : AutomationBase
     {
         private readonly HomeAutomationPlatform _hub;

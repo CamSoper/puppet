@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Puppet.Common.Devices;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,21 +10,24 @@ namespace Puppet.Common.Automation
     {
         // See the attribute guidelines at 
         //  http://go.microsoft.com/fwlink/?LinkId=85236
-        readonly string triggerDeviceId;
+        readonly string _triggerDeviceId;
+        readonly Capability _capability;
 
         // This is a positional argument
-        public TriggerDeviceAttribute(string triggerDeviceId)
+        public TriggerDeviceAttribute(string triggerDeviceId, Capability capability)
         {
-            this.triggerDeviceId = triggerDeviceId;
-
-            // TODO: Implement code here
-
-            //throw new NotImplementedException();
+            _triggerDeviceId = triggerDeviceId;
+            _capability = capability;
         }
 
         public string TriggerDeviceId
         {
-            get { return triggerDeviceId; }
+            get { return _triggerDeviceId; }
+        }
+
+        public Capability Capability
+        {
+            get { return _capability; }
         }
     }
 }

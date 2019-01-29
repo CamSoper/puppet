@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Puppet.Automation
 {
-    [TriggerDevice(DeviceMap.ContactSensor.PantryDoor)]
+    [TriggerDevice(DeviceMap.ContactSensor.PantryDoor, Capability.Contact)]
     public class PantryLightAutomation : AutomationBase
     {
         SwitchRelay _pantryLight;
