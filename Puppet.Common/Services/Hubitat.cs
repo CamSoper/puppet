@@ -18,21 +18,18 @@ using Newtonsoft.Json.Linq;
 
 namespace Puppet.Common.Services
 {
+    /// <summary>
+    /// Represents a physical Hubitat device.
+    /// </summary>
     public class Hubitat : HomeAutomationPlatform
     {
-        const string _appSettingsFileName = "appsettings.json";
-
         string _baseAddress;
         string _accessToken;
         string _websocketUrl;
         HttpClient _client;
         
-        public Hubitat()
+        public Hubitat(IConfiguration configuration) : base (configuration)
         {
-            IConfiguration configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory()) // Directory where the json files are located
-                .AddJsonFile(_appSettingsFileName, optional: false, reloadOnChange: true)
-                .Build();
             HubitatOptions hubitatOptions = configuration.GetSection("Hubitat").Get<HubitatOptions>();
 
             _baseAddress = hubitatOptions.BaseUrl;
@@ -59,8 +56,6 @@ namespace Puppet.Common.Services
             result.EnsureSuccessStatusCode();
         }
 
-
-
         async void HubitatEventWatcher()
         {
             try
@@ -81,12 +76,12 @@ namespace Puppet.Common.Services
             }
             catch(AggregateException ae)
             {
-                ae.Handle((x) =>
+                ae.Handle((x) => 
                 {
                     if (x is WebSocketException)
                     {
                         Console.WriteLine($"{DateTime.Now} Hubitat websocket error! {x.Message} -- Retrying in 5 seconds...");
-                        Task.Delay(TimeSpan.FromSeconds(5)).Wait();
+                        Thread.Sleep(TimeSpan.FromMinutes(5));
                         return true;
                     }
                     else
@@ -98,7 +93,8 @@ namespace Puppet.Common.Services
             }
             catch(Exception ex) 
             {
-                // Something unknown went wrong. I don't care what because this method should run forever. Just mention it.
+                // Something unknown went wrong. I don't care what 
+                // because this method should run forever. Just mention it.
                 Console.WriteLine($"{DateTime.Now} {ex} {ex.Message}");
             }
             finally

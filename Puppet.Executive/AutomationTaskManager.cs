@@ -5,6 +5,13 @@ using System.Text;
 
 namespace Puppet.Executive
 {
+    /// <summary>
+    /// This class maintains a collection of AutomationTasks and their
+    /// CancellationTokenSources. This is so long-running tasks are kept 
+    /// in scope until they're done running, along with their cancellation
+    /// tokens, so they can be cancelled if another AutomationTask running 
+    /// the same IAutomation comes along.
+    /// </summary>
     public class AutomationTaskManager
     {
         public HashSet<AutomationTaskTokenSourcePair> TaskList { get; }
@@ -46,7 +53,7 @@ namespace Puppet.Executive
         }
 
         /// <summary>
-        /// Cancels all existing automation tasks with the given name.
+        /// Cancels all existing automation tasks with the given type.
         /// </summary>
         /// <param name="automationType">The type of the automation to cancel.</param>
         public void CancelAllTasks(Type automationType)

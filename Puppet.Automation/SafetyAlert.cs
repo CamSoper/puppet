@@ -20,7 +20,7 @@ namespace Puppet.Automation
             //_speakers.Add(new Speaker(hub, DeviceMap.Speaker.WebhookNotifier));
         }
 
-        public override void Handle(CancellationToken token)
+        public override async void Handle(CancellationToken token)
         {
             string message = "";
             DateTime when = DateTime.Now;
@@ -44,7 +44,7 @@ namespace Puppet.Automation
             int count = 1;
             while (true)
             {
-                Task.Delay(TimeSpan.FromHours(1)).Wait();
+                await Task.Delay(TimeSpan.FromHours(1));
                 if (token.IsCancellationRequested) return;
                 string reminderMessage = $"Reminder from {count} hour{((count == 1) ? "" : "s")} ago: {message}";
                 if (count > 5)

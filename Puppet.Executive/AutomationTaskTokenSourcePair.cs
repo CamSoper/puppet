@@ -5,6 +5,10 @@ using System.Threading;
 
 namespace Puppet.Executive
 {
+    /// <summary>
+    /// This is a composite model for holding AutomationTasks
+    /// and their matching CancellationTokenSources.
+    /// </summary>
     public class AutomationTaskTokenSourcePair
     {
         public AutomationTask Task { get; set; }

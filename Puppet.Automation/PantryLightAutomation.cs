@@ -19,9 +19,9 @@ namespace Puppet.Automation
         public PantryLightAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             _pantryLight = 
-                _hub.GetDevice<SwitchRelay>("Switch.PantryLight") as SwitchRelay;
+                _hub.GetDeviceByName<SwitchRelay>("Switch.PantryLight") as SwitchRelay;
             _kitchenSpeaker = 
-                _hub.GetDevice<Speaker>("Speaker.KitchenSpeaker") as Speaker;
+                _hub.GetDeviceByName<Speaker>("Speaker.KitchenSpeaker") as Speaker;
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace Puppet.Automation
         /// <param name="evt">The event passed from the automation controller.
         /// In this case, the pantry door opening/closing.</param>
         /// <param name="token">A .NET cancellation token received if this handler is to be cancelled. </param>
-        public override void Handle(CancellationToken token)
+        public override async void Handle(CancellationToken token)
         {
             if(_evt.value == "open")
             {
@@ -41,18 +41,18 @@ namespace Puppet.Automation
                 _hub.StateBag.AddOrUpdate("PantryOpened", DateTime.Now, 
                     (key, oldvalue) => DateTime.Now); // This is the lambda to just update an existing value with the current DateTime
 
-                // Wait a bit
-                Task.Delay(TimeSpan.FromMinutes(5)).Wait();
+                // Wait a bit...
+                await Task.Delay(TimeSpan.FromMinutes(5));
                 if (token.IsCancellationRequested) return;
                 _kitchenSpeaker.Speak("Please close the pantry door");
 
-                // Wait a bit more
-                Task.Delay(TimeSpan.FromMinutes(5)).Wait();
+                // Wait a bit more...
+                await Task.Delay(TimeSpan.FromMinutes(5));
                 if (token.IsCancellationRequested) return;
                 _kitchenSpeaker.Speak("I said, please close the pantry door");
 
-                // Wait a bit longer...
-                Task.Delay(TimeSpan.FromMinutes(5)).Wait();
+                // Wait a bit longer and then give up...
+                await Task.Delay(TimeSpan.FromMinutes(5));
                 if (token.IsCancellationRequested) return;
                 _kitchenSpeaker.Speak("Fine, I'll do it myself.");
                 _pantryLight.Off();
