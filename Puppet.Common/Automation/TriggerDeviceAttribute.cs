@@ -8,8 +8,8 @@ namespace Puppet.Common.Automation
     [System.AttributeUsage(System.AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
     public sealed class TriggerDeviceAttribute : Attribute
     {
-        readonly string _deviceMappedName;
-        readonly Capability _capability;
+        private readonly string _deviceMappedName;
+        private readonly Capability _capability;
 
         // This is a positional argument
         public TriggerDeviceAttribute(string deviceMappedName, Capability capability)
@@ -18,14 +18,7 @@ namespace Puppet.Common.Automation
             _capability = capability;
         }
 
-        public string DeviceMappedName
-        {
-            get { return _deviceMappedName; }
-        }
-
-        public Capability Capability
-        {
-            get { return _capability; }
-        }
+        public string DeviceMappedName => _deviceMappedName;
+        public Capability Capability => _capability; 
     }
 }
