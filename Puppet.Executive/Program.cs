@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.DependencyInjection;
 using Puppet.Common.Services;
-using System.Linq;
-using System.Collections.Generic;
-using System.Reflection;
 using Puppet.Common.Automation;
 
 namespace Puppet.Executive
@@ -17,7 +10,7 @@ namespace Puppet.Executive
     {
         static AutomationTaskManager _taskManager;
         static HomeAutomationPlatform _hub;
-        static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             // Abstraction representing the home automation system
             _hub = new Hubitat();
@@ -29,7 +22,7 @@ namespace Puppet.Executive
             // Loop forever, this is a daemon process
             while (true)
             {
-                Task.Delay(TimeSpan.FromSeconds(60)).Wait();
+                await Task.Delay(TimeSpan.FromSeconds(60));
                 _taskManager.RemoveCompletedTasks();
             }
             

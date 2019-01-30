@@ -8,7 +8,7 @@ using Puppet.Common.Services;
 
 namespace Puppet.Automation
 {
-    [TriggerDevice(DeviceMap.SwitchRelay.GarageEntry, Capability.Switch)]
+    [TriggerDevice("Switch.GarageEntry", Capability.Switch)]
     public class GarageEntryPowerAllowance : PowerAllowanceBase
     {
         public GarageEntryPowerAllowance(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)

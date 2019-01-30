@@ -8,9 +8,12 @@ using System.Threading.Tasks;
 
 namespace Puppet.Common.Devices
 {
-    public class SwitchRelay : IDevice
+    public class SwitchRelay : DeviceBase
     {
-        HomeAutomationPlatform _hub;
+        public SwitchRelay(HomeAutomationPlatform hub, string id) : base(hub, id)
+        {
+        }
+
         public enum SwitchStatus
         {
             On,
@@ -25,19 +28,6 @@ namespace Puppet.Common.Devices
                 // TODO: Go back to the hub to get the current status
                 return SwitchStatus.Unknown;
             }
-        }
-
-        public string Id { get; }
-
-
-        // TODO: Go get these from the hub
-        public string Name => throw new NotImplementedException();
-        public string Label => throw new NotImplementedException();
-
-        public SwitchRelay(HomeAutomationPlatform hub, string id)
-        {
-            _hub = hub;
-            this.Id = id;
         }
 
         public void On()

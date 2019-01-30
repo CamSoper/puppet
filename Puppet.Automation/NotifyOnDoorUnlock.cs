@@ -6,16 +6,11 @@ using System.Threading;
 
 namespace Puppet.Automation
 {
-    [TriggerDevice(DeviceMap.Lock.FrontDoorDeadbolt, Capability.Lock)]
+    [TriggerDevice("Lock.FrontDoorDeadbolt", Capability.Lock)]
     public class NotifyOnDoorUnlock : AutomationBase
     {
-        HomeAutomationPlatform _hub;
-        HubEvent _evt;
-
         public NotifyOnDoorUnlock(HomeAutomationPlatform hub, HubEvent evt) : base (hub,evt)
         {
-            _hub = hub;
-            _evt = evt;
         }
         
         public override void Handle(CancellationToken token)
@@ -24,7 +19,7 @@ namespace Puppet.Automation
             {
                 if(_evt.descriptionText.Contains("was unlocked by"))
                 {
-                    var speaker = new Speaker(_hub, DeviceMap.Speaker.WebhookNotifier);
+                    Speaker speaker = _hub.GetDevice<Speaker>("Speaker.KitchenSpeaker") as Speaker;
                     speaker.Speak($"{_evt.descriptionText}.");
                 }
             }

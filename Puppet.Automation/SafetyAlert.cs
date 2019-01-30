@@ -13,16 +13,11 @@ namespace Puppet.Automation
     public class SafetyAlert : AutomationBase
     {
         List<Speaker> _speakers;
-        HomeAutomationPlatform _hub;
-        HubEvent _evt;
-
         public SafetyAlert(HomeAutomationPlatform hub, HubEvent evt) : base (hub, evt)
         {
-            _hub = hub;
-            _evt = evt;
             _speakers = new List<Speaker>();
-            _speakers.Add(new Speaker(hub, DeviceMap.Speaker.KitchenSpeaker));
-            _speakers.Add(new Speaker(hub, DeviceMap.Speaker.WebhookNotifier));
+            //_speakers.Add(new Speaker(hub, DeviceMap.Speaker.KitchenSpeaker));
+            //_speakers.Add(new Speaker(hub, DeviceMap.Speaker.WebhookNotifier));
         }
 
         public override void Handle(CancellationToken token)

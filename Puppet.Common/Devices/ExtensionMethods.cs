@@ -6,7 +6,7 @@ namespace Puppet.Common.Devices
 {
     public static class ExtensionMethods
     {
-        public static void Speak(this List<Speaker> notifiers, string message)
+        public static void Speak(this IEnumerable<Speaker> notifiers, string message)
         {
             foreach(var s in notifiers)
             {

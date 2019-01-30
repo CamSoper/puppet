@@ -8,16 +8,11 @@ using System.Threading.Tasks;
 
 namespace Puppet.Automation
 {
-    [TriggerDevice(DeviceMap.SwitchRelay.LivingRoomXmasVSwitch, Capability.Switch)]
+    [TriggerDevice("Switch.LivingRoomXmasVSwitch", Capability.Switch)]
     public class LivingRoomHolidayAutomation : AutomationBase
     {
-        private readonly HomeAutomationPlatform _hub;
-        private readonly HubEvent _evt;
-
         public LivingRoomHolidayAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            _hub = hub;
-            _evt = evt;
         }
 
         /// <summary>
@@ -30,8 +25,10 @@ namespace Puppet.Automation
             const int minutesBetweenCycles = 5;
             if(_evt.value == "on")
             {
-                var LivingRoomXmas1 = new SwitchRelay(_hub, DeviceMap.SwitchRelay.LivingRoomXmasScene1);
-                var LivingRoomXmas2 = new SwitchRelay(_hub, DeviceMap.SwitchRelay.LivingRoomXmasScene2);
+                SwitchRelay LivingRoomXmas1 = 
+                    _hub.GetDevice<SwitchRelay>("Switch.LivingRoomXmasScene1") as SwitchRelay;
+                SwitchRelay LivingRoomXmas2 = 
+                    _hub.GetDevice<SwitchRelay>("Switch.LivingRoomXmasScene2") as SwitchRelay;
 
                 while(true)
                 {
@@ -45,8 +42,8 @@ namespace Puppet.Automation
             }
             else
             {
-                var DefaultLivingRoomScene =
-                    new SwitchRelay(_hub, DeviceMap.SwitchRelay.LivingRoomNormalScene);
+                SwitchRelay DefaultLivingRoomScene =
+                    _hub.GetDevice<SwitchRelay>("Switch.LivingRoomNormalScene") as SwitchRelay;
                 DefaultLivingRoomScene.On();
                 return;
             }

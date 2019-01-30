@@ -1,0 +1,27 @@
+{
+  "Contact": {
+    "FrontDoor": "339",
+    "PantryDoor": "402",
+    "PantryDoorBackup": "224"
+  },
+  "Lock": {
+    "FrontDoorDeadbolt": "388"
+  },
+  "Speaker": {
+    "KitchenSpeaker": "65",
+    "WebhookNotifier": "401"
+  },
+  "Switch": {
+    "PantryLight": "189",
+    "Printer3D": "97",
+    "BasementStairwayLight": "226",
+    "FrontLightsColorfulScene": "418",
+    "FrontLightsWarmWhiteScene": "417",
+    "FrontLightsPower": "338",
+    "GarageEntry": "257",
+    "LivingRoomXmasVSwitch": "421",
+    "LivingRoomXmasScene1": "384",
+    "LivingRoomXmasScene2": "385",
+    "LivingRoomNormalScene": "386"
+  }
+}

@@ -3,26 +3,25 @@ using Puppet.Common.Events;
 using Puppet.Common.Services;
 using Puppet.Common.Automation;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
+using System.Collections.Generic;
 
 namespace Puppet.Automation
 {
-    [TriggerDevice(DeviceMap.ContactSensor.PantryDoor, Capability.Contact)]
+    [TriggerDevice("Contact.PantryDoor", Capability.Contact)]
     public class PantryLightAutomation : AutomationBase
     {
         SwitchRelay _pantryLight;
         Speaker _kitchenSpeaker;
-        HomeAutomationPlatform _hub;
-        HubEvent _evt;
 
         public PantryLightAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            _pantryLight = new SwitchRelay(hub, DeviceMap.SwitchRelay.PantryLight);
-            _kitchenSpeaker = new Speaker(hub, DeviceMap.Speaker.KitchenSpeaker);
-            _hub = hub;
-            _evt = evt;
+            _pantryLight = 
+                _hub.GetDevice<SwitchRelay>("Switch.PantryLight") as SwitchRelay;
+            _kitchenSpeaker = 
+                _hub.GetDevice<Speaker>("Speaker.KitchenSpeaker") as Speaker;
         }
 
         /// <summary>
@@ -38,7 +37,7 @@ namespace Puppet.Automation
                 // Turn on the light
                 _pantryLight.On();
 
-                // Remember when we turned on the light in case we need to know later
+                // Remember when we turned on the light for later (when we respond to an off event)
                 _hub.StateBag.AddOrUpdate("PantryOpened", DateTime.Now, 
                     (key, oldvalue) => DateTime.Now); // This is the lambda to just update an existing value with the current DateTime
 

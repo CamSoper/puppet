@@ -5,7 +5,7 @@ using Puppet.Common.Services;
 
 namespace Puppet.Automation
 {
-    [TriggerDevice(DeviceMap.SwitchRelay.BasementStairwayLight, Capability.Switch)]
+    [TriggerDevice("Switch.BasementStairwayLight", Capability.Switch)]
     public class BasementStairwayPowerAllowance : PowerAllowanceBase
     {
         public BasementStairwayPowerAllowance(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
