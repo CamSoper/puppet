@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Puppet.Executive
 {
@@ -14,22 +16,23 @@ namespace Puppet.Executive
     /// </summary>
     public class AutomationTaskManager
     {
-        public HashSet<AutomationTaskTokenSourcePair> TaskList { get; }
+        private HashSet<AutomationTaskTokenType> _taskList;
 
         public AutomationTaskManager()
         {
-            TaskList = new HashSet<AutomationTaskTokenSourcePair>();
+            _taskList = new HashSet<AutomationTaskTokenType>();
         }
 
         /// <summary>
         /// Stores the task/cancellation token source.
         /// </summary>
         /// <param name="pair">The task and cancellation token source.</param>
-        public void Track(AutomationTaskTokenSourcePair pair)
+        public void Track(Task work, CancellationTokenSource cts, Type automationType)
         {
-            lock (TaskList)
+
+            lock (_taskList)
             {
-                TaskList.Add(pair);
+                _taskList.Add(new AutomationTaskTokenType(work, cts, automationType));
             }
         }
 
@@ -38,34 +41,50 @@ namespace Puppet.Executive
         /// </summary>
         public void RemoveCompletedTasks()
         {
-            int count = 0;
-            lock (TaskList)
+            Task.Run(() =>
             {
-                int countBefore = TaskList.Count;
-                TaskList.RemoveWhere(t => t.Task.IsCompleted);
-                int countAfter = TaskList.Count;
-                count = countBefore - countAfter;
-                if (count > 0)
+                int count = 0;
+                lock (_taskList)
                 {
-                    Console.WriteLine($"{DateTime.Now} Removed {count} completed tasks. {TaskList.Count} tasks remain in progress.");
+                    int countBefore = _taskList.Count;
+                    _taskList.RemoveWhere(t => t.Task.IsCompleted);
+                    int countAfter = _taskList.Count;
+                    count = countBefore - countAfter;
+                    if (count > 0)
+                    {
+                        Console.WriteLine($"{DateTime.Now} Removed {count} completed tasks. {_taskList.Count} tasks remain in progress.");
+                    }
                 }
-            }
+            });
         }
 
         /// <summary>
         /// Cancels all existing automation tasks with the given type.
         /// </summary>
         /// <param name="automationType">The type of the automation to cancel.</param>
-        public void CancelAllTasks(Type automationType)
+        public void CancelExistingTasks(Type automationType)
         {
-            lock (TaskList)
+            lock (_taskList)
             {
-                foreach (var i in TaskList.Where(t => t.Task.AutomationType == automationType && 
+                foreach (var i in _taskList.Where(t => t.AutomationType == automationType && 
                     !t.Task.IsCompleted && !t.CTS.IsCancellationRequested))
                 {
                     i.CTS.Cancel();
                 }
             }
+        }
+    }
+    class AutomationTaskTokenType
+    {
+        public Task Task { get; set; }
+        public CancellationTokenSource CTS { get; set; }
+        public Type AutomationType { get; set; }
+
+        public AutomationTaskTokenType(Task task, CancellationTokenSource cts, Type automationType)
+        {
+            Task = task;
+            CTS = cts;
+            AutomationType = automationType;
         }
     }
 }

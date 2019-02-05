@@ -37,7 +37,7 @@ namespace Puppet.Common.Devices
         }
         public void Off()
         {
-            _hub.DoAction(this, "off");
+             _hub.DoAction(this, "off");
         }
     }
 }

@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 
 namespace Puppet.Executive
 {
-    public class AutomationTask : Task
+    public class AutomationTask
     {
         public Type AutomationType { get; }
-        public AutomationTask(Action action, CancellationToken token, Type automationType) : base(action, token)
-        {
-            this.AutomationType = automationType;
-        }
+        private readonly Func<Task> taskFunc;
+
+        public AutomationTask(Func<Task> action, Type automationType) =>
+         (AutomationType, taskFunc) = (automationType, action);
+
+         public Task Start() => taskFunc();
     }
 }

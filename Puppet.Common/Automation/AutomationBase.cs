@@ -7,6 +7,7 @@ using System.Threading;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
+using System.Threading.Tasks;
 
 namespace Puppet.Common.Automation
 {
@@ -19,6 +20,26 @@ namespace Puppet.Common.Automation
             _hub = hub;
             _evt = evt;
         }
-        public abstract void Handle(CancellationToken token);
+        public abstract Task Handle(CancellationToken token);
+
+        /// <summary>
+        /// Waits for a specified period time then returns a boolean indicating if the task was cancelled.
+        /// </summary>
+        /// <param name="howLong">How long to wait.</param>
+        /// <param name="token">A cancellation token.</param>
+        /// <returns>True if the task was cancelled. False if execution should continue.</returns>
+        protected async Task<bool> WaitForCancellation(TimeSpan howLong, CancellationToken token)
+        {
+            try
+            {
+                await Task.Delay(howLong, token);
+                return false;
+            }
+            catch (TaskCanceledException)
+            {
+                Console.WriteLine($"{DateTime.Now} Existing {this.GetType()} task cancelled.");
+                return true;
+            }
+        }
     }
 }

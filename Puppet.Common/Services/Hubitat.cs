@@ -39,11 +39,11 @@ namespace Puppet.Common.Services
             _client = new HttpClient();
 
             StateBag = new ConcurrentDictionary<string, object>();
-
-            Task.Run(() => { HubitatEventWatcher(); });
         }
 
-        public override async void DoAction(IDevice device, string action, string[] args = null)
+        public override Task StartAutomationEventWatcher() =>  HubitatEventWatcherThread();
+
+        public override void DoAction(IDevice device, string action, string[] args = null)
         {
             // http://[IP Address]/apps/api/143/devices/[Device ID]/[Command]/[Secondary value]?access_token=
 
@@ -52,54 +52,58 @@ namespace Puppet.Common.Services
 
             Uri requestUri = new Uri($"{_baseAddress}/{device.Id}/{action.Trim()}{secondary.Trim()}?access_token={_accessToken}");
             Console.WriteLine($"{DateTime.Now} Sending request to Hubitat: {requestUri.ToString().Split('?')[0]}");
-            var result = await _client.GetAsync(requestUri);
+            var result = _client.GetAsync(requestUri).Result;
             result.EnsureSuccessStatusCode();
         }
 
-        async void HubitatEventWatcher()
+        async Task HubitatEventWatcherThread()
         {
-            try
+            while (true)
             {
-                Console.WriteLine($"{DateTime.Now} Connecting to Hubitat...");
-                var client = new ClientWebSocket();
-                await client.ConnectAsync(new Uri(_websocketUrl), CancellationToken.None);
-                Console.WriteLine($"{DateTime.Now} Websocket success! Watching for events.");
-                ArraySegment<byte> buffer;
-                while (client.State == WebSocketState.Open)
+                try
                 {
-                    buffer = new ArraySegment<byte>(new byte[1024 * 4]);
-                    WebSocketReceiveResult reply = await client.ReceiveAsync(buffer, CancellationToken.None);
-                    string json = System.Text.Encoding.Default.GetString(buffer.ToArray()).TrimEnd('\0');
-                    HubEvent evt = JsonConvert.DeserializeObject<HubEvent>(json);
-                    OnAutomationEvent(new AutomationEventEventArgs() { HubEvent = evt });
+                    Console.WriteLine($"{DateTime.Now} Connecting to Hubitat...");
+                    var client = new ClientWebSocket();
+                    await client.ConnectAsync(new Uri(_websocketUrl), CancellationToken.None);
+                    Console.WriteLine($"{DateTime.Now} Websocket success! Watching for events.");
+                    ArraySegment<byte> buffer;
+                    while (client.State == WebSocketState.Open)
+                    {
+                        buffer = new ArraySegment<byte>(new byte[1024 * 4]);
+                        WebSocketReceiveResult reply = await client.ReceiveAsync(buffer, CancellationToken.None);
+                        string json = System.Text.Encoding.Default.GetString(buffer.ToArray()).TrimEnd('\0');
+                        HubEvent evt = JsonConvert.DeserializeObject<HubEvent>(json);
+                        OnAutomationEvent(new AutomationEventEventArgs() { HubEvent = evt });
+                    }
                 }
-            }
-            catch(AggregateException ae)
-            {
-                ae.Handle((x) => 
+                catch (AggregateException ae)
                 {
-                    if (x is WebSocketException)
+                    ae.Handle((x) =>
                     {
-                        Console.WriteLine($"{DateTime.Now} Hubitat websocket error! {x.Message} -- Retrying in 5 seconds...");
-                        Thread.Sleep(TimeSpan.FromMinutes(5));
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                });
-
-            }
-            catch(Exception ex) 
-            {
-                // Something unknown went wrong. I don't care what 
-                // because this method should run forever. Just mention it.
-                Console.WriteLine($"{DateTime.Now} {ex} {ex.Message}");
-            }
-            finally
-            {
-                HubitatEventWatcher();
+                        if (x is WebSocketException)
+                        {
+                            // We shouldn't ever see this, but just in case...
+                            Console.WriteLine($"{DateTime.Now} Aggregate Exception Hubitat websocket error! {x.Message} -- Retrying in 5 seconds...");
+                            Thread.Sleep(TimeSpan.FromSeconds(5));
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    });
+                }
+                catch (System.Net.WebSockets.WebSocketException wse)
+                {
+                    Console.WriteLine($"{DateTime.Now} Hubitat websocket error! {wse.Message} -- Retrying in 5 seconds...");
+                    await Task.Delay(TimeSpan.FromSeconds(5));
+                }
+                catch (Exception ex)
+                {
+                    // Something unknown went wrong. I don't care what 
+                    // because this method should run forever. Just mention it.
+                    Console.WriteLine($"{DateTime.Now} {ex} {ex.Message}");
+                }
             }
         }
     }

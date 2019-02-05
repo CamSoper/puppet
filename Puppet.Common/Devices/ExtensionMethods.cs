@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Puppet.Common.Devices
 {
@@ -14,9 +15,9 @@ namespace Puppet.Common.Devices
                 {
                     s.Speak(message);
                 }
-                catch
+                catch(Exception ex)
                 {
-                    Console.WriteLine($"Speak operation was unsuccessful for speaker with ID {s.Id}");
+                    Console.WriteLine($"Speak operation was unsuccessful for speaker with ID {s.Id} -- {ex}");
                 }
             }
         }

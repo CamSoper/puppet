@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Puppet.Common.Automation
 {
@@ -12,6 +13,6 @@ namespace Puppet.Common.Automation
         /// Handles events coming from the home automation controller.
         /// </summary>
         /// <param name="token">A .NET cancellation token received if this handler is to be cancelled.</param>
-        void Handle(CancellationToken token);
+        Task Handle(CancellationToken token);
     }
 }

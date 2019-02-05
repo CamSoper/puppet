@@ -14,6 +14,7 @@ namespace Puppet.Executive
 
         static AutomationTaskManager _taskManager;
         static HomeAutomationPlatform _hub;
+
         public static async Task Main(string[] args)
         {
             // Read in the configuration file
@@ -30,15 +31,11 @@ namespace Puppet.Executive
 
             // Bind a method to handle the events raised
             // by the Hubitat device
-            _hub.AutomationEvent += Hub_AutomationEvent; 
+            _hub.AutomationEvent += Hub_AutomationEvent;
+            var hubTask = _hub.StartAutomationEventWatcher();
 
-            // Loop forever, this is a daemon process
-            while (true)
-            {
-                await Task.Delay(TimeSpan.FromSeconds(60));
-                _taskManager.RemoveCompletedTasks();
-            }
-            
+            // Wait forever, this is a daemon process
+            await hubTask;
         }
 
 
@@ -60,25 +57,30 @@ namespace Puppet.Executive
                 if (automation != null)
                 {
                     // If this automation is already running, cancel all running instances
-                    _taskManager.CancelAllTasks(automation.GetType());
+                    _taskManager.CancelExistingTasks(automation.GetType());
 
                     // Start a task to handle the automation and a CancellationToken Source
                     // so we can cancel it later.
                     var cts = new CancellationTokenSource();
-                    var task = new AutomationTask(() =>
+                    Func<Task> handleTask = async() =>
                     {
-                        // This runs the Handle method on the automation class
+                       // This runs the Handle method on the automation class
                         Console.WriteLine($"{DateTime.Now} {automation} event: {evt.descriptionText}");
-                        automation.Handle(cts.Token);
-                    }, cts.Token, automation.GetType());
+                        await automation.Handle(cts.Token);
+                    };
+
+                    var task = new AutomationTask(handleTask, automation.GetType());
 
                     // Ready... go handle it!
-                    task.Start();
-
+                    Task work = task.Start();
+                    
                     // Hold on to the task and its cancellation token source for later.
-                    _taskManager.Track(new AutomationTaskTokenSourcePair(task, cts));
+                    _taskManager.Track(work, cts, automation.GetType());
                 }
             }
+
+            // Let's take this opportunity to get rid of any completed tasks.
+            _taskManager.RemoveCompletedTasks();
         }
     }
 }

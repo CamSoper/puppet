@@ -20,9 +20,9 @@ namespace Puppet.Automation
         /// </summary>
         /// <param name="evt"></param>
         /// <param name="token"></param>
-        public override async void Handle(CancellationToken token)
+        public override async Task Handle(CancellationToken token)
         {
-            const int minutesBetweenCycles = 5;
+            TimeSpan timeBetweenCycles = TimeSpan.FromMinutes(5);
             if(_evt.value == "on")
             {
                 SwitchRelay LivingRoomXmas1 = 
@@ -33,11 +33,9 @@ namespace Puppet.Automation
                 while(true)
                 {
                     LivingRoomXmas1.On();
-                    await Task.Delay(TimeSpan.FromMinutes(minutesBetweenCycles));
-                    if (token.IsCancellationRequested) return;
+                    if (await WaitForCancellation(timeBetweenCycles, token)) return;
                     LivingRoomXmas2.On();
-                    await Task.Delay(TimeSpan.FromMinutes(minutesBetweenCycles));
-                    if (token.IsCancellationRequested) return;
+                    if (await WaitForCancellation(timeBetweenCycles, token)) return;
                 }
             }
             else

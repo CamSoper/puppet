@@ -10,9 +10,11 @@ using System.Collections.Generic;
 
 namespace Puppet.Automation
 {
-    [TriggerDevice("Contact.PantryDoor", Capability.Contact)]
+    [TriggerDevice("Contact.PantryDoorBackup", Capability.Contact)]
+    [TriggerDevice("Switch.PantryAck", Capability.Switch)]
     public class PantryLightAutomation : AutomationBase
     {
+        TimeSpan _interval = TimeSpan.FromMinutes(5);
         SwitchRelay _pantryLight;
         Speaker _kitchenSpeaker;
 
@@ -27,48 +29,52 @@ namespace Puppet.Automation
         /// <summary>
         /// Handles pantry door events coming from the home automation controller.
         /// </summary>
-        /// <param name="evt">The event passed from the automation controller.
-        /// In this case, the pantry door opening/closing.</param>
-        /// <param name="token">A .NET cancellation token received if this handler is to be cancelled. </param>
-        public override async void Handle(CancellationToken token)
+        /// <param name="token">A .NET cancellation token received if this handler is to be cancelled.</param>
+        public override async Task Handle(CancellationToken token)
         {
-            if(_evt.value == "open")
+            if (_evt.value == "open")
             {
                 // Turn on the light
                 _pantryLight.On();
 
                 // Remember when we turned on the light for later (when we respond to an off event)
-                _hub.StateBag.AddOrUpdate("PantryOpened", DateTime.Now, 
+                _hub.StateBag.AddOrUpdate("PantryOpened", DateTime.Now,
                     (key, oldvalue) => DateTime.Now); // This is the lambda to just update an existing value with the current DateTime
 
                 // Wait a bit...
-                await Task.Delay(TimeSpan.FromMinutes(5));
-                if (token.IsCancellationRequested) return;
+                if (await WaitForCancellation(_interval, token)) return;
                 _kitchenSpeaker.Speak("Please close the pantry door");
 
                 // Wait a bit more...
-                await Task.Delay(TimeSpan.FromMinutes(5));
-                if (token.IsCancellationRequested) return;
+                if (await WaitForCancellation(_interval, token)) return;
                 _kitchenSpeaker.Speak("I said, please close the pantry door");
 
                 // Wait a bit longer and then give up...
-                await Task.Delay(TimeSpan.FromMinutes(5));
-                if (token.IsCancellationRequested) return;
+                if (await WaitForCancellation(_interval, token)) return;
                 _kitchenSpeaker.Speak("Fine, I'll do it myself.");
                 _pantryLight.Off();
             }
-            else
+            else if (_evt.value == "closed")
             {
                 // Has the door been open five minutes?
-                DateTime PantryOpenTime = 
+                DateTime PantryOpenTime =
                     _hub.StateBag.ContainsKey("PantryOpened") ? (DateTime)_hub.StateBag["PantryOpened"] : DateTime.Now;
-                if(DateTime.Now - PantryOpenTime > TimeSpan.FromMinutes(5))
+                if (DateTime.Now - PantryOpenTime > _interval)
                 {
                     // It's been open five minutes, so we've nagged by now.
                     // It's only polite to thank them for doing what we've asked!
                     _kitchenSpeaker.Speak("Thank you for closing the pantry door");
                 }
                 _pantryLight.Off();
+            }
+            else if (_evt.value == "on" && 
+                _evt.deviceId == _hub.LookupDeviceId("Switch.PantryAck"))
+            {
+                // If you're in the pantry and you don't want it to nag, turn on Switch.PantryAck via Alexa
+                // which will cancel any running occurances of this automation. We'll say something to acknowledge.
+                SwitchRelay pantryAck = _hub.GetDeviceById<SwitchRelay>(_evt.deviceId) as SwitchRelay;
+                pantryAck.Off();  // Set the Ack switch back to "off"
+                _kitchenSpeaker.Speak("I'm sorry, I didn't know you were busy in there. I'll leave you alone.");
             }
         }
     }

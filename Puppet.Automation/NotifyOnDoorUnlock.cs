@@ -3,6 +3,7 @@ using Puppet.Common.Events;
 using Puppet.Common.Automation;
 using Puppet.Common.Services;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Puppet.Automation
 {
@@ -13,7 +14,7 @@ namespace Puppet.Automation
         {
         }
         
-        public override void Handle(CancellationToken token)
+        public override Task Handle(CancellationToken token)
         {
             if(_evt.value == "unlocked")
             {
@@ -23,6 +24,8 @@ namespace Puppet.Automation
                     speaker.Speak($"{_evt.descriptionText}.");
                 }
             }
+
+            return Task.CompletedTask;
         }
     }
 }

@@ -23,16 +23,11 @@ namespace Puppet.Common.Automation
 
         }
 
-        public override async void Handle(CancellationToken token)
+        public override async Task Handle(CancellationToken token)
         {
             if (_evt.value == "on")
             {
-                await Task.Delay(TimeSpan.FromMinutes(this.Minutes));
-                if (token.IsCancellationRequested)
-                {
-                    Console.Write($"{DateTime.Now} Instance of {this.GetType()} resumed after {this.Minutes} minutes, but task was cancelled.");
-                    return;
-                }
+                if (await WaitForCancellation(TimeSpan.FromMinutes(Minutes), token)) return;    
                 SwitchRelay relay = _hub.GetDeviceById<SwitchRelay>(_evt.deviceId) as SwitchRelay;
                 relay.Off();
             }

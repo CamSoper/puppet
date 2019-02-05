@@ -38,7 +38,9 @@ namespace Puppet.Executive
                     .Count() > 0);
             foreach (Type automation in typeCollection)
             {
-                yield return (IAutomation)Activator.CreateInstance(automation, new Object[] { hub, evt });
+                var thing = Activator.CreateInstance(automation, new Object[] { hub, evt });
+                if (thing is IAutomation automationSource)
+                    yield return automationSource;
             }
         }
     }

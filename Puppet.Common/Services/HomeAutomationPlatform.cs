@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using Puppet.Common.Devices;
@@ -17,7 +18,7 @@ namespace Puppet.Common.Services
 
         public ConcurrentDictionary<string, object> StateBag { get; set; }
         public abstract void DoAction(IDevice device, string action, string[] args = null);
-        
+        public abstract Task StartAutomationEventWatcher();
 
         public event EventHandler<AutomationEventEventArgs> AutomationEvent;
 
