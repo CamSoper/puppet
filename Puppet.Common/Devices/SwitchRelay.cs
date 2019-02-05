@@ -1,10 +1,5 @@
 ﻿
 using Puppet.Common.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace Puppet.Common.Devices
 {
@@ -37,7 +32,7 @@ namespace Puppet.Common.Devices
         }
         public void Off()
         {
-             _hub.DoAction(this, "off");
+            _hub.DoAction(this, "off");
         }
     }
 }

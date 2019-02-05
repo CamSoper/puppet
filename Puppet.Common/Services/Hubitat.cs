@@ -1,20 +1,15 @@
-﻿using Puppet.Common.Exceptions;
-using Puppet.Common.Devices;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
-using System.IO;
-using Puppet.Common.Configuration;
 using System.Net.WebSockets;
 using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Puppet.Common.Configuration;
+using Puppet.Common.Devices;
 using Puppet.Common.Events;
-using Newtonsoft.Json.Linq;
 
 namespace Puppet.Common.Services
 {
@@ -23,12 +18,12 @@ namespace Puppet.Common.Services
     /// </summary>
     public class Hubitat : HomeAutomationPlatform
     {
-        string _baseAddress;
-        string _accessToken;
-        string _websocketUrl;
+        readonly string _baseAddress;
+        readonly string _accessToken;
+        readonly string _websocketUrl;
         HttpClient _client;
-        
-        public Hubitat(IConfiguration configuration) : base (configuration)
+
+        public Hubitat(IConfiguration configuration) : base(configuration)
         {
             HubitatOptions hubitatOptions = configuration.GetSection("Hubitat").Get<HubitatOptions>();
 
@@ -41,7 +36,7 @@ namespace Puppet.Common.Services
             StateBag = new ConcurrentDictionary<string, object>();
         }
 
-        public override Task StartAutomationEventWatcher() =>  HubitatEventWatcherThread();
+        public override Task StartAutomationEventWatcher() => HubitatEventWatcherThread();
 
         public override void DoAction(IDevice device, string action, string[] args = null)
         {
@@ -75,23 +70,6 @@ namespace Puppet.Common.Services
                         HubEvent evt = JsonConvert.DeserializeObject<HubEvent>(json);
                         OnAutomationEvent(new AutomationEventEventArgs() { HubEvent = evt });
                     }
-                }
-                catch (AggregateException ae)
-                {
-                    ae.Handle((x) =>
-                    {
-                        if (x is WebSocketException)
-                        {
-                            // We shouldn't ever see this, but just in case...
-                            Console.WriteLine($"{DateTime.Now} Aggregate Exception Hubitat websocket error! {x.Message} -- Retrying in 5 seconds...");
-                            Thread.Sleep(TimeSpan.FromSeconds(5));
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    });
                 }
                 catch (System.Net.WebSockets.WebSocketException wse)
                 {

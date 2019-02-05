@@ -1,12 +1,10 @@
-﻿using Puppet.Common.Devices;
-using Puppet.Common.Events;
-using Puppet.Common.Services;
-using Puppet.Common.Automation;
-using System;
-using System.Linq;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
+using Puppet.Common.Automation;
+using Puppet.Common.Devices;
+using Puppet.Common.Events;
+using Puppet.Common.Services;
 
 namespace Puppet.Automation
 {
@@ -14,15 +12,15 @@ namespace Puppet.Automation
     [TriggerDevice("Switch.PantryAck", Capability.Switch)]
     public class PantryLightAutomation : AutomationBase
     {
-        TimeSpan _interval = TimeSpan.FromMinutes(5);
+        readonly TimeSpan _interval = TimeSpan.FromMinutes(5);
         SwitchRelay _pantryLight;
         Speaker _kitchenSpeaker;
 
         public PantryLightAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            _pantryLight = 
+            _pantryLight =
                 _hub.GetDeviceByName<SwitchRelay>("Switch.PantryLight") as SwitchRelay;
-            _kitchenSpeaker = 
+            _kitchenSpeaker =
                 _hub.GetDeviceByName<Speaker>("Speaker.KitchenSpeaker") as Speaker;
         }
 
@@ -67,7 +65,7 @@ namespace Puppet.Automation
                 }
                 _pantryLight.Off();
             }
-            else if (_evt.value == "on" && 
+            else if (_evt.value == "on" &&
                 _evt.deviceId == _hub.LookupDeviceId("Switch.PantryAck"))
             {
                 // If you're in the pantry and you don't want it to nag, turn on Switch.PantryAck via Alexa

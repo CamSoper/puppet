@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
@@ -40,7 +38,7 @@ namespace Puppet.Common.Services
         {
             string[] tokens = mappedDeviceName.Split('.');
             if (tokens.Length > 1)
-                return ParseAndLookupMappedDeviceName(obj[tokens[0]], 
+                return ParseAndLookupMappedDeviceName(obj[tokens[0]],
                     mappedDeviceName.Substring(mappedDeviceName.IndexOf(tokens[1])));
             else
                 return obj[mappedDeviceName];

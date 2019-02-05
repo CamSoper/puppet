@@ -1,10 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Puppet.Common.Services;
-using Puppet.Common.Automation;
 using Microsoft.Extensions.Configuration;
-using System.IO;
+using Puppet.Common.Automation;
+using Puppet.Common.Services;
 
 namespace Puppet.Executive
 {
@@ -25,7 +25,7 @@ namespace Puppet.Executive
 
             // Abstraction representing the home automation system
             _hub = new Hubitat(configuration);
-            
+
             // Class to manage long-running tasks
             _taskManager = new AutomationTaskManager();
 
@@ -62,18 +62,18 @@ namespace Puppet.Executive
                     // Start a task to handle the automation and a CancellationToken Source
                     // so we can cancel it later.
                     var cts = new CancellationTokenSource();
-                    Func<Task> handleTask = async() =>
+                    async Task handleTask()
                     {
-                       // This runs the Handle method on the automation class
+                        // This runs the Handle method on the automation class
                         Console.WriteLine($"{DateTime.Now} {automation} event: {evt.descriptionText}");
                         await automation.Handle(cts.Token);
-                    };
+                    }
 
                     var task = new AutomationTask(handleTask, automation.GetType());
 
                     // Ready... go handle it!
                     Task work = task.Start();
-                    
+
                     // Hold on to the task and its cancellation token source for later.
                     _taskManager.Track(work, cts, automation.GetType());
                 }
