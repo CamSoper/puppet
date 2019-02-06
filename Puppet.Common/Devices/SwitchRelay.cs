@@ -20,8 +20,19 @@ namespace Puppet.Common.Devices
         {
             get
             {
-                // TODO: Go back to the hub to get the current status
-                return SwitchStatus.Unknown;
+                switch(GetState()["switch"])
+                {
+                    case "on":
+                        return SwitchStatus.On;
+
+                    case "off":
+                        return SwitchStatus.Off;
+
+                    default:
+                        return SwitchStatus.Unknown;                  
+
+                }
+
             }
         }
 

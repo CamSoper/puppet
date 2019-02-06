@@ -6,24 +6,15 @@ using System.Threading.Tasks;
 
 namespace Puppet.Common.Devices
 {
-    public class Speaker : IDevice
+    public class Speaker : DeviceBase   
     {
-        HomeAutomationPlatform _hub;
-        public string Id { get; }
-
-        public string Name => throw new NotImplementedException();
-
-        public string Label => throw new NotImplementedException();
-
-        public Speaker(HomeAutomationPlatform hub, string id)
+        public Speaker(HomeAutomationPlatform hub, string id) : base(hub, id)
         {
-            _hub = hub;
-            this.Id = id; 
         }
 
         public void Speak(string message)
         {
-            Console.WriteLine($"Speaker ID {Id} speaking: {message}");
+            Console.WriteLine($"{DateTime.Now} Speaker {this.Id} speaking: {message}");
             _hub.DoAction(this, "speak", new string[] { message });
         }
     }

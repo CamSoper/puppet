@@ -49,7 +49,7 @@ namespace Puppet.Automation
 
                 // Wait a bit longer and then give up...
                 if (await WaitForCancellation(_interval, token)) return;
-                _kitchenSpeaker.Speak("Fine, I'll do it myself.");
+                _kitchenSpeaker.Speak("Fine, I'll turn off the light myself.");
                 _pantryLight.Off();
             }
             else if (_evt.value == "closed")

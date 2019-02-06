@@ -1,24 +1,53 @@
-﻿using Puppet.Common.Services;
+﻿using Newtonsoft.Json.Linq;
+using Puppet.Common.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Puppet.Common.Devices
 {
     public abstract class DeviceBase : IDevice
     {
         internal HomeAutomationPlatform _hub;
+        internal Dictionary<string, string> _state;
 
         public string Id { get; }
         
-        // TODO: Go get these from the hub
-        public string Name => throw new NotImplementedException();
-        public string Label => throw new NotImplementedException();
+        public string Name
+        {
+            get
+            {
+                return GetState()["name"]; 
+            }
+        }
+
+        public string Label
+        {
+            get
+            {
+                return GetState()["label"];
+            }
+        }
 
         public DeviceBase(HomeAutomationPlatform hub, string id)
         {
             _hub = hub;
             this.Id = id;
+        }
+        
+        public void RefreshState()
+        {
+            _state = _hub.GetDeviceProperties(this);
+        }
+
+        internal Dictionary<string, string> GetState()
+        {
+            if(_state == null)
+            {
+                _state = _hub.GetDeviceProperties(this);
+            }
+            return _state;
         }
     }
 }

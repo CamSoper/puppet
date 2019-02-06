@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.WebSockets;
@@ -7,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Puppet.Common.Configuration;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
@@ -21,35 +23,21 @@ namespace Puppet.Common.Services
         readonly string _baseAddress;
         readonly string _accessToken;
         readonly string _websocketUrl;
-        HttpClient _client;
+        readonly HttpClient _client;
 
-        public Hubitat(IConfiguration configuration) : base(configuration)
+        public Hubitat(IConfiguration configuration, HttpClient httpClient) : base(configuration)
         {
             HubitatOptions hubitatOptions = configuration.GetSection("Hubitat").Get<HubitatOptions>();
 
             _baseAddress = hubitatOptions.BaseUrl;
             _accessToken = hubitatOptions.AccessToken;
             _websocketUrl = hubitatOptions.EventWebsocketUrl;
-
-            _client = new HttpClient();
+            _client = httpClient;
 
             StateBag = new ConcurrentDictionary<string, object>();
         }
 
         public override Task StartAutomationEventWatcher() => HubitatEventWatcherThread();
-
-        public override void DoAction(IDevice device, string action, string[] args = null)
-        {
-            // http://[IP Address]/apps/api/143/devices/[Device ID]/[Command]/[Secondary value]?access_token=
-
-            string secondary = (args != null) ? $"/{args[0]}" : "";
-            secondary = secondary.Replace(' ', '-').Replace('?', '.');
-
-            Uri requestUri = new Uri($"{_baseAddress}/{device.Id}/{action.Trim()}{secondary.Trim()}?access_token={_accessToken}");
-            Console.WriteLine($"{DateTime.Now} Sending request to Hubitat: {requestUri.ToString().Split('?')[0]}");
-            var result = _client.GetAsync(requestUri).Result;
-            result.EnsureSuccessStatusCode();
-        }
 
         async Task HubitatEventWatcherThread()
         {
@@ -76,6 +64,11 @@ namespace Puppet.Common.Services
                     Console.WriteLine($"{DateTime.Now} Hubitat websocket error! {wse.Message} -- Retrying in 5 seconds...");
                     await Task.Delay(TimeSpan.FromSeconds(5));
                 }
+                catch (System.UriFormatException ufe)
+                {
+                    Console.WriteLine($"{DateTime.Now} URI Format Exception! Fix your config! {ufe.Message}");
+                    await Task.Delay(Timeout.InfiniteTimeSpan);
+                }
                 catch (Exception ex)
                 {
                     // Something unknown went wrong. I don't care what 
@@ -83,6 +76,37 @@ namespace Puppet.Common.Services
                     Console.WriteLine($"{DateTime.Now} {ex} {ex.Message}");
                 }
             }
+        }
+
+        public override Dictionary<string, string> GetDeviceProperties(IDevice device)
+        {
+            Uri requestUri = new Uri($"{_baseAddress}/{device.Id}?access_token={_accessToken}");
+            Console.WriteLine($"{DateTime.Now} Hubitat Device Information Request: {requestUri.ToString().Split('?')[0]}");
+            var result = _client.GetAsync(requestUri).Result;
+            result.EnsureSuccessStatusCode();
+
+            Dictionary<string, string> properties = new Dictionary<string, string>();
+            dynamic rawProperties = JObject.Parse(result.Content.ReadAsStringAsync().Result);
+
+            properties.Add("name", rawProperties.name.ToString());
+            properties.Add("label", rawProperties.label.ToString());
+            foreach (dynamic attribute in rawProperties.attributes)
+            {
+                properties.Add(attribute.name.ToString(), attribute.currentValue.ToString());
+            }
+
+            return properties;
+        }
+
+        public override void DoAction(IDevice device, string action, string[] args = null)
+        {
+            string secondary = (args != null) ? $"/{args[0]}" : "";
+            secondary = secondary.Replace(' ', '-').Replace('?', '.');
+
+            Uri requestUri = new Uri($"{_baseAddress}/{device.Id}/{action.Trim()}{secondary.Trim()}?access_token={_accessToken}");
+            Console.WriteLine($"{DateTime.Now} Hubitat Device Command: {requestUri.ToString().Split('?')[0]}");
+            var result = _client.GetAsync(requestUri).Result;
+            result.EnsureSuccessStatusCode();
         }
     }
 }

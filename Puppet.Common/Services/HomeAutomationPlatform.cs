@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -53,5 +54,7 @@ namespace Puppet.Common.Services
         {
             return Activator.CreateInstance(typeof(T), new Object[] { this, deviceId }) as IDevice;
         }
+
+        public abstract Dictionary<string, string> GetDeviceProperties(IDevice device);
     }
 }

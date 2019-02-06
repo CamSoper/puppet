@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -24,7 +25,7 @@ namespace Puppet.Executive
                 .Build();
 
             // Abstraction representing the home automation system
-            _hub = new Hubitat(configuration);
+            _hub = new Hubitat(configuration, HttpClientFactory.Create());
 
             // Class to manage long-running tasks
             _taskManager = new AutomationTaskManager();
