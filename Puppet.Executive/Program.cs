@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Puppet.Common.Automation;
+using Puppet.Common.Events;
 using Puppet.Common.Services;
 
 namespace Puppet.Executive
@@ -50,6 +51,23 @@ namespace Puppet.Executive
         {
             var evt = e.HubEvent;
 
+            Task.Run(() => StartRelevantAutomationHandlers(evt));
+            //Task.Run(() => SendEventToMqtt(evt));
+            //Task.Run(() => SendEventToAlexa(evt));
+        }
+
+        private static void SendEventToAlexa(HubEvent evt)
+        {
+            // TODO: Forward events to Alexa
+        }
+
+        private static void SendEventToMqtt(HubEvent evt)
+        {
+            // TODO: Forward events to MQTT
+        }
+
+        private static void StartRelevantAutomationHandlers(HubEvent evt)
+        {
             // Get a reference to the automation
             var automations = AutomationFactory.GetAutomations(evt, _hub);
 
