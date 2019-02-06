@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Puppet.Common.Events
 {
-    public class AutomationEventEventArgs : EventArgs
+    public class AutomationEventEventArgs
     {
         public HubEvent HubEvent { get; set; }
     }

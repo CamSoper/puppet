@@ -10,23 +10,9 @@
             "request": "launch",
             "preLaunchTask": "buildExecutive",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/Puppet.Executive/bin/Debug/netcoreapp2.1/Puppet.Executive.dll",
+            "program": "${workspaceFolder}/Puppet.Executive/bin/Debug/netcoreapp2.2/Puppet.Executive.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/Puppet.Executive",
-            // For more information about the 'console' field, see https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md#console-terminal-window
-            "console": "internalConsole",
-            "stopAtEntry": false,
-            "internalConsoleOptions": "openOnSessionStart"
-        },
-        {
-            "name": "Puppet Web Launch",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "buildWeb",
-            // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/Puppet.Web/bin/Debug/netcoreapp2.1/Puppet.Web.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/Puppet.Web",
+            "cwd": "${workspaceFolder}/Puppet.Executive/bin/Debug/netcoreapp2.2/",
             // For more information about the 'console' field, see https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md#console-terminal-window
             "console": "internalConsole",
             "stopAtEntry": false,

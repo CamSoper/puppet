@@ -19,7 +19,7 @@ namespace Puppet.Executive
         /// </summary>
         /// <param name="evt"></param>
         /// <param name="hub"></param>
-        /// <returns>An IEnumberable<IAutomation> containing the automations to be run for this event.</returns>
+        /// <returns>An IEnumerable&lt;IAutomation&gt; containing the automations to be run for this event.</returns>
         public static IEnumerable<IAutomation> GetAutomations(HubEvent evt, HomeAutomationPlatform hub)
         {
             /*

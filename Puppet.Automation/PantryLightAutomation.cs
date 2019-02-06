@@ -69,7 +69,7 @@ namespace Puppet.Automation
                 _evt.deviceId == _hub.LookupDeviceId("Switch.PantryAck"))
             {
                 // If you're in the pantry and you don't want it to nag, turn on Switch.PantryAck via Alexa
-                // which will cancel any running occurances of this automation. We'll say something to acknowledge.
+                // which will cancel any running occurrences of this automation. We'll say something to acknowledge.
                 SwitchRelay pantryAck = _hub.GetDeviceById<SwitchRelay>(_evt.deviceId) as SwitchRelay;
                 pantryAck.Off();  // Set the Ack switch back to "off"
                 _kitchenSpeaker.Speak("I'm sorry, I didn't know you were busy in there. I'll leave you alone.");

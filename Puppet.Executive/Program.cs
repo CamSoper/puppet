@@ -12,17 +12,17 @@ namespace Puppet.Executive
 {
     class Program
     {
-        const string _appSettingsFileName = "appsettings.json";
+        const string APPSETTINGS_FILENAME = "appsettings.json";
 
         static AutomationTaskManager _taskManager;
         static HomeAutomationPlatform _hub;
 
         public static async Task Main(string[] args)
         {
-            // Read in the configuration file
+            // Read the configuration file
             IConfiguration configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory()) // Directory where the json files are located
-                .AddJsonFile(_appSettingsFileName, optional: false, reloadOnChange: true)
+                .AddJsonFile(APPSETTINGS_FILENAME, optional: false, reloadOnChange: true)
                 .Build();
 
             // Abstraction representing the home automation system
@@ -73,7 +73,6 @@ namespace Puppet.Executive
 
             foreach (IAutomation automation in automations)
             {
-
                 // If this automation is already running, cancel all running instances
                 _taskManager.CancelExistingTasks(automation.GetType());
 
@@ -94,7 +93,6 @@ namespace Puppet.Executive
 
                 // Hold on to the task and its cancellation token source for later.
                 _taskManager.Track(work, cts, automation.GetType());
-
             }
 
             // Let's take this opportunity to get rid of any completed tasks.

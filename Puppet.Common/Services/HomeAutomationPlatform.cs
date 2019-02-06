@@ -15,7 +15,7 @@ namespace Puppet.Common.Services
     /// </summary>
     public abstract class HomeAutomationPlatform
     {
-        const string _deviceMapFileName = "devicemap.json";
+        const string DEVICE_FILENAME = "devicemap.json";
         dynamic _deviceMap { get; }
 
         public ConcurrentDictionary<string, object> StateBag { get; set; }
@@ -27,7 +27,7 @@ namespace Puppet.Common.Services
         public HomeAutomationPlatform(IConfiguration configuration)
         {
             this._deviceMap = JObject.Parse(
-                File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), _deviceMapFileName)));
+                File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), DEVICE_FILENAME)));
         }
         protected virtual void OnAutomationEvent(AutomationEventEventArgs e)
         {
