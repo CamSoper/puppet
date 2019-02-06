@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,6 +32,7 @@ namespace Puppet.Executive
             lock (_taskList)
             {
                 _taskList.Add(new AutomationTaskTokenType(work, cts, automationType));
+                Console.WriteLine($"{DateTime.Now} Tracking {_taskList.Count} tasks.");
             }
         }
 
@@ -66,7 +66,7 @@ namespace Puppet.Executive
         {
             lock (_taskList)
             {
-                foreach (var i in _taskList.Where(t => t.AutomationType == automationType && 
+                foreach (var i in _taskList.Where(t => t.AutomationType == automationType &&
                     !t.Task.IsCompleted && !t.CTS.IsCancellationRequested))
                 {
                     i.CTS.Cancel();

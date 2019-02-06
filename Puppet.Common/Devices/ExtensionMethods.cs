@@ -17,7 +17,7 @@ namespace Puppet.Common.Devices
                 }
                 catch(Exception ex)
                 {
-                    Console.WriteLine($"Speak operation was unsuccessful for speaker with ID {s.Id} -- {ex}");
+                    Console.WriteLine($"Speak operation was unsuccessful for speaker {s.Id} -- {ex}");
                 }
             }
         }

@@ -26,7 +26,7 @@ namespace Puppet.Executive
                 .Build();
 
             // Abstraction representing the home automation system
-            _hub = new Hubitat(configuration, HttpClientFactory.Create());
+            _hub = new Hubitat(configuration, new HttpClient());
 
             // Class to manage long-running tasks
             _taskManager = new AutomationTaskManager();
@@ -35,7 +35,7 @@ namespace Puppet.Executive
             // by the Hubitat device
             _hub.AutomationEvent += Hub_AutomationEvent;
             var hubTask = _hub.StartAutomationEventWatcher();
-
+            
             // Wait forever, this is a daemon process
             await hubTask;
         }
@@ -73,29 +73,28 @@ namespace Puppet.Executive
 
             foreach (IAutomation automation in automations)
             {
-                if (automation != null)
+
+                // If this automation is already running, cancel all running instances
+                _taskManager.CancelExistingTasks(automation.GetType());
+
+                // Start a task to handle the automation and a CancellationToken Source
+                // so we can cancel it later.
+                var cts = new CancellationTokenSource();
+                Func<Task> handleTask = async () =>
                 {
-                    // If this automation is already running, cancel all running instances
-                    _taskManager.CancelExistingTasks(automation.GetType());
+                    // This runs the Handle method on the automation class
+                    Console.WriteLine($"{DateTime.Now} {automation} event: {evt.descriptionText}");
+                    await automation.Handle(cts.Token);
+                };
 
-                    // Start a task to handle the automation and a CancellationToken Source
-                    // so we can cancel it later.
-                    var cts = new CancellationTokenSource();
-                    async Task handleTask()
-                    {
-                        // This runs the Handle method on the automation class
-                        Console.WriteLine($"{DateTime.Now} {automation} event: {evt.descriptionText}");
-                        await automation.Handle(cts.Token);
-                    }
+                var task = new AutomationTask(handleTask, automation.GetType());
 
-                    var task = new AutomationTask(handleTask, automation.GetType());
+                // Ready... go handle it!
+                Task work = task.Start();
 
-                    // Ready... go handle it!
-                    Task work = task.Start();
+                // Hold on to the task and its cancellation token source for later.
+                _taskManager.Track(work, cts, automation.GetType());
 
-                    // Hold on to the task and its cancellation token source for later.
-                    _taskManager.Track(work, cts, automation.GetType());
-                }
             }
 
             // Let's take this opportunity to get rid of any completed tasks.

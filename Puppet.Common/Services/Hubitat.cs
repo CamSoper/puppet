@@ -59,12 +59,12 @@ namespace Puppet.Common.Services
                         OnAutomationEvent(new AutomationEventEventArgs() { HubEvent = evt });
                     }
                 }
-                catch (System.Net.WebSockets.WebSocketException wse)
+                catch (WebSocketException wse)
                 {
                     Console.WriteLine($"{DateTime.Now} Hubitat websocket error! {wse.Message} -- Retrying in 5 seconds...");
                     await Task.Delay(TimeSpan.FromSeconds(5));
                 }
-                catch (System.UriFormatException ufe)
+                catch (UriFormatException ufe)
                 {
                     Console.WriteLine($"{DateTime.Now} URI Format Exception! Fix your config! {ufe.Message}");
                     await Task.Delay(Timeout.InfiniteTimeSpan);
@@ -78,24 +78,28 @@ namespace Puppet.Common.Services
             }
         }
 
-        public override Dictionary<string, string> GetDeviceProperties(IDevice device)
+        public override Dictionary<string, string> GetDeviceState(IDevice device)
         {
             Uri requestUri = new Uri($"{_baseAddress}/{device.Id}?access_token={_accessToken}");
-            Console.WriteLine($"{DateTime.Now} Hubitat Device Information Request: {requestUri.ToString().Split('?')[0]}");
+            Console.WriteLine($"{DateTime.Now} Hubitat Device State Request: {requestUri.ToString().Split('?')[0]}");
             var result = _client.GetAsync(requestUri).Result;
             result.EnsureSuccessStatusCode();
 
-            Dictionary<string, string> properties = new Dictionary<string, string>();
-            dynamic rawProperties = JObject.Parse(result.Content.ReadAsStringAsync().Result);
+            Dictionary<string, string> state = new Dictionary<string, string>();
+            dynamic rawJson = JObject.Parse(result.Content.ReadAsStringAsync().Result);
 
-            properties.Add("name", rawProperties.name.ToString());
-            properties.Add("label", rawProperties.label.ToString());
-            foreach (dynamic attribute in rawProperties.attributes)
+            state.Add("name", rawJson.name.ToString());
+            state.Add("label", rawJson.label.ToString());
+            foreach (dynamic attribute in rawJson.attributes)
             {
-                properties.Add(attribute.name.ToString(), attribute.currentValue.ToString());
+                string key = attribute.name.ToString();
+                if (!state.ContainsKey(key))
+                {
+                    state.Add(key, attribute.currentValue.ToString());
+                }
             }
 
-            return properties;
+            return state;
         }
 
         public override void DoAction(IDevice device, string action, string[] args = null)

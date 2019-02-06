@@ -10,6 +10,9 @@ using Puppet.Common.Events;
 
 namespace Puppet.Common.Services
 {
+    /// <summary>
+    /// Base class for Home Automation Platforms.
+    /// </summary>
     public abstract class HomeAutomationPlatform
     {
         const string _deviceMapFileName = "devicemap.json";
@@ -47,7 +50,7 @@ namespace Puppet.Common.Services
 
         public IDevice GetDeviceByName<T>(string mappedDeviceName)
         {
-            return this.GetDeviceById<T>(LookupDeviceId(mappedDeviceName)) as IDevice;
+            return GetDeviceById<T>(LookupDeviceId(mappedDeviceName)) as IDevice;
         }
 
         public IDevice GetDeviceById<T>(string deviceId)
@@ -55,6 +58,6 @@ namespace Puppet.Common.Services
             return Activator.CreateInstance(typeof(T), new Object[] { this, deviceId }) as IDevice;
         }
 
-        public abstract Dictionary<string, string> GetDeviceProperties(IDevice device);
+        public abstract Dictionary<string, string> GetDeviceState(IDevice device);
     }
 }

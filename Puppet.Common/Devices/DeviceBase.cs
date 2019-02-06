@@ -38,14 +38,14 @@ namespace Puppet.Common.Devices
         
         public void RefreshState()
         {
-            _state = _hub.GetDeviceProperties(this);
+            _state = _hub.GetDeviceState(this);
         }
 
         internal Dictionary<string, string> GetState()
         {
             if(_state == null)
             {
-                _state = _hub.GetDeviceProperties(this);
+                RefreshState();
             }
             return _state;
         }
