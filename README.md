@@ -1,73 +1,56 @@
 # Welcome to Puppet
 
-A .NET Core framework for automating Hubitat Elevate and SmartThings.
+A .NET Core framework for automating Hubitat Elevate.
 
 ## How it works
 
 1. An event on one of your devices is triggered. 
     Example: Your pantry door opens, triggering a contact sensor to send **open**.
 
-2. An instance of [this app](https://github.com/CamSoper/Hubitat-CamSoper/tree/master/hubitat-webhooks) is configured to send a webhook to the Puppet Web app.
-    Example: The webhook app posts the event containing the **open** status to `http://some.address.on.my.network:5000/api/automation/?automationName=pantry_door`
+2. The Puppet Executive process captures that event from Hubitat's websocket interface and raises it as a `System.Event` that can be handled in .NET Core code. 
 
-3. The web app handles the request by passing the event information to the Puppet Executive app, which runs in a separate process that manages task state.
+3. The Puppet Executive passes the name of the automation to the `AutomationFactory`. The `AutomationFactory` class instantiates the correct implementation of `IAutomation` and returns it to the Executive.
+    Example: The Executive asks `AutomationFactory` for IAutomation objects that are interested in this event (based on code attributes, like `TriggerDeviceAttribute`).
 
-4. The Puppet Executive passes the name of the automation to the `AutomationFactory`. The `AutomationFactory` class instantiates the correct implementation of `IAutomation` and returns it to the Executive.
-    Example: The Executive asks `AutomationFactory` for an object to handle the automation named `pantry_door`. It returns an instance of `Puppet.Automation.PantryLightAutomation`.
-
-5. The Executive executes the `Handle()` method on the IAutomation object. The object can manipulate other devices via the `HomeAutomationPlatform` class, of which an instance can be passed in by the Executive.
-    Example: The logic in `Puppet.Automation.PantryLightAutomation` should be pretty self-explanatory. :)
+4. The Executive executes the `Handle()` method on each IAutomation object. The object can manipulate other devices via the `HomeAutomationPlatform` class, of which an instance can be passed in by the Executive.
+    Example: See the logic in `Puppet.Automation.PantryLightAutomation`. :)
 
 ## Building
 
-Either build the entire solution with Visual Studio or build the Puppet.Web and Puppet.Executive projects at the command line by going to each of those project directories and running `dotnet build`.
-
-## Setup the Webhooks
-
-Create a new instance of the Webhooks app in your Hubitat for each automation, and assign only the devices that trigger *that specific automation*.
-
-The reason for this is because each time an automation is executed, a cancellation token is sent to all the currently running instances.  So if you have 5 automations in your Puppet system, you will likewise want to have 5 installed instances of the Webhooks Hubitat app.
-
-Plus, it's an efficient way of ensuring that the Hubitat only sends events for devices you want to hear from.
+Either build the entire solution with Visual Studio or build the Puppet.Executive project at the command line by going to the project directory and running `dotnet build`.
 
 ## Setup the Maker API app
 
-It's built-in to the Hubitat. Make sure you've turned it on.
+It's built-in to the Hubitat. Make sure you've turned it on and opted-in all your devices you want to access from Puppet.
 
 ## Running
 
-I've not tried to run the web app in IIS. I just run it with the self-contained web server, Kestrel.
-
-1. Run the web app by switching to the Puppet.Web folder and running `dotnet run --urls=http://*:5000`
-    *Note the URLs flag - It's important!*
-2. In another command prompt window, switch to the Puppet.Executive folder and run `dotnet run`. It will connect to the web app at localhost:5000.
+Configure *appsettings.json*. At a shell prompt, switch to the Puppet.Executive folder and run `dotnet run`.
 
 ## Deployment to a Raspberry Pi
 
-It'll run fine on Windows, but I've not done it. I use a Raspberry Pi running Raspbian for my instance.
+It'll run fine on Windows, which is where I test it. For production I use a Raspberry Pi running Raspbian for my instance.
 
-1. Publish Puppet.Web and Puppet.Executive with the following:
+1. Publish Puppet.Executive with the following:
     `dotnet publish -r linux-arm`
     
     This will build a self-contained deployment, including the SDK, so you won't need to install the SDK on the RPi.
 
-2. Using your file copy tool of choice, copy the contents, which you'll find several levels deep in the *bin* directory, to a location on your RPi. I chose `/home/pi/web` and `/home/pi/executive`.
+2. Using your file copy tool of choice, copy the contents, which you'll find several levels deep in the *bin* directory, to a location on your RPi. I chose `/home/pi/executive`.
 
-3. SSH to your Raspberry Pi. For each of those applications, give the executables permission to run. For example:
+3. SSH to your Raspberry Pi. Give the executables permission to run. For example:
     ```
-    chmod 755 /home/pi/web/Puppet.Web
     chmod 755 /home/pi/executive/Puppet.Executive
     ```
 
-4. Test the applications by running them manually. In one SSH session, run the web app by name, like this: `./Puppet.Web --urls=http://*:5000`. In another, run the Executive with `./Puppet.Executive`. **CTRL-C** to end them both.
+4. Test the application by running it manually. Run the Executive with `./Puppet.Executive`. Press **Ctrl+C** to end it after you're satisfied it works.
 
-5. Setup crontab on your Raspberry Pi to run the two apps in the background on startup. Run `crontab -e` and add the following two lines:
+5. Setup crontab on your Raspberry Pi to run the two apps in the background on startup. Run `crontab -e` and add the following line:
     ```
-    @reboot /home/pi/web/Puppet.Web --urls=http://*:5000 > /home/pi/web.log
     @reboot cd /home/pi/executive && ./Puppet.Executive > /home/pi/executive.log
     ```
 
-    This will run both of the apps at startup and pipe their output to log files in the home directory.
+    This will run the app at startup and pipe its output to a log file in the home directory.
 
 6. Reboot. `sudo reboot`
 
@@ -77,8 +60,40 @@ It'll run fine on Windows, but I've not done it. I use a Raspberry Pi running Ra
 2. Add a class to `Puppet.Automation`. Name it whatever you want. I like ending with `Automation` as a convention, but do whatever you like.
     * Make it implement `Puppet.Common.Automation.IAutomation`.
     * Give it a constructor that takes a single `Puppet.Common.Services.HomeAutomationPlatform` if you want it to be able to do stuff to other devices on your Hubitat.
-3. Add a case to `Puppet.Executive.AutomationFactory` to return an instance of the class you created.
-    * **IMPORTANT** - I don't plan for `AutomationFactory` to be hard-coded forever. One of the enhancements I want to make at some future point is I want it to read the automations dynamically at runtime, and I'll probably pass the name of the class in the `automationName` parameter. For that reason I *strongly* recommend you use the same string for both the name of your `IAutomation` class and your `automationName` parameter.
+    * Decorate it with attributes to indicate what events the automation is interested in, like `TriggerDeviceAttribute`.
+3. Run it. If your attributes are correct, that automation should get picked up and executed asynchronously.
+
+## Example Automation
+
+```csharp
+namespace Puppet.Automation
+{
+    [TriggerDevice("Lock.FrontDoorDeadbolt", Capability.Lock)]
+    public class NotifyOnDoorUnlock : AutomationBase
+    {
+        public NotifyOnDoorUnlock(HomeAutomationPlatform hub, HubEvent evt) : base (hub,evt)
+        {
+        }
+        
+        public override Task Handle(CancellationToken token)
+        {
+            if(_evt.value == "unlocked")
+            {
+                if(_evt.descriptionText.Contains("was unlocked by"))
+                {
+                    Speaker[] speakers = new Speaker[]{
+                        _hub.GetDeviceByName<Speaker>("Speaker.KitchenSpeaker") as Speaker,
+                        _hub.GetDeviceByName<Speaker>("Speaker.WebhookNotifier") as Speaker
+                    };
+                    speakers.Speak($"{_evt.descriptionText}.");
+                }
+            }
+
+            return Task.CompletedTask;
+        }
+    }
+}
+```
 
 ## Enjoy!
 
