@@ -12,8 +12,7 @@ A .NET Core framework for automating Hubitat Elevate.
 3. The Puppet Executive passes the name of the automation to the `AutomationFactory`. The `AutomationFactory` class instantiates the correct implementation of `IAutomation` and returns it to the Executive.
     Example: The Executive asks `AutomationFactory` for IAutomation objects that are interested in this event (based on code attributes, like `TriggerDeviceAttribute`).
 
-4. The Executive executes the `Handle()` method on each IAutomation object. The object can manipulate other devices via the `HomeAutomationPlatform` class, of which an instance can be passed in by the Executive.
-    Example: See the logic in `Puppet.Automation.PantryLightAutomation`. :)
+4. The Executive executes the `Handle()` method on each IAutomation object. The object can manipulate other devices via the `HomeAutomationPlatform` class, of which an instance can be passed in by the Executive. See the example later in this doc.
 
 ## Building
 
