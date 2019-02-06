@@ -55,14 +55,13 @@ It'll run fine on Windows, which is where I test it. For production I use a Rasp
 
 ## Developing new automations
 
-1. Add an instance of the Webhooks app to your Hubitat. Be sure to include the `automationName` parameter.
-2. Add a class to `Puppet.Automation`. Name it whatever you want. I like ending with `Automation` as a convention, but do whatever you like.
-    * Make it implement `Puppet.Common.Automation.IAutomation`.
-    * Give it a constructor that takes a single `Puppet.Common.Services.HomeAutomationPlatform` if you want it to be able to do stuff to other devices on your Hubitat.
-    * Decorate it with attributes to indicate what events the automation is interested in, like `TriggerDeviceAttribute`.
-3. Run it. If your attributes are correct, that automation should get picked up and executed asynchronously.
+1. Add a class to `Puppet.Automation`. Name it whatever you want. I like ending with `Automation` as a convention, but do whatever you like.
+2. Make it implement `Puppet.Common.Automation.IAutomation`.
+3. Give it a constructor that takes a single `Puppet.Common.Services.HomeAutomationPlatform` if you want it to be able to do stuff to other devices on your Hubitat.
+4. Decorate it with attributes to indicate what events the automation is interested in, like `TriggerDeviceAttribute`.
+5. Run it. If your attributes are correct, that automation should get picked up and executed asynchronously.
 
-## Example Automation
+### Example Automation
 
 ```csharp
 namespace Puppet.Automation
