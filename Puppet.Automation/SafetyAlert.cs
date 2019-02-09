@@ -25,10 +25,10 @@ namespace Puppet.Automation
             string message = "";
             DateTime when = DateTime.Now;
 
-            switch(_evt.value)
+            switch(_evt.Value)
             {
                 case "wet":  //water sensor positive
-                    message = $"Water has been detected by the {_evt.displayName}.";
+                    message = $"Water has been detected by the {_evt.DisplayName}.";
                     break;
 
                 case "detected":  //smoke alarm positive

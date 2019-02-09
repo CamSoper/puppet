@@ -16,9 +16,9 @@ namespace Puppet.Automation
     [TriggerDevice("Contact.FrontDoor", Capability.Contact)]
     [TriggerDevice("Contact.SlidingDoor", Capability.Contact)]
     [TriggerDevice("Contact.GarageEntry", Capability.Contact)]
-    class ExteriorDoorOpenAutomation : DoorWatcherBase
+    class NotifyOnExteriorDoorOpen : DoorWatcherBase
     {
-        public ExteriorDoorOpenAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public NotifyOnExteriorDoorOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             NotificationDevices = 
                 new List<Speaker>() {

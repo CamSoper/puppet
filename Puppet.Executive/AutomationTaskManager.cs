@@ -65,7 +65,7 @@ namespace Puppet.Executive
         /// Cancels all existing automation tasks with the given type and, if applicable, intiating device.
         /// </summary>
         /// <param name="automationType">The type of the automation to cancel.</param>
-        public void CancelRelatedTasks(Type automationType, string initiatingDeviceId)
+        public void CancelRunningInstances(Type automationType, string initiatingDeviceId)
         {
 
             bool perDevice = (automationType.GetCustomAttributes<RunPerDeviceAttribute>()?.Count() > 0) ? true : false;

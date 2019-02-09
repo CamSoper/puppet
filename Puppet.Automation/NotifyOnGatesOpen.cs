@@ -12,9 +12,9 @@ namespace Puppet.Automation
     [TriggerDevice("Contact.EastGate", Capability.Contact)]
     [TriggerDevice("Contact.SouthGate", Capability.Contact)]
     [TriggerDevice("Contact.WestGate", Capability.Contact)]
-    public class GatesOpenCloseAutomation : DoorWatcherBase
+    public class NotifyOnGatesOpen : DoorWatcherBase
     {
-        public GatesOpenCloseAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public NotifyOnGatesOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             HowLong = TimeSpan.Zero;
             NotifyOnClose = true;

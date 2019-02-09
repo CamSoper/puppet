@@ -30,7 +30,7 @@ namespace Puppet.Automation
         /// <param name="token">A .NET cancellation token received if this handler is to be cancelled.</param>
         public override async Task Handle(CancellationToken token)
         {
-            if (_evt.value == "open")
+            if (_evt.Value == "open")
             {
                 // Turn on the light
                 _pantryLight.On();
@@ -52,7 +52,7 @@ namespace Puppet.Automation
                 _kitchenSpeaker.Speak("Fine, I'll turn off the light myself.");
                 _pantryLight.Off();
             }
-            else if (_evt.value == "closed")
+            else if (_evt.Value == "closed")
             {
                 // Has the door been open five minutes?
                 DateTime PantryOpenTime =
@@ -65,12 +65,12 @@ namespace Puppet.Automation
                 }
                 _pantryLight.Off();
             }
-            else if (_evt.value == "on" &&
-                _evt.deviceId == _hub.LookupDeviceId("Switch.PantryAck"))
+            else if (_evt.Value == "on" &&
+                _evt.DeviceId == _hub.LookupDeviceId("Switch.PantryAck"))
             {
                 // If you're in the pantry and you don't want it to nag, turn on Switch.PantryAck via Alexa
                 // which will cancel any running occurrences of this automation. We'll say something to acknowledge.
-                SwitchRelay pantryAck = _hub.GetDeviceById<SwitchRelay>(_evt.deviceId) as SwitchRelay;
+                SwitchRelay pantryAck = _hub.GetDeviceById<SwitchRelay>(_evt.DeviceId) as SwitchRelay;
                 pantryAck.Off();  // Set the Ack switch back to "off"
                 _kitchenSpeaker.Speak("I'm sorry, I didn't know you were busy in there. I'll leave you alone.");
             }

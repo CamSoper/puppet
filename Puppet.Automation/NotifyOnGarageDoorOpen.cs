@@ -10,9 +10,9 @@ namespace Puppet.Automation
     [RunPerDevice]
     [TriggerDevice("Contact.GarageDoor1", Capability.Contact)]
     [TriggerDevice("Contact.GarageDoor2", Capability.Contact)]
-    public class GarageDoorOpenAutomation : DoorWatcherBase
+    public class NotifyOnGarageDoorOpen : DoorWatcherBase
     {
-        public GarageDoorOpenAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public NotifyOnGarageDoorOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             NotificationDevices =
                 new List<Speaker>() {

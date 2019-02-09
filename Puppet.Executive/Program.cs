@@ -80,7 +80,7 @@ namespace Puppet.Executive
             foreach (IAutomation automation in automations)
             {
                 // If this automation is already running, cancel all running instances
-                _taskManager.CancelRelatedTasks(automation.GetType(), evt.deviceId);
+                _taskManager.CancelRunningInstances(automation.GetType(), evt.DeviceId);
 
                 // Start a task to handle the automation and a CancellationToken Source
                 // so we can cancel it later.
@@ -88,7 +88,7 @@ namespace Puppet.Executive
                 Func<Task> handleTask = async () =>
                 {
                     var startedTime = DateTime.Now;
-                    Console.WriteLine($"{DateTime.Now} {automation} event: {evt.descriptionText}");
+                    Console.WriteLine($"{DateTime.Now} {automation} event: {evt.DescriptionText}");
                     try
                     {
                         // This runs the Handle method on the automation class
@@ -106,10 +106,9 @@ namespace Puppet.Executive
 
                 // Ready... go handle it!
                 Task work = Task.Run(handleTask, cts.Token);
-                //work.Start();
 
                 // Hold on to the task and its cancellation token source for later.
-                _taskManager.Track(work, cts, automation.GetType(), evt.deviceId);
+                _taskManager.Track(work, cts, automation.GetType(), evt.DeviceId);
             }
 
             // Let's take this opportunity to get rid of any completed tasks.

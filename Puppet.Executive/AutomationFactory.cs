@@ -33,8 +33,8 @@ namespace Puppet.Executive
             IEnumerable<Type> typeCollection = Assembly.LoadFrom(_automationAssembly).GetTypes() 
                 .Where(t => typeof(IAutomation).IsAssignableFrom(t) && 
                     (t.GetCustomAttributes<TriggerDeviceAttribute>() 
-                        .Where(a => hub.LookupDeviceId(a.DeviceMappedName) == evt.deviceId &&
-                            a.Capability.ToString().ToLower() == evt.name))
+                        .Where(a => hub.LookupDeviceId(a.DeviceMappedName) == evt.DeviceId &&
+                            a.Capability.ToString().ToLower() == evt.Name))
                     .Count() > 0);
             foreach (Type automation in typeCollection)
             {

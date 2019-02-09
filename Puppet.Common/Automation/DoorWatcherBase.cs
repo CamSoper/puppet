@@ -32,12 +32,12 @@ namespace Puppet.Common.Automation
                 {
                     await Task.Delay(HowLong, token);
                     NotificationDevices.Speak(String.Format(NotificationFormat, 
-                        _evt.displayName, HowLong.TotalMinutes * (i + 1), HowLong.TotalSeconds * (i + 1)));
+                        _evt.DisplayName, HowLong.TotalMinutes * (i + 1), HowLong.TotalSeconds * (i + 1)));
                 }
             }
             else if(_evt.IsClosedEvent() && NotifyOnClose)
             {
-                NotificationDevices.Speak($"{_evt.displayName} is closed.");
+                NotificationDevices.Speak($"{_evt.DisplayName} is closed.");
             }
         }
     }

@@ -16,12 +16,12 @@ namespace Puppet.Automation
 
         public override Task Handle(CancellationToken token)
         {
-            if (_evt.value == "unlocked")
+            if (_evt.Value == "unlocked")
             {
-                if (_evt.descriptionText.Contains("was unlocked by"))
+                if (_evt.DescriptionText.Contains("was unlocked by"))
                 {
                     Speaker notifier = _hub.GetDeviceByName<Speaker>("Speaker.WebhookNotifier") as Speaker;
-                    notifier.Speak($"{_evt.descriptionText}.");
+                    notifier.Speak($"{_evt.DescriptionText}.");
                 }
             }
 
