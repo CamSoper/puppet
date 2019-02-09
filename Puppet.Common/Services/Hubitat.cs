@@ -20,7 +20,7 @@ namespace Puppet.Common.Services
     /// </summary>
     public class Hubitat : HomeAutomationPlatform
     {
-        readonly string _baseAddress;
+        readonly string _baseMakerApiAddress;
         readonly string _accessToken;
         readonly string _websocketUrl;
         readonly HttpClient _client;
@@ -29,9 +29,9 @@ namespace Puppet.Common.Services
         {
             HubitatOptions hubitatOptions = configuration.GetSection("Hubitat").Get<HubitatOptions>();
 
-            _baseAddress = hubitatOptions.BaseUrl;
+            _baseMakerApiAddress = $"https://{hubitatOptions.HubitatHostNameOrIp}/apps/api/{hubitatOptions.MakerApiAppId}/devices";
             _accessToken = hubitatOptions.AccessToken;
-            _websocketUrl = hubitatOptions.EventWebsocketUrl;
+            _websocketUrl = $"wss://{hubitatOptions.HubitatHostNameOrIp}/eventsocket";
             _client = httpClient;
 
             StateBag = new ConcurrentDictionary<string, object>();
@@ -41,14 +41,19 @@ namespace Puppet.Common.Services
 
         async Task HubitatEventWatcherThread()
         {
+            int wseRetryCount = 0;
             while (true)
             {
                 try
                 {
                     Console.WriteLine($"{DateTime.Now} Connecting to Hubitat...");
                     var client = new ClientWebSocket();
+                    client.Options.RemoteCertificateValidationCallback += (a, b, c, d) => {
+                        return true;
+                    };
                     await client.ConnectAsync(new Uri(_websocketUrl), CancellationToken.None);
                     Console.WriteLine($"{DateTime.Now} Websocket success! Watching for events.");
+                    wseRetryCount = 0;
                     ArraySegment<byte> buffer;
                     while (client.State == WebSocketState.Open)
                     {
@@ -61,8 +66,10 @@ namespace Puppet.Common.Services
                 }
                 catch (WebSocketException wse)
                 {
-                    Console.WriteLine($"{DateTime.Now} Hubitat websocket error! {wse.Message} -- Retrying in 5 seconds...");
-                    await Task.Delay(TimeSpan.FromSeconds(5));
+                    wseRetryCount++;
+                    int waitTimeInSecs = (wseRetryCount > 5) ? 150 : 5;
+                    Console.WriteLine($"{DateTime.Now} Hubitat websocket error! {wse.Message} -- Retrying in {waitTimeInSecs} seconds...");
+                    await Task.Delay(TimeSpan.FromSeconds(waitTimeInSecs));
                 }
                 catch (UriFormatException ufe)
                 {
@@ -80,7 +87,7 @@ namespace Puppet.Common.Services
 
         public override Dictionary<string, string> GetDeviceState(IDevice device)
         {
-            Uri requestUri = new Uri($"{_baseAddress}/{device.Id}?access_token={_accessToken}");
+            Uri requestUri = new Uri($"{_baseMakerApiAddress}/{device.Id}?access_token={_accessToken}");
             Console.WriteLine($"{DateTime.Now} Hubitat Device State Request: {requestUri.ToString().Split('?')[0]}");
             var result = _client.GetAsync(requestUri).Result;
             result.EnsureSuccessStatusCode();
@@ -107,7 +114,7 @@ namespace Puppet.Common.Services
             string secondary = (args != null) ? $"/{args[0]}" : "";
             secondary = secondary.Replace(' ', '-').Replace('?', '.');
 
-            Uri requestUri = new Uri($"{_baseAddress}/{device.Id}/{action.Trim()}{secondary.Trim()}?access_token={_accessToken}");
+            Uri requestUri = new Uri($"{_baseMakerApiAddress}/{device.Id}/{action.Trim()}{secondary.Trim()}?access_token={_accessToken}");
             Console.WriteLine($"{DateTime.Now} Hubitat Device Command: {requestUri.ToString().Split('?')[0]}");
             var result = _client.GetAsync(requestUri).Result;
             result.EnsureSuccessStatusCode();

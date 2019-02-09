@@ -19,6 +19,6 @@ namespace Puppet.Common.Automation
         }
 
         public string DeviceMappedName => _deviceMappedName;
-        public Capability Capability => _capability; 
+        public Capability Capability => _capability;
     }
 }

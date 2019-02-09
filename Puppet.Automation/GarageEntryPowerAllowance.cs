@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
@@ -13,7 +11,7 @@ namespace Puppet.Automation
     {
         public GarageEntryPowerAllowance(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            this.Minutes = 30;
+            HowLong = TimeSpan.FromMinutes(30);
         }
     }
 }

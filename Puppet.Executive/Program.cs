@@ -25,8 +25,14 @@ namespace Puppet.Executive
                 .AddJsonFile(APPSETTINGS_FILENAME, optional: false, reloadOnChange: true)
                 .Build();
 
+            HttpClientHandler customHttpClientHandler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; }
+            };
+            HttpClient _httpClient = new HttpClient(customHttpClientHandler);
+
             // Abstraction representing the home automation system
-            _hub = new Hubitat(configuration, new HttpClient());
+            _hub = new Hubitat(configuration, _httpClient);
 
             // Class to manage long-running tasks
             _taskManager = new AutomationTaskManager();
@@ -74,25 +80,36 @@ namespace Puppet.Executive
             foreach (IAutomation automation in automations)
             {
                 // If this automation is already running, cancel all running instances
-                _taskManager.CancelExistingTasks(automation.GetType());
+                _taskManager.CancelRelatedTasks(automation.GetType(), evt.deviceId);
 
                 // Start a task to handle the automation and a CancellationToken Source
                 // so we can cancel it later.
                 var cts = new CancellationTokenSource();
                 Func<Task> handleTask = async () =>
                 {
-                    // This runs the Handle method on the automation class
+                    var startedTime = DateTime.Now;
                     Console.WriteLine($"{DateTime.Now} {automation} event: {evt.descriptionText}");
-                    await automation.Handle(cts.Token);
+                    try
+                    {
+                        // This runs the Handle method on the automation class
+                        await automation.Handle(cts.Token);
+                    }
+                    catch(TaskCanceledException)
+                    {
+                        Console.WriteLine($"{DateTime.Now} {automation} event from {startedTime} cancelled.");
+                    }
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine($"{DateTime.Now} {automation} {ex} {ex.Message}");
+                    }                    
                 };
 
-                var task = new AutomationTask(handleTask, automation.GetType());
-
                 // Ready... go handle it!
-                Task work = task.Start();
+                Task work = Task.Run(handleTask, cts.Token);
+                //work.Start();
 
                 // Hold on to the task and its cancellation token source for later.
-                _taskManager.Track(work, cts, automation.GetType());
+                _taskManager.Track(work, cts, automation.GetType(), evt.deviceId);
             }
 
             // Let's take this opportunity to get rid of any completed tasks.

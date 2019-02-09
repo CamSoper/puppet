@@ -1,4 +1,5 @@
-﻿using Puppet.Common.Automation;
+﻿using System;
+using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
@@ -10,7 +11,7 @@ namespace Puppet.Automation
     {
         public BasementStairwayPowerAllowance(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            this.Minutes = 5;
+            HowLong = TimeSpan.FromMinutes(5);
         }
     }
 }

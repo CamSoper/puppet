@@ -40,15 +40,15 @@ namespace Puppet.Automation
                     (key, oldvalue) => DateTime.Now); // This is the lambda to just update an existing value with the current DateTime
 
                 // Wait a bit...
-                if (await WaitForCancellation(_interval, token)) return;
+                await Task.Delay(_interval, token);
                 _kitchenSpeaker.Speak("Please close the pantry door");
 
                 // Wait a bit more...
-                if (await WaitForCancellation(_interval, token)) return;
+                await Task.Delay(_interval, token);
                 _kitchenSpeaker.Speak("I said, please close the pantry door");
 
                 // Wait a bit longer and then give up...
-                if (await WaitForCancellation(_interval, token)) return;
+                await Task.Delay(_interval, token);
                 _kitchenSpeaker.Speak("Fine, I'll turn off the light myself.");
                 _pantryLight.Off();
             }

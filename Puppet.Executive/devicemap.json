@@ -2,7 +2,16 @@
   "Contact": {
     "FrontDoor": "339",
     "PantryDoor": "402",
-    "PantryDoorBackup": "224"
+    "PantryDoorBackup": "224",
+    "SlidingDoor": "194",
+    "GarageEntry": "289",
+    "BasementEgress": "321",
+    "EastGate": "359",
+    "SouthGate": "358",
+    "WestGate": "357",
+    "GarageDoor1": "391",
+    "GarageDoor2": "392",
+    "TestDoor1": "544"
   },
   "Lock": {
     "FrontDoorDeadbolt": "388"

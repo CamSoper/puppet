@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Puppet.Common.Automation;
+using Puppet.Common.Events;
 
 namespace Puppet.Executive
 {
@@ -26,12 +29,12 @@ namespace Puppet.Executive
         /// Stores the task/cancellation token source.
         /// </summary>
         /// <param name="pair">The task and cancellation token source.</param>
-        public void Track(Task work, CancellationTokenSource cts, Type automationType)
+        public void Track(Task work, CancellationTokenSource cts, Type automationType, string initiatingDeviceId)
         {
 
             lock (_taskList)
             {
-                _taskList.Add(new AutomationTaskTokenType(work, cts, automationType));
+                _taskList.Add(new AutomationTaskTokenType(work, cts, automationType, initiatingDeviceId));
                 Console.WriteLine($"{DateTime.Now} Tracking {_taskList.Count} tasks.");
             }
         }
@@ -59,15 +62,37 @@ namespace Puppet.Executive
         }
 
         /// <summary>
-        /// Cancels all existing automation tasks with the given type.
+        /// Cancels all existing automation tasks with the given type and, if applicable, intiating device.
         /// </summary>
         /// <param name="automationType">The type of the automation to cancel.</param>
-        public void CancelExistingTasks(Type automationType)
+        public void CancelRelatedTasks(Type automationType, string initiatingDeviceId)
         {
+
+            bool perDevice = (automationType.GetCustomAttributes<RunPerDeviceAttribute>()?.Count() > 0) ? true : false;
+            Func<AutomationTaskTokenType, bool> filterAction;
+            if (perDevice)
+            {
+                filterAction = (t) =>
+                {
+                    return t.AutomationType == automationType
+                            && t.InitiatingDeviceId == initiatingDeviceId
+                            && !t.Task.IsCompleted
+                            && !t.CTS.IsCancellationRequested;
+                };
+            }
+            else
+            {
+                filterAction = (t) =>
+                {
+                    return t.AutomationType == automationType
+                            && !t.Task.IsCompleted
+                            && !t.CTS.IsCancellationRequested;
+                };
+            }
+
             lock (_taskList)
             {
-                foreach (var i in _taskList.Where(t => t.AutomationType == automationType &&
-                    !t.Task.IsCompleted && !t.CTS.IsCancellationRequested))
+                foreach (var i in _taskList.Where(filterAction))
                 {
                     i.CTS.Cancel();
                 }
@@ -79,12 +104,14 @@ namespace Puppet.Executive
         public Task Task { get; set; }
         public CancellationTokenSource CTS { get; set; }
         public Type AutomationType { get; set; }
+        public string InitiatingDeviceId { get; set; }
 
-        public AutomationTaskTokenType(Task task, CancellationTokenSource cts, Type automationType)
+        public AutomationTaskTokenType(Task task, CancellationTokenSource cts, Type automationType, string initiatingDeviceId)
         {
             Task = task;
             CTS = cts;
             AutomationType = automationType;
+            InitiatingDeviceId = initiatingDeviceId;
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using Puppet.Common.Devices;
-using Puppet.Common.Events;
-using Puppet.Common.Automation;
-using Puppet.Common.Services;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Puppet.Common.Automation;
+using Puppet.Common.Devices;
+using Puppet.Common.Events;
+using Puppet.Common.Services;
 
 namespace Puppet.Automation
 {
@@ -23,19 +23,19 @@ namespace Puppet.Automation
         public override async Task Handle(CancellationToken token)
         {
             TimeSpan timeBetweenCycles = TimeSpan.FromMinutes(5);
-            if(_evt.value == "on")
+            if (_evt.value == "on")
             {
-                SwitchRelay LivingRoomXmas1 = 
+                SwitchRelay LivingRoomXmas1 =
                     _hub.GetDeviceByName<SwitchRelay>("Switch.LivingRoomXmasScene1") as SwitchRelay;
-                SwitchRelay LivingRoomXmas2 = 
+                SwitchRelay LivingRoomXmas2 =
                     _hub.GetDeviceByName<SwitchRelay>("Switch.LivingRoomXmasScene2") as SwitchRelay;
 
-                while(true)
+                while (true)
                 {
                     LivingRoomXmas1.On();
-                    if (await WaitForCancellation(timeBetweenCycles, token)) return;
+                    await Task.Delay(timeBetweenCycles, token);
                     LivingRoomXmas2.On();
-                    if (await WaitForCancellation(timeBetweenCycles, token)) return;
+                    await Task.Delay(timeBetweenCycles, token);
                 }
             }
             else

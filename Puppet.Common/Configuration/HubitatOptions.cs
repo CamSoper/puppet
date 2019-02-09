@@ -6,8 +6,8 @@ namespace Puppet.Common.Configuration
 {
     public class HubitatOptions
     {
-        public string BaseUrl { get; set; }
+        public string HubitatHostNameOrIp { get; set; }
+        public int MakerApiAppId { get; set; }
         public string AccessToken { get; set; }
-        public string EventWebsocketUrl { get; set; }
     }
 }

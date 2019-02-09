@@ -1,12 +1,9 @@
-﻿using Puppet.Common.Devices;
-using Puppet.Common.Events;
-using Puppet.Common.Automation;
-using Puppet.Common.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Puppet.Common.Devices;
+using Puppet.Common.Events;
+using Puppet.Common.Services;
 
 namespace Puppet.Common.Automation
 {
@@ -16,7 +13,7 @@ namespace Puppet.Common.Automation
     /// </summary>
     public abstract class PowerAllowanceBase : AutomationBase
     {
-        public int Minutes { get; set; }
+        public TimeSpan HowLong { get; set; }
 
         public PowerAllowanceBase(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
@@ -27,7 +24,7 @@ namespace Puppet.Common.Automation
         {
             if (_evt.value == "on")
             {
-                if (await WaitForCancellation(TimeSpan.FromMinutes(Minutes), token)) return;    
+                await Task.Delay(HowLong, token);
                 SwitchRelay relay = _hub.GetDeviceById<SwitchRelay>(_evt.deviceId) as SwitchRelay;
                 relay.Off();
             }
