@@ -16,7 +16,7 @@ namespace Puppet.Automation
 
         public override Task Handle(CancellationToken token)
         {
-            if (_evt.Value == "unlocked")
+            if (_evt.IsUnLockedEvent)
             {
                 if (_evt.DescriptionText.Contains("was unlocked by"))
                 {

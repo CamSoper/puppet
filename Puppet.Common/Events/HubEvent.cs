@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Puppet.Common.Events
 {
@@ -20,28 +17,11 @@ namespace Puppet.Common.Events
         [JsonProperty(PropertyName = "source")]
         public string Source { get; set; }
 
-        public bool IsOpenEvent()
-        {
-            if (Value == "open") return true;
-            return false;
-        }
-
-        public bool IsClosedEvent()
-        {
-            if (Value == "closed") return true;
-            return false;
-        }
-
-        public bool IsLockedEvent()
-        {
-            if (Value == "locked") return true;
-            return false;
-        }
-
-        public bool IsUnLockedEvent()
-        {
-            if (Value == "unlocked") return true;
-            return false;
-        }
+        public bool IsOpenEvent => Value == "open";
+        public bool IsClosedEvent => Value == "closed";
+        public bool IsLockedEvent => Value == "locked";
+        public bool IsUnLockedEvent => Value == "unlocked";
+        public bool IsOnEvent => Value == "on";
+        public bool IsOffEvent => Value == "off";
     }
 }

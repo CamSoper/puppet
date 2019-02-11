@@ -1,17 +1,17 @@
-﻿using Puppet.Common.Devices;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using Puppet.Common.Devices;
 
 namespace Puppet.Common.Automation
 {
-    [System.AttributeUsage(System.AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
+    /// <summary>
+    /// Indicates that this IAutomation should be triggered by the specified device's capability.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
     public sealed class TriggerDeviceAttribute : Attribute
     {
         private readonly string _deviceMappedName;
         private readonly Capability _capability;
 
-        // This is a positional argument
         public TriggerDeviceAttribute(string deviceMappedName, Capability capability)
         {
             _deviceMappedName = deviceMappedName;

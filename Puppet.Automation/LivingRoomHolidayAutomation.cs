@@ -23,7 +23,7 @@ namespace Puppet.Automation
         public override async Task Handle(CancellationToken token)
         {
             TimeSpan timeBetweenCycles = TimeSpan.FromMinutes(5);
-            if (_evt.Value == "on")
+            if (_evt.IsOnEvent)
             {
                 SwitchRelay LivingRoomXmas1 =
                     _hub.GetDeviceByName<SwitchRelay>("Switch.LivingRoomXmasScene1") as SwitchRelay;

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
