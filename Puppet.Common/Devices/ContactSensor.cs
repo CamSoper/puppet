@@ -6,23 +6,36 @@ using System.Threading.Tasks;
 
 namespace Puppet.Common.Devices
 {
-    enum ContactStatus
+    public enum ContactStatus
     {
         Open,
-        Closed
+        Closed,
+        Unknown
     }
 
-    public class ContactSensor : IDevice
+    public class ContactSensor : DeviceBase
     {
-        ContactSensor(string deviceId, HomeAutomationPlatform hub)
+        public ContactSensor(HomeAutomationPlatform hub, string id) : base(hub, id)
         {
-
         }
 
-        public string Id => throw new NotImplementedException();
+        public ContactStatus Status
+        {
+            get
+            {
+                switch(GetState()["contact"])
+                {
+                    case "open":
+                        return ContactStatus.Open;
 
-        public string Name => throw new NotImplementedException();
+                    case "closed":
+                        return ContactStatus.Closed;
 
-        public string Label => throw new NotImplementedException();
+                    default:
+                        return ContactStatus.Unknown;                  
+                }
+
+            }
+        }
     }
 }

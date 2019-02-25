@@ -1,5 +1,4 @@
-﻿using Puppet.Automation;
-using Puppet.Common.Automation;
+﻿using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
@@ -8,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Puppet.Executive
+namespace Puppet.Executive.Automation
 {
     public class AutomationFactory
     {

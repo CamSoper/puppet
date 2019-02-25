@@ -26,9 +26,9 @@ namespace Puppet.Automation
             if (_evt.IsOnEvent)
             {
                 SwitchRelay LivingRoomXmas1 =
-                    _hub.GetDeviceByName<SwitchRelay>("Switch.LivingRoomXmasScene1") as SwitchRelay;
+                    _hub.GetDeviceByMappedName<SwitchRelay>("Switch.LivingRoomXmasScene1") as SwitchRelay;
                 SwitchRelay LivingRoomXmas2 =
-                    _hub.GetDeviceByName<SwitchRelay>("Switch.LivingRoomXmasScene2") as SwitchRelay;
+                    _hub.GetDeviceByMappedName<SwitchRelay>("Switch.LivingRoomXmasScene2") as SwitchRelay;
 
                 while (true)
                 {
@@ -41,7 +41,7 @@ namespace Puppet.Automation
             else
             {
                 SwitchRelay DefaultLivingRoomScene =
-                    _hub.GetDeviceByName<SwitchRelay>("Switch.LivingRoomNormalScene") as SwitchRelay;
+                    _hub.GetDeviceByMappedName<SwitchRelay>("Switch.LivingRoomNormalScene") as SwitchRelay;
                 DefaultLivingRoomScene.On();
                 return;
             }

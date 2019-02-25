@@ -30,7 +30,6 @@ namespace Puppet.Common.Devices
 
                     default:
                         return SwitchStatus.Unknown;                  
-
                 }
 
             }

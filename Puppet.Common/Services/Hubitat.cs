@@ -12,6 +12,8 @@ using Newtonsoft.Json.Linq;
 using Puppet.Common.Configuration;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
+using Puppet.Common.Exceptions;
+using Puppet.Common.Models;
 
 namespace Puppet.Common.Services
 {
@@ -116,8 +118,24 @@ namespace Puppet.Common.Services
 
             Uri requestUri = new Uri($"{_baseMakerApiAddress}/{device.Id}/{action.Trim()}{secondary.Trim()}?access_token={_accessToken}");
             Console.WriteLine($"{DateTime.Now} Hubitat Device Command: {requestUri.ToString().Split('?')[0]}");
-            var result = _client.GetAsync(requestUri).Result;
+            HttpResponseMessage result = _client.GetAsync(requestUri).Result;
             result.EnsureSuccessStatusCode();
+        }
+
+        public override IDevice GetDeviceByLabel<T>(string label)
+        {
+            Uri requestUri = new Uri($"{_baseMakerApiAddress}?access_token={_accessToken}");
+            Console.WriteLine($"{DateTime.Now} Hubitat Device Command: {requestUri.ToString().Split('?')[0]}");
+            HttpResponseMessage result = _client.GetAsync(requestUri).Result;
+            result.EnsureSuccessStatusCode();
+
+            List<HubitatDevice> hubitatDevices = JsonConvert.DeserializeObject<List<HubitatDevice>>(result.Content.ReadAsStringAsync().Result);
+            string deviceId = hubitatDevices.Where(x => x.Label == label).FirstOrDefault()?.Id;
+            if(deviceId == null)
+            {
+                throw new DeviceNotFoundException("No device was found with the provided label.");
+            }
+            return this.GetDeviceById<GenericDevice>(deviceId);
         }
     }
 }

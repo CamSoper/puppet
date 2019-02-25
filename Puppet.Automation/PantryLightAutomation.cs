@@ -19,9 +19,9 @@ namespace Puppet.Automation
         public PantryLightAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             _pantryLight =
-                _hub.GetDeviceByName<SwitchRelay>("Switch.PantryLight") as SwitchRelay;
+                _hub.GetDeviceByMappedName<SwitchRelay>("Switch.PantryLight") as SwitchRelay;
             _kitchenSpeaker =
-                _hub.GetDeviceByName<Speaker>("Speaker.KitchenSpeaker") as Speaker;
+                _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker") as Speaker;
         }
 
         /// <summary>

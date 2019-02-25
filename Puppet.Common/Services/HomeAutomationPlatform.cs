@@ -48,7 +48,7 @@ namespace Puppet.Common.Services
                 return obj[mappedDeviceName];
         }
 
-        public IDevice GetDeviceByName<T>(string mappedDeviceName)
+        public IDevice GetDeviceByMappedName<T>(string mappedDeviceName)
         {
             return GetDeviceById<T>(LookupDeviceId(mappedDeviceName)) as IDevice;
         }
@@ -59,5 +59,7 @@ namespace Puppet.Common.Services
         }
 
         public abstract Dictionary<string, string> GetDeviceState(IDevice device);
+
+        public abstract IDevice GetDeviceByLabel<T>(string label);
     }
 }

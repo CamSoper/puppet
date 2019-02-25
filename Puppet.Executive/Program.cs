@@ -5,8 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Puppet.Common.Automation;
+using Puppet.Common.Configuration;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
+using Puppet.Executive.Automation;
+using Puppet.Executive.Mqtt;
 
 namespace Puppet.Executive
 {
@@ -16,6 +19,7 @@ namespace Puppet.Executive
 
         static AutomationTaskManager _taskManager;
         static HomeAutomationPlatform _hub;
+        static IMqttService _mqtt;
 
         public static async Task Main(string[] args)
         {
@@ -25,6 +29,7 @@ namespace Puppet.Executive
                 .AddJsonFile(APPSETTINGS_FILENAME, optional: false, reloadOnChange: true)
                 .Build();
 
+            // Create an HttpClient that doesn't validate the server certificate
             HttpClientHandler customHttpClientHandler = new HttpClientHandler
             {
                 ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; }
@@ -34,6 +39,16 @@ namespace Puppet.Executive
             // Abstraction representing the home automation system
             _hub = new Hubitat(configuration, _httpClient);
 
+            // Start the MQTT service, if applicable.
+            MqttOptions mqttOptions = configuration.GetSection("MQTT").Get<MqttOptions>();
+            if (mqttOptions?.Enabled ?? false)
+            {
+                _mqtt = new MqttService(await MqttClientFactory.GetClient(mqttOptions),
+                                        mqttOptions,
+                                        _hub);
+                await _mqtt.Start();
+            }
+
             // Class to manage long-running tasks
             _taskManager = new AutomationTaskManager();
 
@@ -41,7 +56,7 @@ namespace Puppet.Executive
             // by the Hubitat device
             _hub.AutomationEvent += Hub_AutomationEvent;
             var hubTask = _hub.StartAutomationEventWatcher();
-            
+
             // Wait forever, this is a daemon process
             await hubTask;
         }
@@ -58,7 +73,7 @@ namespace Puppet.Executive
             var evt = e.HubEvent;
 
             Task.Run(() => StartRelevantAutomationHandlers(evt));
-            //Task.Run(() => SendEventToMqtt(evt));
+            Task.Run(() => SendEventToMqtt(evt));
             //Task.Run(() => SendEventToAlexa(evt));
         }
 
@@ -69,7 +84,7 @@ namespace Puppet.Executive
 
         private static void SendEventToMqtt(HubEvent evt)
         {
-            // TODO: Forward events to MQTT
+            _mqtt?.SendEventToMqttAsync(evt);
         }
 
         private static void StartRelevantAutomationHandlers(HubEvent evt)
@@ -94,14 +109,14 @@ namespace Puppet.Executive
                         // This runs the Handle method on the automation class
                         await automation.Handle(cts.Token);
                     }
-                    catch(TaskCanceledException)
+                    catch (TaskCanceledException)
                     {
                         Console.WriteLine($"{DateTime.Now} {automation} event from {startedTime} cancelled.");
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Console.WriteLine($"{DateTime.Now} {automation} {ex} {ex.Message}");
-                    }                    
+                    }
                 };
 
                 // Ready... go handle it!

@@ -22,8 +22,8 @@ namespace Puppet.Automation
         {
             NotificationDevices = 
                 new List<Speaker>() {
-                    _hub.GetDeviceByName<Speaker>("Speaker.WebhookNotifier") as Speaker,
-                    _hub.GetDeviceByName<Speaker>("Speaker.KitchenSpeaker") as Speaker
+                    _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier") as Speaker,
+                    _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker") as Speaker
                 };
 
             HowLong = TimeSpan.FromMinutes(2);

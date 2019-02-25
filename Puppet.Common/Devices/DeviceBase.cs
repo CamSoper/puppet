@@ -13,27 +13,13 @@ namespace Puppet.Common.Devices
         internal Dictionary<string, string> _state;
 
         public string Id { get; }
-        
-        public string Name
-        {
-            get
-            {
-                return GetState()["name"]; 
-            }
-        }
-
-        public string Label
-        {
-            get
-            {
-                return GetState()["label"];
-            }
-        }
-
+        public string Name => GetState()["name"]; 
+        public string Label => GetState()["label"];
+            
         public DeviceBase(HomeAutomationPlatform hub, string id)
         {
             _hub = hub;
-            this.Id = id;
+            Id = id;
         }
         
         public void RefreshState()

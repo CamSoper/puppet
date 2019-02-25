@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Puppet.Common.Automation;
 using Puppet.Common.Events;
 
-namespace Puppet.Executive
+namespace Puppet.Executive.Automation
 {
     /// <summary>
     /// This class maintains a collection of AutomationTasks and their

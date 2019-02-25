@@ -6,7 +6,7 @@ REM
 scp pi@automation:/home/pi/executive/appsettings.json ./
 pushd Puppet.Executive
 dotnet publish -r linux-arm -c Release
-ssh pi@automation kill $(pidof dotnet)
+ssh pi@automation kill $(pidof Puppet.Executive)
 ssh pi@automation rm /home/pi/executive/*
 scp ./bin/Release/netcoreapp2.2/linux-arm/publish/* pi@automation:/home/pi/executive
 popd 
