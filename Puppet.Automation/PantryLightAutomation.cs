@@ -9,7 +9,6 @@ using Puppet.Common.Services;
 namespace Puppet.Automation
 {
     [TriggerDevice("Contact.PantryDoorBackup", Capability.Contact)]
-    [TriggerDevice("Switch.PantryAck", Capability.Switch)]
     public class PantryLightAutomation : AutomationBase
     {
         readonly TimeSpan _interval = TimeSpan.FromMinutes(5);
@@ -64,15 +63,6 @@ namespace Puppet.Automation
                     _kitchenSpeaker.Speak("Thank you for closing the pantry door");
                 }
                 _pantryLight.Off();
-            }
-            else if (_evt.IsOnEvent &&
-                _evt.DeviceId == _hub.LookupDeviceId("Switch.PantryAck"))
-            {
-                // If you're in the pantry and you don't want it to nag, turn on Switch.PantryAck via Alexa
-                // which will cancel any running occurrences of this automation. We'll say something to acknowledge.
-                SwitchRelay pantryAck = _hub.GetDeviceById<SwitchRelay>(_evt.DeviceId) as SwitchRelay;
-                pantryAck.Off();  // Set the Ack switch back to "off"
-                _kitchenSpeaker.Speak("I'm sorry, I didn't know you were busy in there. I'll leave you alone.");
             }
         }
     }
