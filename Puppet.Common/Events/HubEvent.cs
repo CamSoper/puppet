@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Puppet.Common.Devices;
 
 namespace Puppet.Common.Events
 {
@@ -23,5 +24,7 @@ namespace Puppet.Common.Events
         public bool IsUnLockedEvent => Value == "unlocked";
         public bool IsOnEvent => Value == "on";
         public bool IsOffEvent => Value == "off";
+        public bool IsButtonPushedEvent => Name == "pushed";
+        public bool IsButtonHeldEvent => Name == "held";
     }
 }

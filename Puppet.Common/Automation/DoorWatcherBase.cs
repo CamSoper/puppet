@@ -21,7 +21,7 @@ namespace Puppet.Common.Automation
 
         }
 
-        public override async Task Handle(CancellationToken token)
+        public override async Task Handle()
         {
             if (_evt.IsOpenEvent)
             {
@@ -30,7 +30,7 @@ namespace Puppet.Common.Automation
 
                 for (int i = 0; i < NumberOfNotifications; i++)
                 {
-                    await Task.Delay(HowLong, token);
+                    await WaitForCancellation(HowLong);
                     NotificationDevices.Speak(String.Format(NotificationFormat,
                         _evt.DisplayName, HowLong.TotalMinutes * (i + 1), HowLong.TotalSeconds * (i + 1)));
                     // Yes, there's an extra parameter being passed into String.Format.

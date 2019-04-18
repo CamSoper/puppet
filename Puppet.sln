@@ -1,9 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28306.52
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28711.60
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Puppet.Executive", "Puppet.Executive\Puppet.Executive.csproj", "{8E5C5A21-59DA-4CD8-9913-F90A41FBD6C3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5006D4AE-3F37-4CB3-BAE6-E65E1E17EB8C} = {5006D4AE-3F37-4CB3-BAE6-E65E1E17EB8C}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Puppet.Common", "Puppet.Common\Puppet.Common.csproj", "{0566D83E-694E-4DB1-930B-9DC118842457}"
 EndProject

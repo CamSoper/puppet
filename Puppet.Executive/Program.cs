@@ -99,7 +99,6 @@ namespace Puppet.Executive
 
                 // Start a task to handle the automation and a CancellationToken Source
                 // so we can cancel it later.
-                var cts = new CancellationTokenSource();
                 Func<Task> handleTask = async () =>
                 {
                     var startedTime = DateTime.Now;
@@ -107,7 +106,7 @@ namespace Puppet.Executive
                     try
                     {
                         // This runs the Handle method on the automation class
-                        await automation.Handle(cts.Token);
+                        await automation.Handle();
                     }
                     catch (TaskCanceledException)
                     {
@@ -120,10 +119,10 @@ namespace Puppet.Executive
                 };
 
                 // Ready... go handle it!
-                Task work = Task.Run(handleTask, cts.Token);
+                Task work = Task.Run(handleTask, automation.CTS.Token);
 
                 // Hold on to the task and its cancellation token source for later.
-                _taskManager.Track(work, cts, automation.GetType(), evt.DeviceId);
+                _taskManager.Track(work, automation.CTS, automation.GetType(), evt.DeviceId);
             }
 
             // Let's take this opportunity to get rid of any completed tasks.

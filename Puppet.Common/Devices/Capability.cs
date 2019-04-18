@@ -8,6 +8,8 @@ namespace Puppet.Common.Devices
     {
         Switch,
         Contact,
-        Lock
+        Lock,
+        Pushed,
+        Held
     }
 }

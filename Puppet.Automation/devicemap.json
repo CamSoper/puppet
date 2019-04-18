@@ -1,8 +1,7 @@
 {
   "Contact": {
     "FrontDoor": "339",
-    "PantryDoor": "402",
-    "PantryDoorBackup": "224",
+    "PantryDoor": "224",
     "SlidingDoor": "194",
     "GarageEntry": "289",
     "BasementEgress": "321",
@@ -11,7 +10,9 @@
     "WestGate": "357",
     "GarageDoor1": "391",
     "GarageDoor2": "392",
-    "TestDoor1": "544"
+    "TestDoor1": "544",
+    "BasementDoor": "227",
+    "GarageEntryDoor": "289"
   },
   "Lock": {
     "FrontDoorDeadbolt": "388"
@@ -33,5 +34,8 @@
     "LivingRoomXmasScene2": "385",
     "LivingRoomNormalScene": "386",
     "PantryAck": "512"
+  },
+  "Button": {
+    "OfficeRemote": "345"
   }
 }

@@ -12,7 +12,8 @@ namespace Puppet.Common.Automation
         /// <summary>
         /// Handles events coming from the home automation controller.
         /// </summary>
-        /// <param name="token">A .NET cancellation token received if this handler is to be cancelled.</param>
-        Task Handle(CancellationToken token);
+        Task Handle();
+
+        CancellationTokenSource CTS { get; }
     }
 }

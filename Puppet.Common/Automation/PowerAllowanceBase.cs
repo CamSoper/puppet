@@ -20,11 +20,11 @@ namespace Puppet.Common.Automation
 
         }
 
-        public override async Task Handle(CancellationToken token)
+        public override async Task Handle()
         {
             if (_evt.IsOnEvent)
             {
-                await Task.Delay(HowLong, token);
+                await WaitForCancellation(HowLong);
                 SwitchRelay relay = _hub.GetDeviceById<SwitchRelay>(_evt.DeviceId) as SwitchRelay;
                 relay.Off();
             }

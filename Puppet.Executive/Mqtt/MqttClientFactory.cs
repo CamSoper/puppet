@@ -1,11 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using MQTTnet;
+﻿using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Extensions.ManagedClient;
 using Puppet.Common.Configuration;
-using Puppet.Common.Services;
+using System;
+using System.Threading.Tasks;
 
 namespace Puppet.Executive.Mqtt
 {
@@ -19,19 +17,19 @@ namespace Puppet.Executive.Mqtt
                 .WithClientId(mqttOptions.ClientId)
                 .WithTcpServer(mqttOptions.BrokerHostNameOrIp, mqttOptions.Port);
 
-            if(!String.IsNullOrEmpty(mqttOptions.UserName) && 
+            if (!String.IsNullOrEmpty(mqttOptions.UserName) &&
                 !String.IsNullOrEmpty(mqttOptions.Password))
             {
                 clientConnectionOptionsBuilder = clientConnectionOptionsBuilder
                     .WithCredentials(mqttOptions.UserName, mqttOptions.Password);
             }
 
-            if(mqttOptions.EnableTls)
+            if (mqttOptions.EnableTls)
             {
                 clientConnectionOptionsBuilder = clientConnectionOptionsBuilder
                     .WithTls();
             }
-                
+
             var managedClientOptions = new ManagedMqttClientOptionsBuilder()
             .WithAutoReconnectDelay(TimeSpan.FromSeconds(5))
             .WithClientOptions(clientConnectionOptionsBuilder.Build())

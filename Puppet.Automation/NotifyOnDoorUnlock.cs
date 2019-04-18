@@ -14,7 +14,7 @@ namespace Puppet.Automation
         {
         }
 
-        public override Task Handle(CancellationToken token)
+        public override Task Handle()
         {
             if (_evt.IsUnLockedEvent)
             {
