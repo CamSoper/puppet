@@ -14,7 +14,7 @@
             "args": [],
             "cwd": "${workspaceFolder}/Puppet.Executive/bin/Debug/netcoreapp2.2/",
             // For more information about the 'console' field, see https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md#console-terminal-window
-            "console": "externalTerminal",
+            "console":"integratedTerminal",
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart"
         },
