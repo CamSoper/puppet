@@ -40,7 +40,7 @@ namespace Puppet.Automation
                 return;
             }
 
-            await WaitForCancellationAsync(TimeSpan.FromSeconds(10));
+            await WaitForCancellationAsync(TimeSpan.FromMinutes(5));
 
             int attempts = 0;
             while (_frontDoor.Status == ContactStatus.Closed && 
@@ -49,7 +49,7 @@ namespace Puppet.Automation
             {
                 attempts++;
                 _frontDoorLock.Lock();
-                await WaitForCancellationAsync(TimeSpan.FromSeconds(20));
+                await WaitForCancellationAsync(TimeSpan.FromSeconds(30));
             }
 
             if (_frontDoorLock.Status != LockStatus.Locked)

@@ -22,7 +22,7 @@ namespace Puppet.Automation
         {
             bool ShouldNotify = 
                 _hub.StateBag.ContainsKey(_mailboxNotifyKey) ? 
-                    ((DateTime)_hub.StateBag[_mailboxNotifyKey] > DateTime.Now.AddMinutes(-5)) : 
+                    ((DateTime)_hub.StateBag[_mailboxNotifyKey] < DateTime.Now.AddMinutes(-5)) : 
                     true;
 
             if (ShouldNotify)
@@ -30,9 +30,12 @@ namespace Puppet.Automation
                 _hub.StateBag.AddOrUpdate(_mailboxNotifyKey, DateTime.Now,
                     (key, oldvalue) => DateTime.Now);
 
-                Speaker kitchenSpeaker =
-                    _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker") as Speaker;
-                kitchenSpeaker.Speak("There is activity at the mailbox.");
+                List<Speaker> notificationDevices =
+                    new List<Speaker>() {
+                        _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier") as Speaker,
+                        _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker") as Speaker
+                    };
+                notificationDevices.Speak("There is activity at the mailbox.");
 
             }
 
