@@ -15,36 +15,27 @@ namespace Puppet.Common.Automation
     {
         protected HomeAutomationPlatform _hub;
         protected HubEvent _evt;
+        protected CancellationToken _token;
 
         public AutomationBase(HomeAutomationPlatform hub, HubEvent evt)
         {
             _hub = hub;
             _evt = evt;
-            CTS = new CancellationTokenSource();
         }
 
-        public CancellationTokenSource CTS { get; }
+        public Task Handle(CancellationToken token)
+        {
+            _token = token;
+            return Handle();
+        }
 
-        public abstract Task Handle();
+        protected abstract Task Handle();
 
         /// <summary>
         /// Waits for a specified period time then returns a boolean indicating if the task was cancelled.
         /// </summary>
         /// <param name="howLong">How long to wait.</param>
-        /// <param name="token">A cancellation token.</param>
-        /// <returns>True if the task was cancelled. False if execution should continue.</returns>
-        protected async Task<bool> WaitForCancellation(TimeSpan howLong)
-        {
-            try
-            {
-                await Task.Delay(howLong, CTS.Token);
-                return false;
-            }
-            catch (TaskCanceledException)
-            {
-                Console.WriteLine($"{DateTime.Now} Existing {this.GetType()} task cancelled.");
-                return true;
-            }
-        }
+        protected async Task WaitForCancellationAsync(TimeSpan howLong) => await Task.Delay(howLong, _token);
+   
     }
 }

@@ -18,7 +18,7 @@ namespace Puppet.Automation
         {
         }
 
-        public override Task Handle()
+        protected override Task Handle()
         {
             Speaker speaker = _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker") as Speaker;
             if(_evt.IsButtonPushedEvent)

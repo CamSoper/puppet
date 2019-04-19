@@ -14,7 +14,7 @@ namespace Puppet.Automation
         {
         }
 
-        public override Task Handle()
+        protected override Task Handle()
         {
             if (_evt.IsUnLockedEvent)
             {

@@ -18,7 +18,7 @@ namespace Puppet.Common.Automation
         {
         }
 
-        public async override Task Handle()
+        protected async override Task Handle()
         {
             if (!(_evt.IsOpenEvent || _evt.IsOnEvent))
                 return;
@@ -29,7 +29,7 @@ namespace Puppet.Common.Automation
             }
             if(EnableDeactivation)
             {
-                await WaitForCancellation(DeactivationWait);
+                await WaitForCancellationAsync(DeactivationWait);
                 foreach(var s in SwitchesToActivate)
                 {
                     s.Off();

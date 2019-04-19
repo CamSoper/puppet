@@ -20,7 +20,7 @@ namespace Puppet.Automation
         /// </summary>
         /// <param name="evt"></param>
         /// <param name="token"></param>
-        public override async Task Handle()
+        protected override async Task Handle()
         {
             TimeSpan timeBetweenCycles = TimeSpan.FromMinutes(5);
             if (_evt.IsOnEvent)
@@ -33,9 +33,9 @@ namespace Puppet.Automation
                 while (true)
                 {
                     LivingRoomXmas1.On();
-                    await WaitForCancellation(timeBetweenCycles);
+                    await WaitForCancellationAsync(timeBetweenCycles);
                     LivingRoomXmas2.On();
-                    await WaitForCancellation(timeBetweenCycles);
+                    await WaitForCancellationAsync(timeBetweenCycles);
                 }
             }
             else

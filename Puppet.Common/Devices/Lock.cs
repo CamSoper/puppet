@@ -5,28 +5,45 @@ using System.Text;
 
 namespace Puppet.Common.Devices
 {
-    public class LockDevice : IDevice
+    public enum LockStatus
     {
-        HomeAutomationPlatform _hub;
-        public string Id { get; }
-
-        public string Name => throw new NotImplementedException();
-
-        public string Label => throw new NotImplementedException();
-
-        public LockDevice(HomeAutomationPlatform hub)
+        Locked,
+        Unlocked,
+        Unknown
+    }
+    public class LockDevice : DeviceBase
+    {
+        public LockDevice(HomeAutomationPlatform hub, string id) : base(hub, id)
         {
-            _hub = hub;
         }
 
         public void Lock()
         {
-            _hub.DoAction(this, "lock", null);
+            _hub.DoAction(this, "lock");
         }
 
         public void Unlock()
         {
-            _hub.DoAction(this, "unlock", null);
+            _hub.DoAction(this, "unlock");
+        }
+
+        public LockStatus Status
+        {
+            get
+            {
+                switch (GetState()["lock"])
+                {
+                    case "locked":
+                        return LockStatus.Locked;
+
+                    case "unlocked":
+                        return LockStatus.Unlocked;
+
+                    default:
+                        return LockStatus.Unknown;
+                }
+
+            }
         }
     }
 }

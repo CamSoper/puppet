@@ -14,6 +14,7 @@ namespace Puppet.Automation
         readonly TimeSpan _interval = TimeSpan.FromMinutes(5);
         SwitchRelay _pantryLight;
         Speaker _kitchenSpeaker;
+        const string _timeOpenedKey = "PantryOpenedTime";
 
         public PantryLightAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
@@ -27,7 +28,7 @@ namespace Puppet.Automation
         /// Handles pantry door events coming from the home automation controller.
         /// </summary>
         /// <param name="token">A .NET cancellation token received if this handler is to be cancelled.</param>
-        public override async Task Handle()
+        protected override async Task Handle()
         {
             if (_evt.IsOpenEvent)
             {
@@ -35,19 +36,19 @@ namespace Puppet.Automation
                 _pantryLight.On();
 
                 // Remember when we turned on the light for later (when we respond to an off event)
-                _hub.StateBag.AddOrUpdate("PantryOpened", DateTime.Now,
+                _hub.StateBag.AddOrUpdate(_timeOpenedKey, DateTime.Now,
                     (key, oldvalue) => DateTime.Now); // This is the lambda to just update an existing value with the current DateTime
 
                 // Wait a bit...
-                await WaitForCancellation(_interval);
+                await WaitForCancellationAsync(_interval);
                 _kitchenSpeaker.Speak("Please close the pantry door");
 
                 // Wait a bit more...
-                await WaitForCancellation(_interval);
+                await WaitForCancellationAsync(_interval);
                 _kitchenSpeaker.Speak("I said, please close the pantry door");
 
                 // Wait a bit longer and then give up...
-                await WaitForCancellation(_interval);
+                await WaitForCancellationAsync(_interval);
                 _kitchenSpeaker.Speak("Fine, I'll turn off the light myself.");
                 _pantryLight.Off();
             }
@@ -55,7 +56,7 @@ namespace Puppet.Automation
             {
                 // Has the door been open five minutes?
                 DateTime PantryOpenTime =
-                    _hub.StateBag.ContainsKey("PantryOpened") ? (DateTime)_hub.StateBag["PantryOpened"] : DateTime.Now;
+                    _hub.StateBag.ContainsKey(_timeOpenedKey) ? (DateTime)_hub.StateBag[_timeOpenedKey] : DateTime.Now;
                 if (DateTime.Now - PantryOpenTime > _interval)
                 {
                     // It's been open five minutes, so we've nagged by now.

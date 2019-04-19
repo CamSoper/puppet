@@ -12,7 +12,8 @@
     "GarageDoor2": "392",
     "TestDoor1": "544",
     "BasementDoor": "227",
-    "GarageEntryDoor": "289"
+    "GarageEntryDoor": "289",
+    "Mailbox": "355"
   },
   "Lock": {
     "FrontDoorDeadbolt": "388"
