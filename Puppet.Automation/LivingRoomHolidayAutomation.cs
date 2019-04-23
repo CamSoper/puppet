@@ -16,7 +16,7 @@ namespace Puppet.Automation
         }
 
         /// <summary>
-        /// Cycles living room lights between two scenes while a vswitch is turned on
+        /// Cycles living room lights between two scenes while a v-switch is turned on
         /// </summary>
         /// <param name="evt"></param>
         /// <param name="token"></param>
