@@ -22,8 +22,6 @@ namespace Puppet.Automation
             if(_evt.IsOpenEvent && IsDark(30, -30))
             {
                 _patio.On();
-                await WaitForCancellationAsync(TimeSpan.FromMinutes(30));
-                _patio.Off();
             }
         }
     }
