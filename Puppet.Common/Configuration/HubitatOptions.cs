@@ -9,5 +9,7 @@ namespace Puppet.Common.Configuration
         public string HubitatHostNameOrIp { get; set; }
         public int MakerApiAppId { get; set; }
         public string AccessToken { get; set; }
+        public int AuxAppId { get; set; }
+        public string AuxAppAccessToken { get; set; }
     }
 }

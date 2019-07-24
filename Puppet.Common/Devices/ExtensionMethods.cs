@@ -21,5 +21,17 @@ namespace Puppet.Common.Devices
                 }
             }
         }
+
+        public static bool IsAnyOpen(this IEnumerable<ContactSensor> sensors)
+        {
+            foreach(var s in sensors)
+            {
+                if(s.Status == ContactStatus.Open)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

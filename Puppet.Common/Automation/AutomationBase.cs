@@ -37,5 +37,28 @@ namespace Puppet.Common.Automation
         /// <param name="howLong">How long to wait.</param>
         protected async Task WaitForCancellationAsync(TimeSpan howLong) => await Task.Delay(howLong, _token);
    
+        /// <summary>
+        /// Returns a bool indicating if it's currently dark outside based on sunrise and sunset times.
+        /// </summary>
+        /// <param name="sunriseOffset">Sunrise offset in minutes.</param>
+        /// <param name="sunsetOffset">Sunset offset in minutes.</param>
+        protected bool IsDark(int sunriseOffset = 0, int sunsetOffset = 0)
+        {
+            DateTime SunriseWithOffset = 
+                _hub.SunriseAndSunset.Sunrise.AddMinutes(sunriseOffset);
+
+            DateTime SunsetWithOffset =
+                _hub.SunriseAndSunset.Sunset.AddMinutes(sunsetOffset);
+
+            if (DateTime.Now >= SunriseWithOffset && 
+                DateTime.Now <= SunsetWithOffset)
+            {
+                return false;   
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }

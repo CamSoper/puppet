@@ -24,8 +24,11 @@ namespace Puppet.Common.Services
     {
         readonly string _baseMakerApiAddress;
         readonly string _accessToken;
+        readonly string _baseAuxAppAddress;
+        readonly string _auxAppAccessToken;
         readonly string _websocketUrl;
         readonly HttpClient _client;
+        SunriseAndSunset _sunriseAndSunset;
 
         public Hubitat(IConfiguration configuration, HttpClient httpClient) : base(configuration)
         {
@@ -35,6 +38,9 @@ namespace Puppet.Common.Services
             _accessToken = hubitatOptions.AccessToken;
             _websocketUrl = $"wss://{hubitatOptions.HubitatHostNameOrIp}/eventsocket";
             _client = httpClient;
+
+            _baseAuxAppAddress = $"https://{hubitatOptions.HubitatHostNameOrIp}/apps/api/{hubitatOptions.AuxAppId}"; 
+            _auxAppAccessToken = hubitatOptions.AuxAppAccessToken;
 
             StateBag = new ConcurrentDictionary<string, object>();
         }
@@ -137,5 +143,28 @@ namespace Puppet.Common.Services
             }
             return this.GetDeviceById<GenericDevice>(deviceId);
         }
+
+        public override async Task SendNotification(string notificationText)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public override SunriseAndSunset SunriseAndSunset
+        {
+            get
+            {
+                if(_sunriseAndSunset == null || 
+                    (_sunriseAndSunset?.Sunrise.Date < DateTime.Now.Date))
+                {
+                    Uri requestUri = new Uri($"{_baseAuxAppAddress}/suntimes?access_token={_auxAppAccessToken}");
+                    Console.WriteLine($"{DateTime.Now} Hubitat Device Command: {requestUri.ToString().Split('?')[0]}");
+                    HttpResponseMessage result = _client.GetAsync(requestUri).Result;
+                    result.EnsureSuccessStatusCode();
+                    _sunriseAndSunset = JsonConvert.DeserializeObject<SunriseAndSunset>(result.Content.ReadAsStringAsync().Result);
+                }
+                return _sunriseAndSunset;    
+            }
+        }
+
     }
 }

@@ -13,7 +13,7 @@ namespace Puppet.Automation
     {
         public GarageEntryLighting(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            if (DateTime.Now.Hour <= 8 || DateTime.Now.Hour >= 17)
+            if (IsDark(30, -30))
             {
                 SwitchesToActivate =
                     new List<SwitchRelay>()

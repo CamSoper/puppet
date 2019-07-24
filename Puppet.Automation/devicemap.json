@@ -36,7 +36,9 @@
     "LivingRoomXmasScene1": "384",
     "LivingRoomXmasScene2": "385",
     "LivingRoomNormalScene": "386",
-    "PantryAck": "512"
+    "PantryAck": "512",
+    "PatioLight": "448",
+    "Floodlights": "196"
   },
   "Button": {
     "OfficeRemote": "345"

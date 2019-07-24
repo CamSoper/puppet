@@ -3,24 +3,24 @@ using Puppet.Common.Services;
 
 namespace Puppet.Common.Devices
 {
+    public enum SwitchStatus
+    {
+        On,
+        Off,
+        Unknown
+    }
     public class SwitchRelay : DeviceBase
     {
+
         public SwitchRelay(HomeAutomationPlatform hub, string id) : base(hub, id)
         {
-        }
-
-        public enum SwitchStatus
-        {
-            On,
-            Off,
-            Unknown
         }
 
         public SwitchStatus Status
         {
             get
             {
-                switch(GetState()["switch"])
+                switch (GetState()["switch"])
                 {
                     case "on":
                         return SwitchStatus.On;
@@ -29,7 +29,7 @@ namespace Puppet.Common.Devices
                         return SwitchStatus.Off;
 
                     default:
-                        return SwitchStatus.Unknown;                  
+                        return SwitchStatus.Unknown;
                 }
 
             }

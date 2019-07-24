@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
+using Puppet.Common.Models;
 
 namespace Puppet.Common.Services
 {
@@ -20,6 +21,8 @@ namespace Puppet.Common.Services
 
         public ConcurrentDictionary<string, object> StateBag { get; set; }
         public abstract void DoAction(IDevice device, string action, string[] args = null);
+        public abstract Task SendNotification(string notificationText);
+        
         public abstract Task StartAutomationEventWatcher();
 
         public event EventHandler<AutomationEventEventArgs> AutomationEvent;
@@ -29,6 +32,9 @@ namespace Puppet.Common.Services
             this._deviceMap = JObject.Parse(
                 File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), DEVICE_FILENAME)));
         }
+        
+        public abstract SunriseAndSunset SunriseAndSunset { get; }
+
         protected virtual void OnAutomationEvent(AutomationEventEventArgs e)
         {
             AutomationEvent?.Invoke(this, e);
@@ -47,7 +53,6 @@ namespace Puppet.Common.Services
             else
                 return obj[mappedDeviceName];
         }
-
         public IDevice GetDeviceByMappedName<T>(string mappedDeviceName)
         {
             return GetDeviceById<T>(LookupDeviceId(mappedDeviceName)) as IDevice;

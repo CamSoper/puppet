@@ -11,7 +11,7 @@ namespace Puppet.Automation
     {
         public GarageEntryPowerAllowance(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            HowLong = TimeSpan.FromMinutes(10);
+            HowLong = TimeSpan.FromMinutes(5);
         }
     }
 }
