@@ -53,18 +53,18 @@ namespace Puppet.Common.Services
             else
                 return obj[mappedDeviceName];
         }
-        public IDevice GetDeviceByMappedName<T>(string mappedDeviceName)
+        public T GetDeviceByMappedName<T>(string mappedDeviceName)
         {
-            return GetDeviceById<T>(LookupDeviceId(mappedDeviceName)) as IDevice;
+            return GetDeviceById<T>(LookupDeviceId(mappedDeviceName));
         }
 
-        public IDevice GetDeviceById<T>(string deviceId)
+        public T GetDeviceById<T>(string deviceId)
         {
-            return Activator.CreateInstance(typeof(T), new Object[] { this, deviceId }) as IDevice;
+            return (T)Activator.CreateInstance(typeof(T), new Object[] { this, deviceId });
         }
 
         public abstract Dictionary<string, string> GetDeviceState(IDevice device);
 
-        public abstract IDevice GetDeviceByLabel<T>(string label);
+        public abstract T GetDeviceByLabel<T>(string label);
     }
 }

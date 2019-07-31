@@ -18,7 +18,7 @@ namespace Puppet.Automation
         public GarageLighting(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             SwitchesToActivate.Add(
-                _hub.GetDeviceByMappedName<SwitchRelay>("Switch.GarageLights") as SwitchRelay);
+                _hub.GetDeviceByMappedName<SwitchRelay>("Switch.GarageLights"));
 
             DeactivationWait = TimeSpan.FromMinutes(30);
             EnableDeactivation = true;

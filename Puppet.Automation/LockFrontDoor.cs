@@ -20,15 +20,15 @@ namespace Puppet.Automation
         public LockFrontDoor(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             _frontDoor =
-                _hub.GetDeviceByMappedName<ContactSensor>("Contact.FrontDoor") as ContactSensor;
+                _hub.GetDeviceByMappedName<ContactSensor>("Contact.FrontDoor");
 
             _frontDoorLock =
-                _hub.GetDeviceByMappedName<LockDevice>("Lock.FrontDoorDeadbolt") as LockDevice;
+                _hub.GetDeviceByMappedName<LockDevice>("Lock.FrontDoorDeadbolt");
 
             _notificationDevices =
                 new List<Speaker>() {
-                    _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier") as Speaker,
-                    _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker") as Speaker
+                    _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
+                    _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
                 };
         }
 

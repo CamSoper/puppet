@@ -21,7 +21,7 @@ namespace Puppet.Automation
                 if (_evt.DescriptionText.Contains("was unlocked by") && 
                     !_evt.DescriptionText.Contains("thumb"))
                 {
-                    Speaker notifier = _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier") as Speaker;
+                    Speaker notifier = _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier");
                     notifier.Speak($"{_evt.DescriptionText}.");
                 }
             }

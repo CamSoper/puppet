@@ -22,14 +22,14 @@ namespace Puppet.Automation
         public FrontLights(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             _doors = new List<ContactSensor>();
-            _doors.Add(_hub.GetDeviceByMappedName<ContactSensor>("Contact.FrontDoor") as ContactSensor);
-            _doors.Add(_hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor1Opener") as ContactSensor);
-            _doors.Add(_hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor1") as ContactSensor);
-            _doors.Add(_hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor2Opener") as ContactSensor);
-            _doors.Add(_hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor2") as ContactSensor);
+            _doors.Add(_hub.GetDeviceByMappedName<ContactSensor>("Contact.FrontDoor"));
+            _doors.Add(_hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor1Opener"));
+            _doors.Add(_hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor1"));
+            _doors.Add(_hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor2Opener"));
+            _doors.Add(_hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor2"));
 
             _frontLights = 
-                _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FrontLightsPower") as SwitchRelay;
+                _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FrontLightsPower");
         }
 
         protected override async Task Handle()

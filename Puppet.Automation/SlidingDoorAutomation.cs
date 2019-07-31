@@ -8,21 +8,16 @@ using Puppet.Common.Services;
 namespace Puppet.Automation
 {
     [TriggerDevice("Contact.SlidingDoor", Capability.Contact)]
-    public class SlidingDoorAutomation : AutomationBase
+    public class SlidingDoorAutomation : TriggeredLightingAutomationBase
     {
-        SwitchRelay _patio;
         public SlidingDoorAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            _patio = 
-                _hub.GetDeviceByMappedName<SwitchRelay>("Switch.PatioLight") as SwitchRelay;
-        }
-
-        protected override async Task Handle()
-        {
-            if(_evt.IsOpenEvent && IsDark(30, -30))
+            if (IsDark(30, -30))
             {
-                _patio.On();
+                SwitchesToActivate.Add(_hub.GetDeviceByMappedName<SwitchRelay>("Switch.PatioLight"));
             }
+            EnableDeactivation = true;
+            DeactivationWait = TimeSpan.FromMinutes(30);
         }
     }
 }

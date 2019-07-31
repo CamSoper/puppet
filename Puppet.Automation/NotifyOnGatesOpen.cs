@@ -19,8 +19,8 @@ namespace Puppet.Automation
             NotifyOnClose = true;
             NotificationDevices =
                 new List<Speaker>() {
-                    _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier") as Speaker,
-                    _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker") as Speaker
+                    _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
+                    _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
                 };
             NotificationFormat = @"{0} is open.";
         }

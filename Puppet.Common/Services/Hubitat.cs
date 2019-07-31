@@ -128,7 +128,7 @@ namespace Puppet.Common.Services
             result.EnsureSuccessStatusCode();
         }
 
-        public override IDevice GetDeviceByLabel<T>(string label)
+        public override T GetDeviceByLabel<T>(string label)
         {
             Uri requestUri = new Uri($"{_baseMakerApiAddress}?access_token={_accessToken}");
             Console.WriteLine($"{DateTime.Now} Hubitat Device Command: {requestUri.ToString().Split('?')[0]}");
@@ -141,7 +141,7 @@ namespace Puppet.Common.Services
             {
                 throw new DeviceNotFoundException("No device was found with the provided label.");
             }
-            return this.GetDeviceById<GenericDevice>(deviceId);
+            return this.GetDeviceById<T>(deviceId);
         }
 
         public override async Task SendNotification(string notificationText)

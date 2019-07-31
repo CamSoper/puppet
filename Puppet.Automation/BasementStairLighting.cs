@@ -16,7 +16,7 @@ namespace Puppet.Automation
             SwitchesToActivate =
                 new List<SwitchRelay>()
                 {
-                    _hub.GetDeviceByMappedName<SwitchRelay>("Switch.BasementStairwayLight") as SwitchRelay
+                    _hub.GetDeviceByMappedName<SwitchRelay>("Switch.BasementStairwayLight"),
                 };
         }
     }

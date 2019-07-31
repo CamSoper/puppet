@@ -13,7 +13,7 @@ namespace Puppet.Automation
         public PatioAndFloodlightAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             _floodlights = 
-                _hub.GetDeviceByMappedName<SwitchRelay>("Switch.Floodlights") as SwitchRelay;
+                _hub.GetDeviceByMappedName<SwitchRelay>("Switch.Floodlights");
         }
 
         protected override Task Handle()
