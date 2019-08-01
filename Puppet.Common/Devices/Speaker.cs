@@ -12,10 +12,10 @@ namespace Puppet.Common.Devices
         {
         }
 
-        public void Speak(string message)
+        public async Task Speak(string message)
         {
             Console.WriteLine($"{DateTime.Now} Speaker {this.Id} speaking: {message}");
-            _hub.DoAction(this, "speak", new string[] { message });
+            await _hub.DoAction(this, "speak", new string[] { message });
         }
     }
 }

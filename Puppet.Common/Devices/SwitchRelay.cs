@@ -1,5 +1,6 @@
 ﻿
 using Puppet.Common.Services;
+using System.Threading.Tasks;
 
 namespace Puppet.Common.Devices
 {
@@ -35,14 +36,14 @@ namespace Puppet.Common.Devices
             }
         }
 
-        public void On()
+        public async Task On()
         {
-            _hub.DoAction(this, "on");
+            await _hub.DoAction(this, "on");
 
         }
-        public void Off()
+        public async Task Off()
         {
-            _hub.DoAction(this, "off");
+            await _hub.DoAction(this, "off");
         }
     }
 }

@@ -24,12 +24,14 @@ namespace Puppet.Automation
 
         private async Task InitDevices()
         {
-            _doors = new List<ContactSensor>();
-            _doors.Add(await _hub.GetDeviceByMappedName<ContactSensor>("Contact.FrontDoor"));
-            _doors.Add(await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor1Opener"));
-            _doors.Add(await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor1"));
-            _doors.Add(await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor2Opener"));
-            _doors.Add(await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor2"));
+            _doors = new List<ContactSensor>
+            {
+                await _hub.GetDeviceByMappedName<ContactSensor>("Contact.FrontDoor"),
+                await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor1Opener"),
+                await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor1"),
+                await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor2Opener"),
+                await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor2")
+            };
 
             _frontLights =
                 await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FrontLightsPower");
@@ -41,14 +43,14 @@ namespace Puppet.Automation
 
             if(_evt.IsOpenEvent && await IsDark(30, -30))
             {
-                _frontLights.On();
+                await _frontLights.On();
             }
             else
             {
                 if(!_doors.IsAnyOpen() && _frontLights.Status == SwitchStatus.On)
                 {
                     await WaitForCancellationAsync(TimeSpan.FromMinutes(10));
-                    _frontLights.Off();
+                    await _frontLights.Off();
                 }
             }
         }

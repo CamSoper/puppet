@@ -33,7 +33,7 @@ namespace Puppet.Common.Automation
             {
                 foreach(var s in SwitchesToActivate)
                 {
-                    s.On();
+                    await s.On();
                 }
                 _hub.StateBag.AddOrUpdate(timeActivatedKey, DateTime.Now,
                     (key, oldvalue) => DateTime.Now);
@@ -52,7 +52,7 @@ namespace Puppet.Common.Automation
                 await WaitForCancellationAsync(timeToWait);
                 foreach(var s in SwitchesToActivate)
                 {
-                    s.Off();
+                    await s.Off();
                 }
                 _hub.StateBag.Remove(timeActivatedKey, out var ignoreMe);
             }

@@ -38,7 +38,7 @@ namespace Puppet.Automation
             if (_evt.IsOpenEvent)
             {
                 // Turn on the light
-                _pantryLight.On();
+                await _pantryLight.On();
 
                 // Remember when we turned on the light for later (when we respond to an off event)
                 _hub.StateBag.AddOrUpdate(_timeOpenedKey, DateTime.Now,
@@ -46,16 +46,16 @@ namespace Puppet.Automation
 
                 // Wait a bit...
                 await WaitForCancellationAsync(_interval);
-                _kitchenSpeaker.Speak("Please close the pantry door");
+                await _kitchenSpeaker.Speak("Please close the pantry door");
 
                 // Wait a bit more...
                 await WaitForCancellationAsync(_interval);
-                _kitchenSpeaker.Speak("I said, please close the pantry door");
+                await _kitchenSpeaker.Speak("I said, please close the pantry door");
 
                 // Wait a bit longer and then give up...
                 await WaitForCancellationAsync(_interval);
-                _kitchenSpeaker.Speak("Fine, I'll turn off the light myself.");
-                _pantryLight.Off();
+                await _kitchenSpeaker.Speak("Fine, I'll turn off the light myself.");
+                await _pantryLight.Off();
             }
             else
             {
@@ -66,9 +66,9 @@ namespace Puppet.Automation
                 {
                     // It's been open five minutes, so we've nagged by now.
                     // It's only polite to thank them for doing what we've asked!
-                    _kitchenSpeaker.Speak("Thank you for closing the pantry door");
+                    await _kitchenSpeaker.Speak("Thank you for closing the pantry door");
                 }
-                _pantryLight.Off();
+                await _pantryLight.Off();
             }
         }
     }

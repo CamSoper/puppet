@@ -26,16 +26,16 @@ namespace Puppet.Automation
                 switch(_evt.Value)
                 {
                     case "1":
-                        speaker.Speak("Your father requires quiet, please.");
+                        await speaker.Speak("Your father requires quiet, please.");
                         break;
                     case "2":
-                        speaker.Speak("Your father says he hears you, but is unable to answer.");
+                        await speaker.Speak("Your father says he hears you, but is unable to answer.");
                         break;
                     case "3":
-                        speaker.Speak("Please let the dogs in.");
+                        await speaker.Speak("Please let the dogs in.");
                         break;
                     case "4":
-                        speaker.Speak("Whatever you are doing, it is frustrating your father. Please correct it now or there will be consequences.");
+                        await speaker.Speak("Whatever you are doing, it is frustrating your father. Please correct it now or there will be consequences.");
                         break;
                 }
             }     
@@ -50,7 +50,7 @@ namespace Puppet.Automation
                     case "3":
                         break;
                     case "4":
-                        speaker.Speak("I said, there will be consequences. BIG. CONSEQUENCES.");
+                        await speaker.Speak("I said, there will be consequences. BIG. CONSEQUENCES.");
                         break;
                 }
             }

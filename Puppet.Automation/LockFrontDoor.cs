@@ -37,9 +37,11 @@ namespace Puppet.Automation
 
         protected async override Task Handle()
         {
+            await InitDevices();
+
             if(_evt.Value == "unknown" && _evt.DeviceId == _hub.LookupDeviceId("Lock.FrontDoorDeadbolt"))
             {
-                _notificationDevices.Speak("Front door deadbolt is in an unknown state! Please check it.");
+                await _notificationDevices.Speak("Front door deadbolt is in an unknown state! Please check it.");
                 return;
             }
 
@@ -51,13 +53,13 @@ namespace Puppet.Automation
                     attempts < 3)
             {
                 attempts++;
-                _frontDoorLock.Lock();
+                await _frontDoorLock.Lock();
                 await WaitForCancellationAsync(TimeSpan.FromSeconds(30));
             }
 
             if (_frontDoorLock.Status != LockStatus.Locked)
             {
-                _notificationDevices.Speak("Front door deadbolt failed to lock! Please check it.");
+                await _notificationDevices.Speak("Front door deadbolt failed to lock! Please check it.");
             }
         }
     }

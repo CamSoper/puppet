@@ -22,7 +22,7 @@ namespace Puppet.Automation
                     !_evt.DescriptionText.Contains("thumb"))
                 {
                     Speaker notifier = await _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier");
-                    notifier.Speak($"{_evt.DescriptionText}.");
+                    await notifier.Speak($"{_evt.DescriptionText}.");
                 }
             }
         }

@@ -25,11 +25,11 @@ namespace Puppet.Automation
 
             if(_evt.IsOnEvent)
             {
-                _floodlights.On();
+                await _floodlights.On();
             }
             else
             {
-                _floodlights.Off();
+                await _floodlights.Off();
             }
         }
     }

@@ -17,19 +17,21 @@ namespace Puppet.Common.Services
     public abstract class HomeAutomationPlatform
     {
         const string DEVICE_FILENAME = "devicemap.json";
-        dynamic _deviceMap { get; }
+        dynamic DeviceMap { get; }
 
         public ConcurrentDictionary<string, object> StateBag { get; set; }
-        public abstract void DoAction(IDevice device, string action, string[] args = null);
+        public abstract Task DoAction(IDevice device, string action, string[] args = null);
         public abstract Task SendNotification(string notificationText);
         
         public abstract Task StartAutomationEventWatcher();
 
         public event EventHandler<AutomationEventEventArgs> AutomationEvent;
 
+#pragma warning disable IDE0060 // Remove unused parameter
         public HomeAutomationPlatform(IConfiguration configuration)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
-            this._deviceMap = JObject.Parse(
+            this.DeviceMap = JObject.Parse(
                 File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), DEVICE_FILENAME)));
         }
 
@@ -42,7 +44,7 @@ namespace Puppet.Common.Services
 
         public string LookupDeviceId(string mappedDeviceName)
         {
-            return ParseAndLookupMappedDeviceName(this._deviceMap, mappedDeviceName);
+            return ParseAndLookupMappedDeviceName(this.DeviceMap, mappedDeviceName);
         }
         string ParseAndLookupMappedDeviceName(dynamic obj, string mappedDeviceName)
         {

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Puppet.Common.Devices
 {
@@ -17,14 +18,14 @@ namespace Puppet.Common.Devices
         {
         }
 
-        public void Lock()
+        public async Task Lock()
         {
-            _hub.DoAction(this, "lock");
+            await _hub.DoAction(this, "lock");
         }
 
-        public void Unlock()
+        public async Task Unlock()
         {
-            _hub.DoAction(this, "unlock");
+            await _hub.DoAction(this, "unlock");
         }
 
         public LockStatus Status

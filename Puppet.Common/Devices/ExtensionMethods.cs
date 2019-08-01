@@ -7,13 +7,13 @@ namespace Puppet.Common.Devices
 {
     public static class ExtensionMethods
     {
-        public static void Speak(this IEnumerable<Speaker> notifiers, string message)
+        public static async Task Speak(this IEnumerable<Speaker> notifiers, string message)
         {
             foreach(var s in notifiers)
             {
                 try
                 {
-                    s.Speak(message);
+                    await s.Speak(message);
                 }
                 catch(Exception ex)
                 {

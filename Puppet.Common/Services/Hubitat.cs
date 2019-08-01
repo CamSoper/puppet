@@ -55,21 +55,24 @@ namespace Puppet.Common.Services
                 try
                 {
                     Console.WriteLine($"{DateTime.Now} Connecting to Hubitat...");
-                    var client = new ClientWebSocket();
-                    client.Options.RemoteCertificateValidationCallback += (a, b, c, d) => {
-                        return true;
-                    };
-                    await client.ConnectAsync(new Uri(_websocketUrl), CancellationToken.None);
-                    Console.WriteLine($"{DateTime.Now} Websocket success! Watching for events.");
-                    wseRetryCount = 0;
-                    ArraySegment<byte> buffer;
-                    while (client.State == WebSocketState.Open)
+                    using (var client = new ClientWebSocket())
                     {
-                        buffer = new ArraySegment<byte>(new byte[1024 * 4]);
-                        WebSocketReceiveResult reply = await client.ReceiveAsync(buffer, CancellationToken.None);
-                        string json = System.Text.Encoding.Default.GetString(buffer.ToArray()).TrimEnd('\0');
-                        HubEvent evt = JsonConvert.DeserializeObject<HubEvent>(json);
-                        OnAutomationEvent(new AutomationEventEventArgs() { HubEvent = evt });
+                        client.Options.RemoteCertificateValidationCallback += (a, b, c, d) =>
+                        {
+                            return true;
+                        };
+                        await client.ConnectAsync(new Uri(_websocketUrl), CancellationToken.None);
+                        Console.WriteLine($"{DateTime.Now} Websocket success! Watching for events.");
+                        wseRetryCount = 0;
+                        ArraySegment<byte> buffer;
+                        while (client.State == WebSocketState.Open)
+                        {
+                            buffer = new ArraySegment<byte>(new byte[1024 * 4]);
+                            WebSocketReceiveResult reply = await client.ReceiveAsync(buffer, CancellationToken.None);
+                            string json = System.Text.Encoding.Default.GetString(buffer.ToArray()).TrimEnd('\0');
+                            HubEvent evt = JsonConvert.DeserializeObject<HubEvent>(json);
+                            OnAutomationEvent(new AutomationEventEventArgs() { HubEvent = evt });
+                        }
                     }
                 }
                 catch (WebSocketException wse)
@@ -97,51 +100,57 @@ namespace Puppet.Common.Services
         {
             Uri requestUri = new Uri($"{_baseMakerApiAddress}/{device.Id}?access_token={_accessToken}");
             Console.WriteLine($"{DateTime.Now} Hubitat Device State Request: {requestUri.ToString().Split('?')[0]}");
-            var result = await _client.GetAsync(requestUri);
-            result.EnsureSuccessStatusCode();
-
-            Dictionary<string, string> state = new Dictionary<string, string>();
-            dynamic rawJson = JObject.Parse(await result.Content.ReadAsStringAsync());
-
-            state.Add("name", rawJson.name.ToString());
-            state.Add("label", rawJson.label.ToString());
-            foreach (dynamic attribute in rawJson.attributes)
+            using (var result = await _client.GetAsync(requestUri))
             {
-                string key = attribute.name.ToString();
-                if (!state.ContainsKey(key))
-                {
-                    state.Add(key, attribute.currentValue.ToString());
-                }
-            }
+                result.EnsureSuccessStatusCode();
 
-            return state;
+                Dictionary<string, string> state = new Dictionary<string, string>();
+                dynamic rawJson = JObject.Parse(await result.Content.ReadAsStringAsync());
+
+                state.Add("name", rawJson.name.ToString());
+                state.Add("label", rawJson.label.ToString());
+                foreach (dynamic attribute in rawJson.attributes)
+                {
+                    string key = attribute.name.ToString();
+                    if (!state.ContainsKey(key))
+                    {
+                        state.Add(key, attribute.currentValue.ToString());
+                    }
+                }
+
+                return state;
+            }
         }
 
-        public override async void DoAction(IDevice device, string action, string[] args = null)
+        public override async Task DoAction(IDevice device, string action, string[] args = null)
         {
             string secondary = (args != null) ? $"/{args[0]}" : "";
             secondary = secondary.Replace(' ', '-').Replace('?', '.');
 
             Uri requestUri = new Uri($"{_baseMakerApiAddress}/{device.Id}/{action.Trim()}{secondary.Trim()}?access_token={_accessToken}");
             Console.WriteLine($"{DateTime.Now} Hubitat Device Command: {requestUri.ToString().Split('?')[0]}");
-            HttpResponseMessage result = await _client.GetAsync(requestUri);
-            result.EnsureSuccessStatusCode();
+            using (HttpResponseMessage result = await _client.GetAsync(requestUri))
+            {
+                result.EnsureSuccessStatusCode();
+            }
         }
 
         public override async Task<T> GetDeviceByLabel<T>(string label)
         {
             Uri requestUri = new Uri($"{_baseMakerApiAddress}?access_token={_accessToken}");
             Console.WriteLine($"{DateTime.Now} Hubitat Device Command: {requestUri.ToString().Split('?')[0]}");
-            HttpResponseMessage result = await _client.GetAsync(requestUri);
-            result.EnsureSuccessStatusCode();
-
-            List<HubitatDevice> hubitatDevices = JsonConvert.DeserializeObject<List<HubitatDevice>>(await result.Content.ReadAsStringAsync());
-            string deviceId = hubitatDevices.Where(x => x.Label == label).FirstOrDefault()?.Id;
-            if(deviceId == null)
+            using (HttpResponseMessage result = await _client.GetAsync(requestUri))
             {
-                throw new DeviceNotFoundException("No device was found with the provided label.");
+                result.EnsureSuccessStatusCode();
+                List<HubitatDevice> hubitatDevices = JsonConvert.DeserializeObject<List<HubitatDevice>>(await result.Content.ReadAsStringAsync());
+
+                string deviceId = hubitatDevices.Where(x => x.Label == label).FirstOrDefault()?.Id;
+                if (deviceId == null)
+                {
+                    throw new DeviceNotFoundException("No device was found with the provided label.");
+                }
+                return await GetDeviceById<T>(deviceId);
             }
-            return await GetDeviceById<T>(deviceId);
         }
 
         public override async Task SendNotification(string notificationText)
@@ -156,9 +165,11 @@ namespace Puppet.Common.Services
             {
                 Uri requestUri = new Uri($"{_baseAuxAppAddress}/suntimes?access_token={_auxAppAccessToken}");
                 Console.WriteLine($"{DateTime.Now} Hubitat Device Command: {requestUri.ToString().Split('?')[0]}");
-                HttpResponseMessage result = await _client.GetAsync(requestUri);
-                result.EnsureSuccessStatusCode();
-                _sunriseAndSunset = JsonConvert.DeserializeObject<SunriseAndSunset>(await result.Content.ReadAsStringAsync());
+                using (HttpResponseMessage result = await _client.GetAsync(requestUri))
+                {
+                    result.EnsureSuccessStatusCode();
+                    _sunriseAndSunset = JsonConvert.DeserializeObject<SunriseAndSunset>(await result.Content.ReadAsStringAsync());
+                }
             }
             return _sunriseAndSunset;    
         }

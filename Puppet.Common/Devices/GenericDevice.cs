@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Puppet.Common.Services;
 
 namespace Puppet.Common.Devices
@@ -11,14 +12,14 @@ namespace Puppet.Common.Devices
         {
         }
 
-        public void DoAction(string command, string parameter = null)
+        public async Task DoAction(string command, string parameter = null)
         {
             string[] args = null;
             if (parameter != null)
             {
                 args = new string[] { parameter };
             }
-            _hub.DoAction(this, command, args);
+            await _hub.DoAction(this, command, args);
         }
     }
 }

@@ -45,7 +45,7 @@ namespace Puppet.Common.Services
                     parm = payload;
                 }
 
-                device.DoAction(tokens[3], parm);
+                await device.DoAction(tokens[3], parm);
             }
             catch (Exception ex)
             {

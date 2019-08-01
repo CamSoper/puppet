@@ -32,9 +32,9 @@ namespace Puppet.Automation
 
                 while (true)
                 {
-                    LivingRoomXmas1.On();
+                    await LivingRoomXmas1.On();
                     await WaitForCancellationAsync(timeBetweenCycles);
-                    LivingRoomXmas2.On();
+                    await LivingRoomXmas2.On();
                     await WaitForCancellationAsync(timeBetweenCycles);
                 }
             }
@@ -42,7 +42,7 @@ namespace Puppet.Automation
             {
                 SwitchRelay DefaultLivingRoomScene =
                     await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.LivingRoomNormalScene");
-                DefaultLivingRoomScene.On();
+                await DefaultLivingRoomScene.On();
                 return;
             }
         }
