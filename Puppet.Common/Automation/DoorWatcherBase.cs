@@ -8,7 +8,7 @@ using Puppet.Common.Services;
 
 namespace Puppet.Common.Automation
 {
-    public class DoorWatcherBase : AutomationBase
+    public abstract class DoorWatcherBase : AutomationBase
     {
         public TimeSpan HowLong { get; set; }
         public List<Speaker> NotificationDevices { get; set; }
@@ -17,12 +17,14 @@ namespace Puppet.Common.Automation
         public bool NotifyOnClose { get; set; }
 
         public DoorWatcherBase(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
-        {
+        {}
 
-        }
+        protected abstract Task InitDevices();
 
         protected override async Task Handle()
         {
+            await InitDevices();
+
             if (_evt.IsOpenEvent)
             {
                 if (NumberOfNotifications < 1) NumberOfNotifications = 1;

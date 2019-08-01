@@ -12,12 +12,16 @@ namespace Puppet.Automation
     {
         public SlidingDoorAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            if (IsDark(30, -30))
-            {
-                SwitchesToActivate.Add(_hub.GetDeviceByMappedName<SwitchRelay>("Switch.PatioLight"));
-            }
             EnableDeactivation = true;
             DeactivationWait = TimeSpan.FromMinutes(30);
+        }
+
+        public override async Task InitDevices()
+        {
+            if (await IsDark(30, -30))
+            {
+                SwitchesToActivate.Add(await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.PatioLight"));
+            }
         }
     }
 }

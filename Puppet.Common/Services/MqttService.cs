@@ -25,7 +25,7 @@ namespace Puppet.Common.Services
             _mqttClient.ApplicationMessageReceived += OnMqttMessageReceived;
         }
 
-        private void OnMqttMessageReceived(object sender, MQTTnet.MqttApplicationMessageReceivedEventArgs e)
+        private async void OnMqttMessageReceived(object sender, MQTTnet.MqttApplicationMessageReceivedEventArgs e)
         {
             Console.WriteLine($"{DateTime.Now} Received MQTT message. Topic: {e.ApplicationMessage.Topic} Payload: {e.ApplicationMessage.ConvertPayloadToString()}");
             try
@@ -39,7 +39,7 @@ namespace Puppet.Common.Services
                     throw new InvalidMqttTopicException();
                 }
 
-                GenericDevice device = _hub.GetDeviceByLabel<GenericDevice>(tokens[2]) as GenericDevice;
+                GenericDevice device = await _hub.GetDeviceByLabel<GenericDevice>(tokens[2]);
                 if (!string.IsNullOrEmpty(payload))
                 {
                     parm = payload;

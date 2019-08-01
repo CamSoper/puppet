@@ -93,15 +93,15 @@ namespace Puppet.Common.Services
             }
         }
 
-        public override Dictionary<string, string> GetDeviceState(IDevice device)
+        public override async Task<Dictionary<string, string>> GetDeviceState(IDevice device)
         {
             Uri requestUri = new Uri($"{_baseMakerApiAddress}/{device.Id}?access_token={_accessToken}");
             Console.WriteLine($"{DateTime.Now} Hubitat Device State Request: {requestUri.ToString().Split('?')[0]}");
-            var result = _client.GetAsync(requestUri).Result;
+            var result = await _client.GetAsync(requestUri);
             result.EnsureSuccessStatusCode();
 
             Dictionary<string, string> state = new Dictionary<string, string>();
-            dynamic rawJson = JObject.Parse(result.Content.ReadAsStringAsync().Result);
+            dynamic rawJson = JObject.Parse(await result.Content.ReadAsStringAsync());
 
             state.Add("name", rawJson.name.ToString());
             state.Add("label", rawJson.label.ToString());
@@ -117,31 +117,31 @@ namespace Puppet.Common.Services
             return state;
         }
 
-        public override void DoAction(IDevice device, string action, string[] args = null)
+        public override async void DoAction(IDevice device, string action, string[] args = null)
         {
             string secondary = (args != null) ? $"/{args[0]}" : "";
             secondary = secondary.Replace(' ', '-').Replace('?', '.');
 
             Uri requestUri = new Uri($"{_baseMakerApiAddress}/{device.Id}/{action.Trim()}{secondary.Trim()}?access_token={_accessToken}");
             Console.WriteLine($"{DateTime.Now} Hubitat Device Command: {requestUri.ToString().Split('?')[0]}");
-            HttpResponseMessage result = _client.GetAsync(requestUri).Result;
+            HttpResponseMessage result = await _client.GetAsync(requestUri);
             result.EnsureSuccessStatusCode();
         }
 
-        public override T GetDeviceByLabel<T>(string label)
+        public override async Task<T> GetDeviceByLabel<T>(string label)
         {
             Uri requestUri = new Uri($"{_baseMakerApiAddress}?access_token={_accessToken}");
             Console.WriteLine($"{DateTime.Now} Hubitat Device Command: {requestUri.ToString().Split('?')[0]}");
-            HttpResponseMessage result = _client.GetAsync(requestUri).Result;
+            HttpResponseMessage result = await _client.GetAsync(requestUri);
             result.EnsureSuccessStatusCode();
 
-            List<HubitatDevice> hubitatDevices = JsonConvert.DeserializeObject<List<HubitatDevice>>(result.Content.ReadAsStringAsync().Result);
+            List<HubitatDevice> hubitatDevices = JsonConvert.DeserializeObject<List<HubitatDevice>>(await result.Content.ReadAsStringAsync());
             string deviceId = hubitatDevices.Where(x => x.Label == label).FirstOrDefault()?.Id;
             if(deviceId == null)
             {
                 throw new DeviceNotFoundException("No device was found with the provided label.");
             }
-            return this.GetDeviceById<T>(deviceId);
+            return await GetDeviceById<T>(deviceId);
         }
 
         public override async Task SendNotification(string notificationText)
@@ -149,21 +149,18 @@ namespace Puppet.Common.Services
             throw new NotImplementedException();
         }
         
-        public override SunriseAndSunset SunriseAndSunset
+        public override async Task<SunriseAndSunset> GetSunriseAndSunset()
         {
-            get
+            if(_sunriseAndSunset == null || 
+                (_sunriseAndSunset?.Sunrise.Date < DateTime.Now.Date))
             {
-                if(_sunriseAndSunset == null || 
-                    (_sunriseAndSunset?.Sunrise.Date < DateTime.Now.Date))
-                {
-                    Uri requestUri = new Uri($"{_baseAuxAppAddress}/suntimes?access_token={_auxAppAccessToken}");
-                    Console.WriteLine($"{DateTime.Now} Hubitat Device Command: {requestUri.ToString().Split('?')[0]}");
-                    HttpResponseMessage result = _client.GetAsync(requestUri).Result;
-                    result.EnsureSuccessStatusCode();
-                    _sunriseAndSunset = JsonConvert.DeserializeObject<SunriseAndSunset>(result.Content.ReadAsStringAsync().Result);
-                }
-                return _sunriseAndSunset;    
+                Uri requestUri = new Uri($"{_baseAuxAppAddress}/suntimes?access_token={_auxAppAccessToken}");
+                Console.WriteLine($"{DateTime.Now} Hubitat Device Command: {requestUri.ToString().Split('?')[0]}");
+                HttpResponseMessage result = await _client.GetAsync(requestUri);
+                result.EnsureSuccessStatusCode();
+                _sunriseAndSunset = JsonConvert.DeserializeObject<SunriseAndSunset>(await result.Content.ReadAsStringAsync());
             }
+            return _sunriseAndSunset;    
         }
 
     }

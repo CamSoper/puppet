@@ -11,13 +11,18 @@ namespace Puppet.Automation
     {
         SwitchRelay _floodlights;
         public PatioAndFloodlightAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        { }
+
+        private async Task InitDevices()
         {
-            _floodlights = 
-                _hub.GetDeviceByMappedName<SwitchRelay>("Switch.Floodlights");
+            _floodlights =
+                await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.Floodlights");
         }
 
-        protected override Task Handle()
+        protected override async Task Handle()
         {
+            await InitDevices();
+
             if(_evt.IsOnEvent)
             {
                 _floodlights.On();
@@ -26,7 +31,6 @@ namespace Puppet.Automation
             {
                 _floodlights.Off();
             }
-            return Task.CompletedTask;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
@@ -17,12 +18,16 @@ namespace Puppet.Automation
         {
             HowLong = TimeSpan.Zero;
             NotifyOnClose = true;
+            NotificationFormat = @"{0} is open.";
+        }
+
+        protected override async Task InitDevices()
+        {
             NotificationDevices =
                 new List<Speaker>() {
-                    _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
-                    _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
-                };
-            NotificationFormat = @"{0} is open.";
+                    await _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
+                    await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
+    };
         }
     }
 }

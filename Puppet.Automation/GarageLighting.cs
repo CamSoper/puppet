@@ -5,6 +5,7 @@ using Puppet.Common.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Puppet.Automation
 {
@@ -17,11 +18,14 @@ namespace Puppet.Automation
     {
         public GarageLighting(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            SwitchesToActivate.Add(
-                _hub.GetDeviceByMappedName<SwitchRelay>("Switch.GarageLights"));
-
             DeactivationWait = TimeSpan.FromMinutes(30);
             EnableDeactivation = true;
+        }
+
+        public override async Task InitDevices()
+        {
+            SwitchesToActivate.Add(
+                await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.GarageLights"));
         }
     }
 }

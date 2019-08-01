@@ -56,8 +56,8 @@ namespace Puppet.Automation
 
                 List<Speaker> notificationDevices =
                     new List<Speaker>() {
-                        _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
-                        _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
+                        await _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
+                        await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
                     };
                 notificationDevices.Speak("There is activity at the mailbox.");
 

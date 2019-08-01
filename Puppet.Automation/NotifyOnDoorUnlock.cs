@@ -14,19 +14,17 @@ namespace Puppet.Automation
         {
         }
 
-        protected override Task Handle()
+        protected override async Task Handle()
         {
             if (_evt.IsUnLockedEvent)
             {
                 if (_evt.DescriptionText.Contains("was unlocked by") && 
                     !_evt.DescriptionText.Contains("thumb"))
                 {
-                    Speaker notifier = _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier");
+                    Speaker notifier = await _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier");
                     notifier.Speak($"{_evt.DescriptionText}.");
                 }
             }
-
-            return Task.CompletedTask;
         }
     }
 }

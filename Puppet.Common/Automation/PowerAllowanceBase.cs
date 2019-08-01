@@ -25,7 +25,7 @@ namespace Puppet.Common.Automation
             if (_evt.IsOnEvent)
             {
                 await WaitForCancellationAsync(HowLong);
-                SwitchRelay relay = _hub.GetDeviceById<SwitchRelay>(_evt.DeviceId) as SwitchRelay;
+                SwitchRelay relay = await _hub.GetDeviceById<SwitchRelay>(_evt.DeviceId);
                 relay.Off();
             }
         }

@@ -22,16 +22,16 @@ namespace Puppet.Common.Devices
             Id = id;
         }
         
-        public void RefreshState()
+        public async Task RefreshState()
         {
-            _state = _hub.GetDeviceState(this);
+            _state = await _hub.GetDeviceState(this);
         }
 
         internal Dictionary<string, string> GetState()
         {
             if(_state == null)
             {
-                RefreshState();
+                Task.Run(() => RefreshState()).Wait(); 
             }
             return _state;
         }

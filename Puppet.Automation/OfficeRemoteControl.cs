@@ -18,9 +18,9 @@ namespace Puppet.Automation
         {
         }
 
-        protected override Task Handle()
+        protected override async Task Handle()
         {
-            Speaker speaker = _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker");
+            Speaker speaker = await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker");
             if(_evt.IsButtonPushedEvent)
             {
                 switch(_evt.Value)
@@ -54,8 +54,6 @@ namespace Puppet.Automation
                         break;
                 }
             }
-
-            return Task.CompletedTask;
         }
     }
 }

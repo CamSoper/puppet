@@ -8,6 +8,7 @@ using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
 using System.Threading.Tasks;
+using Puppet.Common.Models;
 
 namespace Puppet.Common.Automation
 {
@@ -42,13 +43,11 @@ namespace Puppet.Common.Automation
         /// </summary>
         /// <param name="sunriseOffset">Sunrise offset in minutes.</param>
         /// <param name="sunsetOffset">Sunset offset in minutes.</param>
-        protected bool IsDark(int sunriseOffset = 0, int sunsetOffset = 0)
+        protected async Task<bool> IsDark(int sunriseOffset = 0, int sunsetOffset = 0)
         {
-            DateTime SunriseWithOffset = 
-                _hub.SunriseAndSunset.Sunrise.AddMinutes(sunriseOffset);
-
-            DateTime SunsetWithOffset =
-                _hub.SunriseAndSunset.Sunset.AddMinutes(sunsetOffset);
+            SunriseAndSunset sun = await _hub.GetSunriseAndSunset();
+            DateTime SunriseWithOffset = sun.Sunrise.AddMinutes(sunriseOffset);
+            DateTime SunsetWithOffset = sun.Sunset.AddMinutes(sunsetOffset);
 
             if (DateTime.Now >= SunriseWithOffset && 
                 DateTime.Now <= SunsetWithOffset)

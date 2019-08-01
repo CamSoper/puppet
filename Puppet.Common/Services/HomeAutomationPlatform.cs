@@ -32,8 +32,8 @@ namespace Puppet.Common.Services
             this._deviceMap = JObject.Parse(
                 File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), DEVICE_FILENAME)));
         }
-        
-        public abstract SunriseAndSunset SunriseAndSunset { get; }
+
+        public abstract Task<SunriseAndSunset> GetSunriseAndSunset();
 
         protected virtual void OnAutomationEvent(AutomationEventEventArgs e)
         {
@@ -53,18 +53,18 @@ namespace Puppet.Common.Services
             else
                 return obj[mappedDeviceName];
         }
-        public T GetDeviceByMappedName<T>(string mappedDeviceName)
+        public async Task<T> GetDeviceByMappedName<T>(string mappedDeviceName)
         {
-            return GetDeviceById<T>(LookupDeviceId(mappedDeviceName));
+            return await GetDeviceById<T>(LookupDeviceId(mappedDeviceName));
         }
 
-        public T GetDeviceById<T>(string deviceId)
+        public async Task<T> GetDeviceById<T>(string deviceId)
         {
-            return (T)Activator.CreateInstance(typeof(T), new Object[] { this, deviceId });
+            return await Task.FromResult((T)Activator.CreateInstance(typeof(T), new Object[] { this, deviceId }));
         }
 
-        public abstract Dictionary<string, string> GetDeviceState(IDevice device);
+        public abstract Task<Dictionary<string, string>> GetDeviceState(IDevice device);
 
-        public abstract T GetDeviceByLabel<T>(string label);
+        public abstract Task<T> GetDeviceByLabel<T>(string label);
     }
 }

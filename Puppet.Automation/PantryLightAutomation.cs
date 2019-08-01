@@ -17,11 +17,14 @@ namespace Puppet.Automation
         const string _timeOpenedKey = "PantryOpenedTime";
 
         public PantryLightAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        { }
+
+        private async Task InitDevices()
         {
             _pantryLight =
-                _hub.GetDeviceByMappedName<SwitchRelay>("Switch.PantryLight");
+                await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.PantryLight");
             _kitchenSpeaker =
-                _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker");
+                await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker");
         }
 
         /// <summary>
@@ -30,6 +33,8 @@ namespace Puppet.Automation
         /// <param name="token">A .NET cancellation token received if this handler is to be cancelled.</param>
         protected override async Task Handle()
         {
+            await InitDevices();
+
             if (_evt.IsOpenEvent)
             {
                 // Turn on the light

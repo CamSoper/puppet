@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
@@ -14,14 +15,17 @@ namespace Puppet.Automation
     {
         public NotifyOnGarageDoorOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            NotificationDevices =
-                new List<Speaker>() {
-                    _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
-                    _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
-                };
-
             HowLong = TimeSpan.FromMinutes(5);
             NumberOfNotifications = 2;
+        }
+
+        protected override async Task InitDevices()
+        {
+            NotificationDevices =
+                new List<Speaker>() {
+                    await _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
+                    await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
+                };
         }
     }
 }

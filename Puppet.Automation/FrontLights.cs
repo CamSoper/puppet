@@ -20,21 +20,26 @@ namespace Puppet.Automation
         List<ContactSensor> _doors;
         
         public FrontLights(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        {}
+
+        private async Task InitDevices()
         {
             _doors = new List<ContactSensor>();
-            _doors.Add(_hub.GetDeviceByMappedName<ContactSensor>("Contact.FrontDoor"));
-            _doors.Add(_hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor1Opener"));
-            _doors.Add(_hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor1"));
-            _doors.Add(_hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor2Opener"));
-            _doors.Add(_hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor2"));
+            _doors.Add(await _hub.GetDeviceByMappedName<ContactSensor>("Contact.FrontDoor"));
+            _doors.Add(await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor1Opener"));
+            _doors.Add(await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor1"));
+            _doors.Add(await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor2Opener"));
+            _doors.Add(await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor2"));
 
-            _frontLights = 
-                _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FrontLightsPower");
+            _frontLights =
+                await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FrontLightsPower");
         }
 
         protected override async Task Handle()
         {
-            if(_evt.IsOpenEvent && IsDark(30, -30))
+            await InitDevices();
+
+            if(_evt.IsOpenEvent && await IsDark(30, -30))
             {
                 _frontLights.On();
             }

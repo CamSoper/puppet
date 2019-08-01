@@ -20,13 +20,17 @@ namespace Puppet.Automation
     {
         public NotifyOnExteriorDoorOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            NotificationDevices = 
+            HowLong = TimeSpan.FromMinutes(2);
+        }
+
+        protected override async Task InitDevices()
+        {
+            NotificationDevices =
                 new List<Speaker>() {
-                    _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
-                    _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
+                    await _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
+                    await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
                 };
 
-            HowLong = TimeSpan.FromMinutes(2);
         }
     }
 }
