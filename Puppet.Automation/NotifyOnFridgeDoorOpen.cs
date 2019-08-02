@@ -29,5 +29,6 @@ namespace Puppet.Automation
                     await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
                 };
         }
+
     }
 }

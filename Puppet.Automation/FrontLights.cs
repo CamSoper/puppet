@@ -22,7 +22,7 @@ namespace Puppet.Automation
         public FrontLights(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {}
 
-        private async Task InitDevices()
+        protected override async Task InitDevices()
         {
             _doors = new List<ContactSensor>
             {
@@ -39,8 +39,6 @@ namespace Puppet.Automation
 
         protected override async Task Handle()
         {
-            await InitDevices();
-
             if(_evt.IsOpenEvent && await IsDark(30, -30))
             {
                 await _frontLights.On();

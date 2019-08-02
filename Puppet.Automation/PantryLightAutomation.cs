@@ -19,7 +19,7 @@ namespace Puppet.Automation
         public PantryLightAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         { }
 
-        private async Task InitDevices()
+        protected override async Task InitDevices()
         {
             _pantryLight =
                 await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.PantryLight");
@@ -33,8 +33,6 @@ namespace Puppet.Automation
         /// <param name="token">A .NET cancellation token received if this handler is to be cancelled.</param>
         protected override async Task Handle()
         {
-            await InitDevices();
-
             if (_evt.IsOpenEvent)
             {
                 // Turn on the light

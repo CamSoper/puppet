@@ -15,7 +15,7 @@ namespace Puppet.Automation
         public BasementStairLighting(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {}
 
-        public override async Task InitDevices()
+        protected override async Task InitDevices()
         {
             SwitchesToActivate =
             new List<SwitchRelay>()

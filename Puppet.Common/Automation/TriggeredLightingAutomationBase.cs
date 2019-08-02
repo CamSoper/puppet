@@ -17,7 +17,6 @@ namespace Puppet.Common.Automation
         public TimeSpan DeactivationWait { get; set; }
         public bool EnableDeactivation { get; set; }
         public List<SwitchRelay> SwitchesToActivate { get; set; }
-        public abstract Task InitDevices();
         public TriggeredLightingAutomationBase(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             SwitchesToActivate = new List<SwitchRelay>();
@@ -25,7 +24,6 @@ namespace Puppet.Common.Automation
 
         protected async override Task Handle()
         {
-            await InitDevices();
             if (SwitchesToActivate.Count == 0)
             {
                 return;

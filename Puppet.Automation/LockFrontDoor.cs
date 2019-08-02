@@ -20,7 +20,7 @@ namespace Puppet.Automation
         public LockFrontDoor(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {}
 
-        private async Task InitDevices()
+        protected override async Task InitDevices()
         {
             _frontDoor =
                 await _hub.GetDeviceByMappedName<ContactSensor>("Contact.FrontDoor");
@@ -35,10 +35,8 @@ namespace Puppet.Automation
                 };
         }
 
-        protected async override Task Handle()
+        protected override async Task Handle()
         {
-            await InitDevices();
-
             if(_evt.Value == "unknown" && _evt.DeviceId == _hub.LookupDeviceId("Lock.FrontDoorDeadbolt"))
             {
                 await _notificationDevices.Speak("Front door deadbolt is in an unknown state! Please check it.");

@@ -24,13 +24,17 @@ namespace Puppet.Common.Automation
             _evt = evt;
         }
 
-        public Task Handle(CancellationToken token)
+        public async Task Handle(CancellationToken token)
         {
             _token = token;
-            return Handle();
+            await InitDevices();
+            await Handle();
         }
 
+        protected abstract Task InitDevices();
+
         protected abstract Task Handle();
+        
 
         /// <summary>
         /// Waits for a specified period time then returns a boolean indicating if the task was cancelled.

@@ -16,7 +16,7 @@ namespace Puppet.Automation
             DeactivationWait = TimeSpan.FromMinutes(30);
         }
 
-        public override async Task InitDevices()
+        protected override async Task InitDevices()
         {
             if (await IsDark(30, -30))
             {

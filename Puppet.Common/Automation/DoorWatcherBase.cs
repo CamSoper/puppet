@@ -19,11 +19,8 @@ namespace Puppet.Common.Automation
         public DoorWatcherBase(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {}
 
-        protected abstract Task InitDevices();
-
         protected override async Task Handle()
         {
-            await InitDevices();
             if (NotificationDevices.Count == 0)
             {
                 return;

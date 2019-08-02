@@ -46,5 +46,10 @@ namespace Puppet.Automation
                 return;
             }
         }
+
+        protected override Task InitDevices()
+        {
+            return Task.CompletedTask;
+        }
     }
 }

@@ -22,7 +22,7 @@ namespace Puppet.Automation
             EnableDeactivation = true;
         }
 
-        public override async Task InitDevices()
+        protected override async Task InitDevices()
         {
             SwitchesToActivate.Add(
                 await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.GarageLights"));

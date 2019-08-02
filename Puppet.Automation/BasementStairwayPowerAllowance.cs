@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
@@ -12,6 +13,11 @@ namespace Puppet.Automation
         public BasementStairwayPowerAllowance(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             HowLong = TimeSpan.FromMinutes(5);
+        }
+
+        protected override Task InitDevices()
+        {
+            return Task.CompletedTask;
         }
     }
 }

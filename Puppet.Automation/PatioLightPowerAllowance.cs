@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
@@ -12,6 +13,10 @@ namespace Puppet.Automation
         public PatioLightPowerAllowance(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             HowLong = TimeSpan.FromMinutes(30);
+        }
+        protected override Task InitDevices()
+        {
+            return Task.CompletedTask;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Puppet.Automation
         public GarageEntryLighting(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {}
 
-        public override async Task InitDevices()
+        protected override async Task InitDevices()
         {
             if (await IsDark(30, -30))
             {
