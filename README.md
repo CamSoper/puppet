@@ -1,6 +1,6 @@
 # Welcome to Puppet
 
-A .NET Core framework for automating Hubitat Elevate.
+A .NET Core framework for home automation with Hubitat Elevate.
 
 ## How it works
 
