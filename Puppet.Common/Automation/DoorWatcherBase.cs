@@ -24,6 +24,10 @@ namespace Puppet.Common.Automation
         protected override async Task Handle()
         {
             await InitDevices();
+            if (NotificationDevices.Count == 0)
+            {
+                return;
+            }
 
             if (_evt.IsOpenEvent)
             {
@@ -33,7 +37,7 @@ namespace Puppet.Common.Automation
                 for (int i = 0; i < NumberOfNotifications; i++)
                 {
                     await WaitForCancellationAsync(HowLong);
-                    NotificationDevices.Speak(String.Format(NotificationFormat,
+                    await NotificationDevices.Speak(String.Format(NotificationFormat,
                         _evt.DisplayName, HowLong.TotalMinutes * (i + 1), HowLong.TotalSeconds * (i + 1)));
                     // There's an unused string parameter being passed into String.Format.
                     // That way the deriving class can set the NotificationFormat to mention
@@ -42,7 +46,7 @@ namespace Puppet.Common.Automation
             }
             else if (_evt.IsClosedEvent && NotifyOnClose)
             {
-                NotificationDevices.Speak($"{_evt.DisplayName} is closed.");
+                await NotificationDevices.Speak($"{_evt.DisplayName} is closed.");
             }
         }
     }

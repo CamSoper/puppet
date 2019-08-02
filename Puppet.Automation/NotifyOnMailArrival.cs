@@ -59,7 +59,7 @@ namespace Puppet.Automation
                         await _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
                         await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
                     };
-                notificationDevices.Speak("There is activity at the mailbox.");
+                await notificationDevices.Speak("There is activity at the mailbox.");
 
             }
         }

@@ -14,6 +14,10 @@
     "GarageDoor1Opener": "394",
     "GarageDoor2Opener": "395",
     "GarageEntryDoor": "289",
+    "GarageFreezer": "738",
+    "GarageFridge": "737",
+    "KitchenFridge": "288",
+    "BasementFreezer":  "322",
     "Mailbox": "355"
   },
   "Lock": {

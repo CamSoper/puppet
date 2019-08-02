@@ -26,6 +26,10 @@ namespace Puppet.Common.Automation
         protected async override Task Handle()
         {
             await InitDevices();
+            if (SwitchesToActivate.Count == 0)
+            {
+                return;
+            }
 
             string timeActivatedKey = this.GetType().ToString();
             TimeSpan timeToWait = TimeSpan.MinValue;
