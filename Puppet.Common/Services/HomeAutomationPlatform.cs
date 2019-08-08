@@ -20,6 +20,7 @@ namespace Puppet.Common.Services
         dynamic DeviceMap { get; }
 
         public ConcurrentDictionary<string, object> StateBag { get; set; }
+        public IConfiguration Configuration { get; set; }
         public abstract Task DoAction(IDevice device, string action, string[] args = null);
         public abstract Task SendNotification(string notificationText);
         
@@ -33,6 +34,8 @@ namespace Puppet.Common.Services
         {
             this.DeviceMap = JObject.Parse(
                 File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), DEVICE_FILENAME)));
+
+            Configuration = configuration;
         }
 
         public abstract Task<SunriseAndSunset> GetSunriseAndSunset();

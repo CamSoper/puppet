@@ -37,9 +37,8 @@ namespace Puppet.Automation
 
         protected override async Task Handle()
         {
-            if(_evt.Value == "unknown" && _evt.DeviceId == _hub.LookupDeviceId("Lock.FrontDoorDeadbolt"))
+            if(_evt.Value.Contains("locking") && _evt.DeviceId == _frontDoorLock.Id)
             {
-                await _notificationDevices.Speak("Front door deadbolt is in an unknown state! Please check it.");
                 return;
             }
 

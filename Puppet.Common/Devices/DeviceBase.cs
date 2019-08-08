@@ -35,5 +35,15 @@ namespace Puppet.Common.Devices
             }
             return _state;
         }
+
+        public async Task DoAction(string command, string parameter = null)
+        {
+            string[] args = null;
+            if (parameter != null)
+            {
+                args = new string[] { parameter };
+            }
+            await _hub.DoAction(this, command, args);
+        }
     }
 }

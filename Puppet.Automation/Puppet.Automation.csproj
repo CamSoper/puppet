@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy $(ProjectDir)\devicemap.json ..\Puppet.Executive\$(OutDir)&#xD;&#xA;copy $(OutDir)\*.* ..\Puppet.Executive\$(OutDir)" />
+    <Exec Command="copy $(ProjectDir)devicemap.json ..\Puppet.Executive\$(OutDir)&#xD;&#xA;copy $(OutDir)*.* ..\Puppet.Executive\$(OutDir)" />
   </Target>
 
 </Project>

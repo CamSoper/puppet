@@ -21,7 +21,8 @@
     "Mailbox": "355"
   },
   "Lock": {
-    "FrontDoorDeadbolt": "388"
+    "FrontDoorDeadbolt": "772",
+    "SmartThingsFrontDoorDeadbolt": "770"
   },
   "Speaker": {
     "KitchenSpeaker": "65",
