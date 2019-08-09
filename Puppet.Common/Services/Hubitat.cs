@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -30,7 +31,8 @@ namespace Puppet.Common.Services
         readonly HttpClient _client;
         SunriseAndSunset _sunriseAndSunset;
 
-        public Hubitat(IConfiguration configuration, HttpClient httpClient) : base(configuration)
+        public Hubitat(IConfiguration configuration, HttpClient httpClient)
+            : base(configuration)
         {
             HubitatOptions hubitatOptions = configuration.GetSection("Hubitat").Get<HubitatOptions>();
 
@@ -41,7 +43,7 @@ namespace Puppet.Common.Services
 
             _baseAuxAppAddress = $"https://{hubitatOptions.HubitatHostNameOrIp}/apps/api/{hubitatOptions.AuxAppId}"; 
             _auxAppAccessToken = hubitatOptions.AuxAppAccessToken;
-
+            
             StateBag = new ConcurrentDictionary<string, object>();
         }
 
@@ -155,6 +157,7 @@ namespace Puppet.Common.Services
 
         public override async Task SendNotification(string notificationText)
         {
+            await Task.CompletedTask;
             throw new NotImplementedException();
         }
         

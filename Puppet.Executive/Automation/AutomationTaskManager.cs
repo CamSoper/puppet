@@ -4,8 +4,10 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
+using Microsoft.Extensions.Configuration;
 using Puppet.Common.Automation;
-using Puppet.Common.Events;
+using Puppet.Common.Telemetry;
 
 namespace Puppet.Executive.Automation
 {
@@ -19,9 +21,13 @@ namespace Puppet.Executive.Automation
     public class AutomationTaskManager
     {
         private HashSet<AutomationTaskTokenType> _taskList;
+        private TelemetryClient _telemetryClient;
+        private Metric _taskCountMetric;
 
-        public AutomationTaskManager()
+        public AutomationTaskManager(IConfiguration configuration)
         {
+            _telemetryClient = AppInsights.GetTelemetryClient(configuration);
+            _taskCountMetric = _telemetryClient.GetMetric("AutomationTasks");
             _taskList = new HashSet<AutomationTaskTokenType>();
         }
 
@@ -35,6 +41,7 @@ namespace Puppet.Executive.Automation
             lock (_taskList)
             {
                 _taskList.Add(new AutomationTaskTokenType(work, cts, automationType, initiatingDeviceId));
+                _taskCountMetric.TrackValue(_taskList.Count);
                 Console.WriteLine($"{DateTime.Now} Tracking {_taskList.Count} tasks.");
             }
         }
@@ -57,6 +64,7 @@ namespace Puppet.Executive.Automation
                     {
                         Console.WriteLine($"{DateTime.Now} Removed {count} completed tasks. {_taskList.Count} tasks remain in progress.");
                     }
+                    _taskCountMetric.TrackValue(_taskList.Count);
                 }
             });
         }

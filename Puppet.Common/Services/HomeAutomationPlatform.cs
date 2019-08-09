@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using Puppet.Common.Devices;
@@ -17,6 +18,7 @@ namespace Puppet.Common.Services
     public abstract class HomeAutomationPlatform
     {
         const string DEVICE_FILENAME = "devicemap.json";
+
         dynamic DeviceMap { get; }
 
         public ConcurrentDictionary<string, object> StateBag { get; set; }

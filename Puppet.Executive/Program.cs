@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
 using Puppet.Common.Automation;
 using Puppet.Common.Configuration;
@@ -10,6 +14,7 @@ using Puppet.Common.Events;
 using Puppet.Common.Services;
 using Puppet.Executive.Automation;
 using Puppet.Executive.Mqtt;
+using Puppet.Common.Telemetry;
 
 namespace Puppet.Executive
 {
@@ -20,6 +25,7 @@ namespace Puppet.Executive
         static AutomationTaskManager _taskManager;
         static HomeAutomationPlatform _hub;
         static IMqttService _mqtt;
+        static TelemetryClient _telemetryClient;
 
         public static async Task Main(string[] args)
         {
@@ -34,34 +40,40 @@ namespace Puppet.Executive
             {
                 ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; }
             };
-            HttpClient _httpClient = new HttpClient(customHttpClientHandler);
 
-            // Abstraction representing the home automation system
-            _hub = new Hubitat(configuration, _httpClient);
+            TelemetryConfiguration telemetryConfig = AppInsights.GetTelemetryConfiguration(configuration);
 
-            // Start the MQTT service, if applicable.
-            MqttOptions mqttOptions = configuration.GetSection("MQTT").Get<MqttOptions>();
-            if (mqttOptions?.Enabled ?? false)
+            using (AppInsights.InitializeDependencyTracking(telemetryConfig))
+            using (AppInsights.InitializePerformanceTracking(telemetryConfig))
+            using (HttpClient _httpClient = new HttpClient(customHttpClientHandler))
             {
-                _mqtt = new MqttService(await MqttClientFactory.GetClient(mqttOptions),
-                                        mqttOptions,
-                                        _hub);
-                await _mqtt.Start();
+                _telemetryClient = new TelemetryClient(telemetryConfig);
+
+                // Abstraction representing the home automation system
+                _hub = new Hubitat(configuration, _httpClient);
+
+                // Start the MQTT service, if applicable.
+                MqttOptions mqttOptions = configuration.GetSection("MQTT").Get<MqttOptions>();
+                if (mqttOptions?.Enabled ?? false)
+                {
+                    _mqtt = new MqttService(await MqttClientFactory.GetClient(mqttOptions),
+                                            mqttOptions,
+                                            _hub);
+                    await _mqtt.Start();
+                }
+
+                // Class to manage long-running tasks
+                _taskManager = new AutomationTaskManager(configuration);
+
+                // Bind a method to handle the events raised
+                // by the Hubitat device
+                _hub.AutomationEvent += Hub_AutomationEvent;
+                var hubTask = _hub.StartAutomationEventWatcher();
+
+                // Wait forever, this is a daemon process
+                await hubTask;
             }
-
-            // Class to manage long-running tasks
-            _taskManager = new AutomationTaskManager();
-
-            // Bind a method to handle the events raised
-            // by the Hubitat device
-            _hub.AutomationEvent += Hub_AutomationEvent;
-            var hubTask = _hub.StartAutomationEventWatcher();
-
-            // Wait forever, this is a daemon process
-            await hubTask;
         }
-
-
 
         /// <summary>
         /// Event handler for AutomationEvents raised by the HomeAutomationPlatform.
@@ -74,12 +86,6 @@ namespace Puppet.Executive
 
             Task.Run(() => StartRelevantAutomationHandlers(evt));
             Task.Run(() => SendEventToMqtt(evt));
-            //Task.Run(() => SendEventToAlexa(evt));
-        }
-
-        private static void SendEventToAlexa(HubEvent evt)
-        {
-            // TODO: Forward events to Alexa
         }
 
         private static void SendEventToMqtt(HubEvent evt)
@@ -104,18 +110,40 @@ namespace Puppet.Executive
                 {
                     var startedTime = DateTime.Now;
                     Console.WriteLine($"{DateTime.Now} {automation} event: {evt.DescriptionText}");
-                    try
+
+                    using (_telemetryClient.StartOperation<RequestTelemetry>(automation.ToString()))
                     {
-                        // This runs the Handle method on the automation class
-                        await automation.Handle(cts.Token);
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        Console.WriteLine($"{DateTime.Now} {automation} event from {startedTime} cancelled.");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"{DateTime.Now} {automation} {ex} {ex.Message}");
+                        _telemetryClient.TrackEvent(automation.ToString(),
+                            new Dictionary<string, string>()
+                            {
+                                {"Device ID", evt.DeviceId },
+                                {"Description", evt.DescriptionText },
+                                {"Display Name", evt.DisplayName },
+                                {"Name", evt.Name },
+                                {"Source", evt.Source },
+                                {"Value", evt.Value },
+                            });
+
+                        try
+                        {
+                            // This runs the Handle method on the automation class
+                            await automation.Handle(cts.Token);
+                        }
+                        catch (TaskCanceledException)
+                        {
+                            TimeSpan executionTime = DateTime.Now - startedTime;
+                            _telemetryClient.TrackEvent($"{automation} Cancelled",
+                                new Dictionary<string, string>()
+                                {
+                                    {"WaitTime", executionTime.TotalSeconds.ToString()},
+                                });
+                            Console.WriteLine($"{DateTime.Now} {automation} event from {startedTime} cancelled.");
+                        }
+                        catch (Exception ex)
+                        {
+                            _telemetryClient.TrackException(ex);
+                            Console.WriteLine($"{DateTime.Now} {automation} {ex} {ex.Message}");
+                        }
                     }
                 };
 

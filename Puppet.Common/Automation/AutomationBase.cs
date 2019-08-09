@@ -16,7 +16,7 @@ namespace Puppet.Common.Automation
     {
         protected HomeAutomationPlatform _hub;
         protected HubEvent _evt;
-        protected CancellationToken _token;
+        protected CancellationToken _cancelToken;
 
         public AutomationBase(HomeAutomationPlatform hub, HubEvent evt)
         {
@@ -26,7 +26,7 @@ namespace Puppet.Common.Automation
 
         public async Task Handle(CancellationToken token)
         {
-            _token = token;
+            _cancelToken = token;
             await InitDevices();
             await Handle();
         }
@@ -40,7 +40,7 @@ namespace Puppet.Common.Automation
         /// Waits for a specified period time then returns a boolean indicating if the task was cancelled.
         /// </summary>
         /// <param name="howLong">How long to wait.</param>
-        protected async Task WaitForCancellationAsync(TimeSpan howLong) => await Task.Delay(howLong, _token);
+        protected async Task WaitForCancellationAsync(TimeSpan howLong) => await Task.Delay(howLong, _cancelToken);
    
         /// <summary>
         /// Returns a bool indicating if it's currently dark outside based on sunrise and sunset times.

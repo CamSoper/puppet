@@ -8,6 +8,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
+using System.Net.Http.Headers;
 
 namespace Puppet.Automation
 {
@@ -16,14 +18,16 @@ namespace Puppet.Automation
     [TriggerDevice("Lock.SmartThingsFrontDoorDeadbolt", Capability.Lock)]
     public class FrontDoorLockSmartThingsIntegration : AutomationBase
     {
-
         LockDevice _frontDoorLock;
         LockDevice _smartthingsLock;
         Uri _endpoint;
+        string _authToken;
 
         public FrontDoorLockSmartThingsIntegration(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            _endpoint = new Uri(_hub.Configuration["FrontDoorLockSmartThingsIntegrationEndpoint"]);
+            var config = _hub.Configuration.GetSection("FrontDoorLock");
+            _endpoint = new Uri(config["SmartThingsIntegrationEndpoint"]);
+            _authToken = config["SmartThingsToken"];
         }
 
         protected override async Task InitDevices()
@@ -59,6 +63,7 @@ namespace Puppet.Automation
                 HttpContent contentPost = new StringContent(bodyText, Encoding.UTF8, "application/json");
                 using (var client = new HttpClient())
                 {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _authToken);
                     HttpResponseMessage response = await client.PostAsync(_endpoint, contentPost);
                     response.EnsureSuccessStatusCode();
                 }
