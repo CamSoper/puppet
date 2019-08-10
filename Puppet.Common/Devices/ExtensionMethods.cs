@@ -24,12 +24,12 @@ namespace Puppet.Common.Devices
 
         public static bool IsAnyOpen(this List<ContactSensor> sensors)
         {
-            return sensors.TrueForAll((s) => s.Status == ContactStatus.Closed);
+            return !sensors.TrueForAll((s) => s.Status == ContactStatus.Closed);
         }
 
         public static bool IsAnyOn(this List<SwitchRelay> switches)
         {
-            return switches.TrueForAll((s) => s.Status == SwitchStatus.Off);
+            return !switches.TrueForAll((s) => s.Status == SwitchStatus.Off);
         }
     }
 }
