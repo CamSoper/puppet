@@ -6,6 +6,8 @@ using Microsoft.ApplicationInsights.DependencyCollector;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector.QuickPulse;
 using Microsoft.Extensions.Configuration;
+using Puppet.Common.Automation;
+using Puppet.Common.Events;
 
 namespace Puppet.Common.Telemetry
 {

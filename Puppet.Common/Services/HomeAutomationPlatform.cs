@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Models;
+using Puppet.Common.Telemetry;
 
 namespace Puppet.Common.Services
 {
@@ -21,6 +22,7 @@ namespace Puppet.Common.Services
 
         dynamic DeviceMap { get; }
 
+        public TelemetryClient TelemetryClient { get; }
         public ConcurrentDictionary<string, object> StateBag { get; set; }
         public IConfiguration Configuration { get; set; }
         public abstract Task DoAction(IDevice device, string action, string[] args = null);
@@ -38,6 +40,8 @@ namespace Puppet.Common.Services
                 File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), DEVICE_FILENAME)));
 
             Configuration = configuration;
+
+            TelemetryClient = AppInsights.GetTelemetryClient(configuration);
         }
 
         public abstract Task<SunriseAndSunset> GetSunriseAndSunset();

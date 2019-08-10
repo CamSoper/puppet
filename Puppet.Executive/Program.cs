@@ -56,9 +56,7 @@ namespace Puppet.Executive
                 MqttOptions mqttOptions = configuration.GetSection("MQTT").Get<MqttOptions>();
                 if (mqttOptions?.Enabled ?? false)
                 {
-                    _mqtt = new MqttService(await MqttClientFactory.GetClient(mqttOptions),
-                                            mqttOptions,
-                                            _hub);
+                    _mqtt = new MqttService(await MqttClientFactory.GetClient(mqttOptions), mqttOptions, _hub);
                     await _mqtt.Start();
                 }
 
@@ -83,6 +81,7 @@ namespace Puppet.Executive
         private static void Hub_AutomationEvent(object sender, Common.Events.AutomationEventEventArgs e)
         {
             var evt = e.HubEvent;
+            _telemetryClient.TrackEvent("Hub Event", evt.GetDictionary());
 
             Task.Run(() => StartRelevantAutomationHandlers(evt));
             Task.Run(() => SendEventToMqtt(evt));
@@ -111,18 +110,9 @@ namespace Puppet.Executive
                     var startedTime = DateTime.Now;
                     Console.WriteLine($"{DateTime.Now} {automation} event: {evt.DescriptionText}");
 
-                    using (_telemetryClient.StartOperation<RequestTelemetry>(automation.ToString()))
+                    using (var operation = _telemetryClient.StartOperation<RequestTelemetry>(automation.ToString()))
                     {
-                        _telemetryClient.TrackEvent(automation.ToString(),
-                            new Dictionary<string, string>()
-                            {
-                                {"Device ID", evt.DeviceId },
-                                {"Description", evt.DescriptionText },
-                                {"Display Name", evt.DisplayName },
-                                {"Name", evt.Name },
-                                {"Source", evt.Source },
-                                {"Value", evt.Value },
-                            });
+                        _telemetryClient.TrackEvent("Automation Started", evt.GetDictionary());
 
                         try
                         {
@@ -132,7 +122,7 @@ namespace Puppet.Executive
                         catch (TaskCanceledException)
                         {
                             TimeSpan executionTime = DateTime.Now - startedTime;
-                            _telemetryClient.TrackEvent($"{automation} Cancelled",
+                            _telemetryClient.TrackEvent($"Automation Cancelled",
                                 new Dictionary<string, string>()
                                 {
                                     {"WaitTime", executionTime.TotalSeconds.ToString()},
@@ -141,6 +131,7 @@ namespace Puppet.Executive
                         }
                         catch (Exception ex)
                         {
+                            operation.Telemetry.Success = false;
                             _telemetryClient.TrackException(ex);
                             Console.WriteLine($"{DateTime.Now} {automation} {ex} {ex.Message}");
                         }

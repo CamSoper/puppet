@@ -27,7 +27,7 @@ namespace Puppet.Executive.Automation
         public AutomationTaskManager(IConfiguration configuration)
         {
             _telemetryClient = AppInsights.GetTelemetryClient(configuration);
-            _taskCountMetric = _telemetryClient.GetMetric("AutomationTasks");
+            _taskCountMetric = _telemetryClient.GetMetric("AutomationTaskCount");
             _taskList = new HashSet<AutomationTaskTokenType>();
         }
 
@@ -62,9 +62,9 @@ namespace Puppet.Executive.Automation
                     count = countBefore - countAfter;
                     if (count > 0)
                     {
+                        _taskCountMetric.TrackValue(_taskList.Count);
                         Console.WriteLine($"{DateTime.Now} Removed {count} completed tasks. {_taskList.Count} tasks remain in progress.");
                     }
-                    _taskCountMetric.TrackValue(_taskList.Count);
                 }
             });
         }

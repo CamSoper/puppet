@@ -27,7 +27,7 @@ namespace Puppet.Automation
                 new List<Speaker>() {
                     await _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
                     await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
-    };
+                };
         }
     }
 }

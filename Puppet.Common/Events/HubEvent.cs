@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Puppet.Common.Devices;
+using System.Collections.Generic;
 
 namespace Puppet.Common.Events
 {
@@ -26,5 +27,18 @@ namespace Puppet.Common.Events
         public bool IsOffEvent => Value == "off";
         public bool IsButtonPushedEvent => Name == "pushed";
         public bool IsButtonHeldEvent => Name == "held";
+
+        public Dictionary<string, string> GetDictionary()
+        {
+            return new Dictionary<string, string>()
+                {
+                    {"Device ID", DeviceId },
+                    {"Description", DescriptionText },
+                    {"Display Name", DisplayName },
+                    {"Name", Name },
+                    {"Source", Source },
+                    {"Value", Value },
+                };
+        }
     }
 }

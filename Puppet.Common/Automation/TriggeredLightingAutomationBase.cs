@@ -33,7 +33,7 @@ namespace Puppet.Common.Automation
             TimeSpan timeToWait = TimeSpan.MinValue;
             if (_evt.IsOpenEvent || _evt.IsOnEvent)
             {
-                foreach(var s in SwitchesToActivate)
+                foreach (var s in SwitchesToActivate)
                 {
                     await s.On();
                 }
@@ -41,18 +41,19 @@ namespace Puppet.Common.Automation
                     (key, oldvalue) => DateTime.Now);
                 timeToWait = DeactivationWait;
             }
-            else if(_evt.IsClosedEvent || _evt.IsOffEvent)
+            else if (_evt.IsClosedEvent || _evt.IsOffEvent)
             {
+
                 DateTime LightActivatedTime =
                     _hub.StateBag.ContainsKey(timeActivatedKey) ? (DateTime)_hub.StateBag[timeActivatedKey] : DateTime.Now;
                 timeToWait = DeactivationWait - (DateTime.Now - LightActivatedTime);
             }
 
-            if(EnableDeactivation)
+            if (EnableDeactivation && SwitchesToActivate.IsAnyOn())
             {
                 Console.WriteLine($"{DateTime.Now} {this.GetType().ToString()} is turning off lights in {timeToWait.ToString()}");
                 await WaitForCancellationAsync(timeToWait);
-                foreach(var s in SwitchesToActivate)
+                foreach (var s in SwitchesToActivate)
                 {
                     await s.Off();
                 }

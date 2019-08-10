@@ -1,11 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.Extensions.Configuration;
 using MQTTnet;
 using MQTTnet.Extensions.ManagedClient;
 using Puppet.Common.Configuration;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Exceptions;
+using Puppet.Common.Telemetry;
 
 namespace Puppet.Common.Services
 {
@@ -13,11 +19,13 @@ namespace Puppet.Common.Services
     {
         private readonly IManagedMqttClient _mqttClient;
         private readonly HomeAutomationPlatform _hub;
+        private readonly TelemetryClient _telemetryClient;
         private readonly string _topicRoot;
         private readonly string _commandTopic;
 
         public MqttService(IManagedMqttClient mqttClient, MqttOptions mqttOptions, HomeAutomationPlatform hub)
         {
+            _telemetryClient = hub.TelemetryClient;
             _mqttClient = mqttClient;
             _hub = hub;
             _topicRoot = mqttOptions.TopicRoot;
@@ -28,28 +36,40 @@ namespace Puppet.Common.Services
         private async void OnMqttMessageReceived(object sender, MQTTnet.MqttApplicationMessageReceivedEventArgs e)
         {
             Console.WriteLine($"{DateTime.Now} Received MQTT message. Topic: {e.ApplicationMessage.Topic} Payload: {e.ApplicationMessage.ConvertPayloadToString()}");
-            try
+            using (var operation =
+                _telemetryClient.StartOperation<RequestTelemetry>($"{this.ToString()}: Message Received"))
             {
-                string parm = null;
-                string[] tokens = e.ApplicationMessage.Topic.Split('/');
-                string payload = e.ApplicationMessage.ConvertPayloadToString();
-
-                if (tokens.Length != 4)
+                _telemetryClient.TrackEvent("MQTT Message Received",
+                    new Dictionary<string, string>()
+                    {
+                        {"Topic", e.ApplicationMessage.Topic },
+                        {"Payload", e.ApplicationMessage.ConvertPayloadToString()},
+                    });
+                try
                 {
-                    throw new InvalidMqttTopicException();
-                }
+                    string parm = null;
+                    string[] tokens = e.ApplicationMessage.Topic.Split('/');
+                    string payload = e.ApplicationMessage.ConvertPayloadToString();
 
-                GenericDevice device = await _hub.GetDeviceByLabel<GenericDevice>(tokens[2]);
-                if (!string.IsNullOrEmpty(payload))
+                    if (tokens.Length != 4)
+                    {
+                        throw new InvalidMqttTopicException();
+                    }
+
+                    GenericDevice device = await _hub.GetDeviceByLabel<GenericDevice>(tokens[2]);
+                    if (!string.IsNullOrEmpty(payload))
+                    {
+                        parm = payload;
+                    }
+
+                    await device.DoAction(tokens[3], parm);
+                }
+                catch (Exception ex)
                 {
-                    parm = payload;
+                    operation.Telemetry.Success = false;
+                    _telemetryClient.TrackException(ex);
+                    Console.WriteLine($"{DateTime.Now} {ex}");
                 }
-
-                await device.DoAction(tokens[3], parm);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"{DateTime.Now} {ex}");
             }
         }
 
