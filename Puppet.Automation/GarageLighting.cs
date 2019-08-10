@@ -11,9 +11,7 @@ namespace Puppet.Automation
 {
     [TriggerDevice("Contact.GarageEntryDoor", Capability.Contact)]
     [TriggerDevice("Contact.GarageDoor1", Capability.Contact)]
-    [TriggerDevice("Contact.GarageDoor1Opener", Capability.Contact)]
     [TriggerDevice("Contact.GarageDoor2", Capability.Contact)]
-    [TriggerDevice("Contact.GarageDoor2Opener", Capability.Contact)]
     public class GarageLighting : TriggeredLightingAutomationBase
     {
         public GarageLighting(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
