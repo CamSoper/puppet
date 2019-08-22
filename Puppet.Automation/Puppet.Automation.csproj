@@ -2,7 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="OfficeRemoteControl.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="devicemap.json" />
@@ -15,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="4.0.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
@@ -25,9 +31,5 @@
   <ItemGroup>
     <ProjectReference Include="..\Puppet.Common\Puppet.Common.csproj" />
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy $(ProjectDir)devicemap.json ..\Puppet.Executive\$(OutDir)&#xD;&#xA;copy $(OutDir)*.* ..\Puppet.Executive\$(OutDir)" />
-  </Target>
 
 </Project>

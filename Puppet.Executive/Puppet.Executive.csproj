@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Puppet.Automation\Puppet.Automation.csproj" />
     <ProjectReference Include="..\Puppet.Common\Puppet.Common.csproj" />
   </ItemGroup>
 

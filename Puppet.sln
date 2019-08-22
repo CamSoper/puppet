@@ -12,6 +12,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Puppet.Common", "Puppet.Com
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Puppet.Automation", "Puppet.Automation\Puppet.Automation.csproj", "{5006D4AE-3F37-4CB3-BAE6-E65E1E17EB8C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Demo.GarageDoor", "Demo.GarageDoor\Demo.GarageDoor.csproj", "{02430AF2-F985-44AA-B551-EEEE8C82BE52}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +32,10 @@ Global
 		{5006D4AE-3F37-4CB3-BAE6-E65E1E17EB8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5006D4AE-3F37-4CB3-BAE6-E65E1E17EB8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5006D4AE-3F37-4CB3-BAE6-E65E1E17EB8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02430AF2-F985-44AA-B551-EEEE8C82BE52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02430AF2-F985-44AA-B551-EEEE8C82BE52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02430AF2-F985-44AA-B551-EEEE8C82BE52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02430AF2-F985-44AA-B551-EEEE8C82BE52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
