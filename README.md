@@ -1,4 +1,4 @@
-# Welcome to Puppet
+![Puppet logo](./Media/Puppet.png)
 
 A .NET Core framework for home automation with Hubitat Elevate.
 
