@@ -6,7 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="OfficeRemoteControl.cs" />
+    <Compile Remove="DemoBulbAndMultisensorReference.cs" />
+    <Compile Remove="GarageDoorController.cs" />
+    <Compile Remove="GarageDoorRemoteControl.cs" />
   </ItemGroup>
 
   <ItemGroup>
