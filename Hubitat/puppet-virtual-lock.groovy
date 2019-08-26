@@ -21,7 +21,7 @@ def lock() {
 def unlock() {
     log.debug "unlock()"
     if (device.currentState("lock").value != "unlocked"){
-        sendEvent(name: "lock", value: "unlocking", descriptionText: "${device.displayName} is locking")
+        sendEvent(name: "lock", value: "unlocking", descriptionText: "${device.displayName} is unlocking")
     }
 }
 
