@@ -4,6 +4,7 @@
     "Speaker": "65",
     "Bulb": "1",
     "Remote": "33",
-    "GarageDoor":  "66"
+    "GarageDoor": "66",
+    "GarageDoorContact": "99"
   }
 }

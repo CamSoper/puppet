@@ -56,11 +56,9 @@ namespace Demo.GarageDoor
                 using (GpioController gpio =
                     new GpioController(PinNumberingScheme.Logical, new RaspberryPi3Driver()))
                 {
-                    gpio.OpenPin(17, PinMode.Output);
-                    gpio.Write(17, 1);
+                    gpio.OpenPin(19, PinMode.Output);
                     Thread.Sleep(TimeSpan.FromSeconds(3));
-                    gpio.Write(17, 1);
-                    gpio.ClosePin(17);
+                    gpio.ClosePin(19);
                 }
             }
             return Task.CompletedTask;

@@ -19,6 +19,11 @@ namespace Puppet.Automation
         {
         }
 
+        protected override async Task InitDevices()
+        {
+            _speaker = await _hub.GetDeviceByMappedName<Speaker>("Demo.Speaker");
+        }
+
         protected override async Task Handle()
         {
             switch(_evt.Value, _evt.IsButtonPushedEvent)
@@ -40,10 +45,5 @@ namespace Puppet.Automation
                     break;
             }
         }
-        protected override async Task InitDevices()
-        {
-            _speaker = await _hub.GetDeviceByMappedName<Speaker>("Demo.Speaker");
-        }
-
     }
 }

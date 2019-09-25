@@ -2,10 +2,6 @@
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Puppet.Automation
@@ -23,10 +19,10 @@ namespace Puppet.Automation
         {
             switch (_evt.Value)
             {
-                case ("1"):
+                case "1":
                     await _garageDoor.DoAction("open");
                     break;
-                case ("2"):
+                case "2":
                     await _garageDoor.DoAction("close");
                     break;
             }
