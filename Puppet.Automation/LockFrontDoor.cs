@@ -1,4 +1,5 @@
-﻿using Puppet.Common.Automation;
+﻿using Puppet.Automation.Services;
+using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
@@ -16,9 +17,12 @@ namespace Puppet.Automation
         ContactSensor _frontDoor;
         LockDevice _frontDoorLock;
         List<Speaker> _notificationDevices;
+        SmartThingsLockService _service;
 
         public LockFrontDoor(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
-        {}
+        {
+            _service = new SmartThingsLockService(_hub.Configuration);
+        }
 
         protected override async Task InitDevices()
         {
@@ -40,6 +44,15 @@ namespace Puppet.Automation
             if(_evt.Value.Contains("locking") && _evt.DeviceId == _frontDoorLock.Id)
             {
                 return;
+            }
+
+            if(_evt.DeviceId == _frontDoor.Id)
+            {
+                if(_evt.IsClosedEvent)
+                {
+                    await WaitForCancellationAsync(TimeSpan.FromSeconds(5));
+                }
+                await _service.Refresh();
             }
 
             await WaitForCancellationAsync(TimeSpan.FromMinutes(5));
