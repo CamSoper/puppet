@@ -11,9 +11,7 @@ namespace Puppet.Automation
 {
     [TriggerDevice("Contact.FrontDoor", Capability.Contact)]
     [TriggerDevice("Contact.GarageDoor1", Capability.Contact)]
-    [TriggerDevice("Contact.GarageDoor1Opener", Capability.Contact)]
     [TriggerDevice("Contact.GarageDoor2", Capability.Contact)]
-    [TriggerDevice("Contact.GarageDoor2Opener", Capability.Contact)]
     public class FrontLights : AutomationBase
     {
         SwitchRelay _frontLights;
@@ -27,9 +25,7 @@ namespace Puppet.Automation
             _doors = new List<ContactSensor>
             {
                 await _hub.GetDeviceByMappedName<ContactSensor>("Contact.FrontDoor"),
-                await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor1Opener"),
                 await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor1"),
-                await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor2Opener"),
                 await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor2")
             };
 
