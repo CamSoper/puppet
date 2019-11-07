@@ -14,7 +14,11 @@ namespace Puppet.Automation
     [TriggerDevice("Contact.GarageDoor2", Capability.Contact)]
     public class FrontLights : AutomationBase
     {
-        SwitchRelay _frontLights;
+        SwitchRelay _frontLightsPower;
+        SwitchRelay _frontLightsWarm;
+        SwitchRelay _frontLightsColor;
+        SwitchRelay _holidayDisplay;
+        
         List<ContactSensor> _doors;
         
         public FrontLights(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
@@ -29,23 +33,52 @@ namespace Puppet.Automation
                 await _hub.GetDeviceByMappedName<ContactSensor>("Contact.GarageDoor2")
             };
 
-            _frontLights =
+            _frontLightsPower =
                 await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FrontLightsPower");
+            _frontLightsColor =
+                await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FrontLightsColorfulScene");
+            _frontLightsWarm =
+                await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FrontLightsWarmWhiteScene");
+            _holidayDisplay =
+                await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.HolidayDisplay");
+            
         }
 
         protected override async Task Handle()
         {
-            if(_evt.IsOpenEvent && await IsDark(30, -30))
+            bool ShouldUseLights = await IsDark(30, -30);
+
+            if(_evt.IsOpenEvent && ShouldUseLights)
             {
-                await _frontLights.On();
+                if(_holidayDisplay.Status == SwitchStatus.On)
+                {
+                    await _frontLightsWarm.On();
+                }
+                else
+                {
+                    await _frontLightsPower.On();
+                }
+                
+            }
+            else if(_evt.IsClosedEvent && ShouldUseLights)
+            {
+                if(!_doors.IsAnyOpen() && _frontLightsPower.Status == SwitchStatus.On)
+                {
+                    if(_holidayDisplay.Status == SwitchStatus.On)
+                    {
+                        await WaitForCancellationAsync(TimeSpan.FromSeconds(10));
+                        await _frontLightsColor.On();
+                    }
+                    else
+                    {
+                        await WaitForCancellationAsync(TimeSpan.FromMinutes(10));
+                        await _frontLightsPower.Off();
+                    }
+                }
             }
             else
             {
-                if(!_doors.IsAnyOpen() && _frontLights.Status == SwitchStatus.On)
-                {
-                    await WaitForCancellationAsync(TimeSpan.FromMinutes(10));
-                    await _frontLights.Off();
-                }
+                await _frontLightsPower.Off();
             }
         }
     }
