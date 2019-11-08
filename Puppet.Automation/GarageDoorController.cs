@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Puppet.Automation
 {
     [RunPerDevice]
-    [TriggerDevice("Demo.MultiSensor", Capability.Contact)]
+    [TriggerDevice("Demo.GarageDoorSensor", Capability.Contact)]
     [TriggerDevice("Demo.GarageDoor", Capability.Door)]
     public class GarageDoorController : AutomationBase
     {

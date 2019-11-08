@@ -26,7 +26,7 @@ namespace Demo.GarageDoor
             Console.WriteLine("Opening Service Bus Connection...");
             ServiceBusConnectionStringBuilder builder = new ServiceBusConnectionStringBuilder(svcBusConn);
             QueueClient client = new QueueClient(builder, ReceiveMode.ReceiveAndDelete);
-
+            
             RegisterHandlers(client);
 
             // Wait
@@ -56,11 +56,11 @@ namespace Demo.GarageDoor
                 using (GpioController gpio =
                     new GpioController(PinNumberingScheme.Logical, new RaspberryPi3Driver()))
                 {
-                    gpio.OpenPin(17, PinMode.Output);
-                    gpio.Write(17, 1);
+                    gpio.OpenPin(20, PinMode.Output);
+                    gpio.Write(20, 1);
                     Thread.Sleep(TimeSpan.FromSeconds(3));
-                    gpio.Write(17, 1);
-                    gpio.ClosePin(17);
+                    gpio.Write(20, 0);
+                    gpio.ClosePin(20);
                 }
             }
             return Task.CompletedTask;
