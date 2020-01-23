@@ -8,27 +8,27 @@ using Puppet.Common.Services;
 
 namespace Puppet.Automation
 {
-    [TriggerDevice("Contact.PantryDoor", Capability.Contact)]
-    public class PantryLightAutomation : AutomationBase
+    [TriggerDevice("SampleDevices.SampleDoor", Capability.Contact)]
+    public class SampleAutomation : AutomationBase
     {
         readonly TimeSpan _interval = TimeSpan.FromMinutes(5);
-        SwitchRelay _pantryLight;
-        Speaker _kitchenSpeaker;
+        SwitchRelay _sampleLight;
+        Speaker _sampleSpeaker;
         const string _timeOpenedKey = "PantryOpenedTime";
 
-        public PantryLightAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public SampleAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         { }
 
         protected override async Task InitDevices()
         {
-            _pantryLight =
-                await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.PantryLight");
-            _kitchenSpeaker =
-                await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker");
+            _sampleLight =
+                await _hub.GetDeviceByMappedName<SwitchRelay>("SampleDevices.SampleLight");
+            _sampleSpeaker =
+                await _hub.GetDeviceByMappedName<Speaker>("SampleDevices.SampleSpeaker");
         }
 
         /// <summary>
-        /// Handles pantry door events coming from the home automation controller.
+        /// Handles door events coming from the home automation controller.
         /// </summary>
         /// <param name="token">A .NET cancellation token received if this handler is to be cancelled.</param>
         protected override async Task Handle()
@@ -36,7 +36,7 @@ namespace Puppet.Automation
             if (_evt.IsOpenEvent)
             {
                 // Turn on the light
-                await _pantryLight.On();
+                await _sampleLight.On();
 
                 // Remember when we turned on the light for later (when we respond to an off event)
                 _hub.StateBag.AddOrUpdate(_timeOpenedKey, DateTime.Now,
@@ -44,16 +44,16 @@ namespace Puppet.Automation
 
                 // Wait a bit...
                 await WaitForCancellationAsync(_interval);
-                await _kitchenSpeaker.Speak("Please close the pantry door");
+                await _sampleSpeaker.Speak("Please close the door.");
 
                 // Wait a bit more...
                 await WaitForCancellationAsync(_interval);
-                await _kitchenSpeaker.Speak("I said, please close the pantry door");
+                await _sampleSpeaker.Speak("I said, please close the door.");
 
                 // Wait a bit longer and then give up...
                 await WaitForCancellationAsync(_interval);
-                await _kitchenSpeaker.Speak("Fine, I'll turn off the light myself.");
-                await _pantryLight.Off();
+                await _sampleSpeaker.Speak("Okay, I'll turn off the light myself.");
+                await _sampleLight.Off();
             }
             else
             {
@@ -64,9 +64,9 @@ namespace Puppet.Automation
                 {
                     // It's been open five minutes, so we've nagged by now.
                     // It's only polite to thank them for doing what we've asked!
-                    await _kitchenSpeaker.Speak("Thank you for closing the pantry door");
+                    await _sampleSpeaker.Speak("Thank you for closing the pantry door");
                 }
-                await _pantryLight.Off();
+                await _sampleLight.Off();
             }
         }
     }
