@@ -10,6 +10,7 @@ namespace Puppet.Common.Devices
         Contact,
         Lock,
         Pushed,
-        Held
+        Held,
+        Door
     }
 }
