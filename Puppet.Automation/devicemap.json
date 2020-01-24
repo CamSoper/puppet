@@ -1,7 +1,55 @@
 {
-  "SampleDevices": {
-    "SampleDoor": "101",
-    "SampleLight": "102",
-    "SampleSpeaker": "103"
+  "Contact": {
+    "FrontDoor": "339",
+    "PantryDoor": "224",
+    "SlidingDoor": "194",
+    "GarageEntry": "289",
+    "BasementEgress": "321",
+    "EastGate": "359",
+    "SouthGate": "358",
+    "WestGate": "357",
+    "BasementDoor": "227",
+    "GarageDoor1": "391",
+    "GarageDoor2": "392",
+    "GarageEntryDoor": "289",
+    "GarageFreezer": "738",
+    "GarageFridge": "774",
+    "KitchenFridge": "288",
+    "BasementFreezer": "322",
+    "Mailbox": "355"
+  },
+  "Garage": {
+    "Door1Opener": "836",
+    "Door2Opener": "837"
+  },
+  "Lock": {
+    "FrontDoorDeadbolt": "772",
+    "SmartThingsFrontDoorDeadbolt": "802"
+  },
+  "Speaker": {
+    "KitchenSpeaker": "65",
+    "WebhookNotifier": "401"
+  },
+  "Switch": {
+    "PantryLight": "189",
+    "Printer3D": "97",
+    "BasementStairwayLight": "226",
+    "FrontLightsColorfulScene": "418",
+    "FrontLightsWarmWhiteScene": "417",
+    "FrontLightsPower": "338",
+    "GarageEntry": "257",
+    "GarageLights": "258",
+    "HolidayDisplay": "832",
+    "LivingRoomXmasVSwitch": "421",
+    "LivingRoomXmasScene1": "384",
+    "LivingRoomXmasScene2": "385",
+    "LivingRoomNormalScene": "386",
+    "PantryAck": "512",
+    "PatioLight": "448",
+    "OutdoorPlug": "211",
+    "Floodlights": "196"
+  },
+  "Button": {
+    "OfficeRemote": "345"
   }
 }
