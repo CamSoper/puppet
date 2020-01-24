@@ -4,6 +4,8 @@ A .NET Core framework for home automation with Hubitat Elevate.
 
 If you're looking for the demos and slides from **My House Runs .NET**, [they're on this branch](https://github.com/CamSoper/puppet/tree/presentation).
 
+The Puppet.Automation project contains a generic sample based on the logic I use for my pantry door. For more sample automations, [see all the Puppet.Automation classes I've created for my house in this branch](https://github.com/CamSoper/puppet/tree/cams-house).
+
 ## How it works
 
 1. An event on one of your devices is triggered. 
