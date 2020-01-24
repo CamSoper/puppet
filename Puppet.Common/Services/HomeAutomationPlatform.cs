@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Configuration;
@@ -20,7 +21,7 @@ namespace Puppet.Common.Services
     {
         const string DEVICE_FILENAME = "devicemap.json";
 
-        dynamic DeviceMap { get; }
+        JsonElement DeviceMap { get; }
 
         public TelemetryClient TelemetryClient { get; }
         public ConcurrentDictionary<string, object> StateBag { get; set; }
@@ -32,12 +33,11 @@ namespace Puppet.Common.Services
 
         public event EventHandler<AutomationEventEventArgs> AutomationEvent;
 
-#pragma warning disable IDE0060 // Remove unused parameter
         public HomeAutomationPlatform(IConfiguration configuration)
-#pragma warning restore IDE0060 // Remove unused parameter
         {
-            this.DeviceMap = JObject.Parse(
-                File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), DEVICE_FILENAME)));
+            this.DeviceMap = JsonDocument
+                                .Parse(File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), DEVICE_FILENAME)))
+                                .RootElement;
 
             Configuration = configuration;
 
@@ -55,15 +55,21 @@ namespace Puppet.Common.Services
         {
             return ParseAndLookupMappedDeviceName(this.DeviceMap, mappedDeviceName);
         }
-        string ParseAndLookupMappedDeviceName(dynamic obj, string mappedDeviceName)
+        string ParseAndLookupMappedDeviceName(JsonElement map, string mappedDeviceName)
         {
             string[] tokens = mappedDeviceName.Split('.');
+            JsonElement deviceElement = map;
             if (tokens.Length > 1)
-                return ParseAndLookupMappedDeviceName(obj[tokens[0]],
-                    mappedDeviceName.Substring(mappedDeviceName.IndexOf(tokens[1])));
-            else
-                return obj[mappedDeviceName];
+            { 
+                for (int i = 0; i < tokens.Length; i++)
+                {
+                    deviceElement = deviceElement.GetProperty(tokens[i]);
+                }
+            }
+
+            return deviceElement.GetString();
         }
+
         public async Task<T> GetDeviceByMappedName<T>(string mappedDeviceName)
         {
             return await GetDeviceById<T>(LookupDeviceId(mappedDeviceName));
