@@ -34,14 +34,14 @@ namespace Puppet.Common.Automation
         protected abstract Task InitDevices();
 
         protected abstract Task Handle();
-        
+
 
         /// <summary>
         /// Waits for a specified period time then returns a boolean indicating if the task was cancelled.
         /// </summary>
         /// <param name="howLong">How long to wait.</param>
         protected async Task WaitForCancellationAsync(TimeSpan howLong) => await Task.Delay(howLong, _cancelToken);
-   
+
         /// <summary>
         /// Returns a bool indicating if it's currently dark outside based on sunrise and sunset times.
         /// </summary>
@@ -53,15 +53,20 @@ namespace Puppet.Common.Automation
             DateTime SunriseWithOffset = sun.Sunrise.AddMinutes(sunriseOffset);
             DateTime SunsetWithOffset = sun.Sunset.AddMinutes(sunsetOffset);
 
-            if (DateTime.Now >= SunriseWithOffset && 
+            if (DateTime.Now >= SunriseWithOffset &&
                 DateTime.Now <= SunsetWithOffset)
             {
-                return false;   
+                return false;
             }
             else
             {
                 return true;
             }
+        }
+
+        protected bool IsTriggerDevice(IDevice device)
+        {
+            return (device.Id == _evt.DeviceId);
         }
     }
 }
