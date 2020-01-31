@@ -6,18 +6,16 @@ using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
 
-namespace Puppet.Automation
+namespace Puppet.Automation.Notification
 {
     [RunPerDevice]
-    [TriggerDevice("Contact.GarageFreezer", Capability.Contact)]
-    [TriggerDevice("Contact.GarageFridge", Capability.Contact)]
-    [TriggerDevice("Contact.KitchenFridge", Capability.Contact)]
-    [TriggerDevice("Contact.BasementFreezer", Capability.Contact)]
-    public class NotifyOnFridgeDoorOpen : DoorWatcherBase
+    [TriggerDevice("Contact.GarageDoor1", Capability.Contact)]
+    [TriggerDevice("Contact.GarageDoor2", Capability.Contact)]
+    public class GarageDoorOpen : DoorWatcherBase
     {
-        public NotifyOnFridgeDoorOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public GarageDoorOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            HowLong = TimeSpan.FromMinutes(1);
+            HowLong = TimeSpan.FromMinutes(5);
             NumberOfNotifications = 2;
         }
 
@@ -29,6 +27,5 @@ namespace Puppet.Automation
                     await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
                 };
         }
-
     }
 }

@@ -7,16 +7,21 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Puppet.Automation
+
+namespace Puppet.Automation.Lighting
 {
     [TriggerDevice("Contact.FrontDoor", Capability.Contact)]
     [TriggerDevice("Contact.GarageDoor1", Capability.Contact)]
     [TriggerDevice("Contact.GarageDoor2", Capability.Contact)]
+    [TriggerDevice("Switch.HolidayDisplay", Capability.Switch)]
+    [TriggerDevice("Switch.FrontLightsPower", Capability.Switch)]
+    [TriggerDevice("Switch.FrontLightsWarmWhiteScene", Capability.Switch)]
     public class FrontLights : AutomationBase
     {
         SwitchRelay _frontLightsPower;
         SwitchRelay _frontLightsWarm;
         SwitchRelay _frontLightsColor;
+        SwitchRelay _frontLightsDark;
         SwitchRelay _holidayDisplay;
         
         List<ContactSensor> _doors;
@@ -39,6 +44,8 @@ namespace Puppet.Automation
                 await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FrontLightsColorfulScene");
             _frontLightsWarm =
                 await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FrontLightsWarmWhiteScene");
+            _frontLightsDark =
+                await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FrontLightsOffScene");
             _holidayDisplay =
                 await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.HolidayDisplay");
             
@@ -48,21 +55,42 @@ namespace Puppet.Automation
         {
             bool ShouldUseLights = await IsDark(30, -30);
 
+            //Power switch was turned off. Turn it back on and make the lights dark.
+            if(_evt.IsOffEvent && _evt.DeviceId == _frontLightsPower.Id)
+            {
+                await WaitForCancellationAsync(TimeSpan.FromSeconds(5));
+                await _frontLightsPower.On();
+                await WaitForCancellationAsync(TimeSpan.FromSeconds(3));
+                await _frontLightsDark.On();
+                return;
+            }
+
+            //Before we do anything else, make sure Power switch is on
+            if(_frontLightsPower.Status == SwitchStatus.Off)
+            {
+                await _frontLightsPower.On();
+                await WaitForCancellationAsync(TimeSpan.FromSeconds(3));
+            }
+
+            if(_evt.IsOnEvent && IsTriggerDevice(_holidayDisplay))
+            {
+                await _frontLightsColor.On();
+                return;
+            }
+
+            if(_evt.IsOnEvent && IsTriggerDevice(_frontLightsWarm))
+            {
+                await _frontLightsWarm.On();
+                return;
+            }
+
             if(_evt.IsOpenEvent && ShouldUseLights)
             {
-                if(_holidayDisplay.Status == SwitchStatus.On)
-                {
-                    await _frontLightsWarm.On();
-                }
-                else
-                {
-                    await _frontLightsPower.On();
-                }
-                
+                await _frontLightsWarm.On();
             }
             else if(_evt.IsClosedEvent && ShouldUseLights)
             {
-                if(!_doors.IsAnyOpen() && _frontLightsPower.Status == SwitchStatus.On)
+                if(!_doors.IsAnyOpen())
                 {
                     if(_holidayDisplay.Status == SwitchStatus.On)
                     {
@@ -72,13 +100,13 @@ namespace Puppet.Automation
                     else
                     {
                         await WaitForCancellationAsync(TimeSpan.FromMinutes(10));
-                        await _frontLightsPower.Off();
+                        await _frontLightsDark.On();
                     }
                 }
             }
             else
             {
-                await _frontLightsPower.Off();
+                await _frontLightsDark.On();
             }
         }
     }

@@ -6,17 +6,19 @@ using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
 
-namespace Puppet.Automation
+namespace Puppet.Automation.Notification
 {
     [RunPerDevice]
-    [TriggerDevice("Contact.GarageDoor1", Capability.Contact)]
-    [TriggerDevice("Contact.GarageDoor2", Capability.Contact)]
-    public class NotifyOnGarageDoorOpen : DoorWatcherBase
+    [TriggerDevice("Contact.EastGate", Capability.Contact)]
+    [TriggerDevice("Contact.SouthGate", Capability.Contact)]
+    [TriggerDevice("Contact.WestGate", Capability.Contact)]
+    public class GatesOpen : DoorWatcherBase
     {
-        public NotifyOnGarageDoorOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public GatesOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            HowLong = TimeSpan.FromMinutes(5);
-            NumberOfNotifications = 2;
+            HowLong = TimeSpan.Zero;
+            NotifyOnClose = true;
+            NotificationFormat = @"{0} is open.";
         }
 
         protected override async Task InitDevices()

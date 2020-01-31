@@ -6,12 +6,12 @@ using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
 
-namespace Puppet.Automation
+namespace Puppet.Automation.Lighting
 {
     [TriggerDevice("Switch.LivingRoomXmasVSwitch", Capability.Switch)]
-    public class LivingRoomHolidayAutomation : AutomationBase
+    public class LivingRoomHolidayDisplay : AutomationBase
     {
-        public LivingRoomHolidayAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public LivingRoomHolidayDisplay(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
         }
 

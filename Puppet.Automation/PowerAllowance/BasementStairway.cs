@@ -5,12 +5,12 @@ using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
 
-namespace Puppet.Automation
+namespace Puppet.Automation.PowerAllowance
 {
     [TriggerDevice("Switch.BasementStairwayLight", Capability.Switch)]
-    public class BasementStairwayPowerAllowance : PowerAllowanceBase
+    public class BasementStairway : PowerAllowanceBase
     {
-        public BasementStairwayPowerAllowance(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public BasementStairway(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             HowLong = TimeSpan.FromMinutes(5);
         }

@@ -5,12 +5,12 @@ using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
 
-namespace Puppet.Automation
+namespace Puppet.Automation.PowerAllowance
 {
     [TriggerDevice("Switch.GarageEntry", Capability.Switch)]
-    public class GarageEntryPowerAllowance : PowerAllowanceBase
+    public class GarageEntry : PowerAllowanceBase
     {
-        public GarageEntryPowerAllowance(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public GarageEntry(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             HowLong = TimeSpan.FromMinutes(5);
         }

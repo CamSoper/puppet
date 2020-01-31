@@ -1,22 +1,21 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
 
-namespace Puppet.Automation
+namespace Puppet.Automation.Lighting
 {
     [TriggerDevice("Contact.PantryDoor", Capability.Contact)]
-    public class PantryLightAutomation : AutomationBase
+    public class Pantry : AutomationBase
     {
         readonly TimeSpan _interval = TimeSpan.FromMinutes(5);
         SwitchRelay _pantryLight;
         Speaker _kitchenSpeaker;
         const string _timeOpenedKey = "PantryOpenedTime";
 
-        public PantryLightAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public Pantry(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         { }
 
         protected override async Task InitDevices()

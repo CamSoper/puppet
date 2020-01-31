@@ -7,19 +7,19 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Puppet.Automation
+namespace Puppet.Automation.Notification
 {
     [TriggerDevice("Contact.EastGate", Capability.Contact)]
     [TriggerDevice("Contact.SouthGate", Capability.Contact)]
     [TriggerDevice("Contact.WestGate", Capability.Contact)]
     [TriggerDevice("Contact.SlidingDoor", Capability.Contact)]
-    public class NotifyOnSlidingDoorAndGatesOpen : AutomationBase
+    public class SlidingDoorAndGatesOpen : AutomationBase
     {
         List<ContactSensor> _gates;
         ContactSensor _slidingDoor;
         List<Speaker> _notificationDevices;
 
-        public NotifyOnSlidingDoorAndGatesOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public SlidingDoorAndGatesOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
         }
 

@@ -7,12 +7,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Puppet.Automation
+namespace Puppet.Automation.Lighting
 {
     [TriggerDevice("Contact.BasementDoor", Capability.Contact)]
-    public class BasementStairLighting : TriggeredLightingAutomationBase
+    public class BasementStair : TriggeredLightingAutomationBase
     {
-        public BasementStairLighting(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public BasementStair(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {}
 
         protected override async Task InitDevices()

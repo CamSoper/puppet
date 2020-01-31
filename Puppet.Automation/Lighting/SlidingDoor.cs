@@ -5,12 +5,12 @@ using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
 
-namespace Puppet.Automation
+namespace Puppet.Automation.Lighting
 {
     [TriggerDevice("Contact.SlidingDoor", Capability.Contact)]
-    public class SlidingDoorAutomation : TriggeredLightingAutomationBase
+    public class SlidingDoor : TriggeredLightingAutomationBase
     {
-        public SlidingDoorAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public SlidingDoor(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             EnableDeactivation = true;
             DeactivationWait = TimeSpan.FromMinutes(30);

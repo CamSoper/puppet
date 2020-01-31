@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Puppet.Automation
+namespace Puppet.Automation.Integration
 {
     [RunPerDevice]
     [TriggerDevice("Contact.GarageDoor1", Capability.Contact)]

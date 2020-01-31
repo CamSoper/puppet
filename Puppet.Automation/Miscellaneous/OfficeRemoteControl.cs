@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Puppet.Automation
+namespace Puppet.Automation.Miscellaneous
 {
     [TriggerDevice("Button.OfficeRemote", Capability.Held)]
     [TriggerDevice("Button.OfficeRemote", Capability.Pushed)]
@@ -21,9 +21,9 @@ namespace Puppet.Automation
         protected override async Task Handle()
         {
             Speaker speaker = await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker");
-            if(_evt.IsButtonPushedEvent)
+            if (_evt.IsButtonPushedEvent)
             {
-                switch(_evt.Value)
+                switch (_evt.Value)
                 {
                     case "1":
                         await speaker.Speak("Your father requires quiet, please.");
@@ -38,7 +38,7 @@ namespace Puppet.Automation
                         await speaker.Speak("Whatever you are doing, it is frustrating your father. Please correct it now or there will be consequences.");
                         break;
                 }
-            }     
+            }
             else
             {
                 switch (_evt.Value)

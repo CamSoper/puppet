@@ -1,24 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
 
-namespace Puppet.Automation
+namespace Puppet.Automation.Notification
 {
+    /// <summary>
+    /// Runs when an exterior door is left open for a specific amount of time
+    /// </summary>
     [RunPerDevice]
-    [TriggerDevice("Contact.EastGate", Capability.Contact)]
-    [TriggerDevice("Contact.SouthGate", Capability.Contact)]
-    [TriggerDevice("Contact.WestGate", Capability.Contact)]
-    public class NotifyOnGatesOpen : DoorWatcherBase
+    [TriggerDevice("Contact.FrontDoor", Capability.Contact)]
+    [TriggerDevice("Contact.SlidingDoor", Capability.Contact)]
+    [TriggerDevice("Contact.GarageEntry", Capability.Contact)]
+    class ExteriorDoorOpen : DoorWatcherBase
     {
-        public NotifyOnGatesOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public ExteriorDoorOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            HowLong = TimeSpan.Zero;
-            NotifyOnClose = true;
-            NotificationFormat = @"{0} is open.";
+            HowLong = TimeSpan.FromMinutes(2);
         }
 
         protected override async Task InitDevices()
@@ -28,6 +30,7 @@ namespace Puppet.Automation
                     await _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
                     await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
                 };
+
         }
     }
 }

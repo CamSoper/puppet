@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Puppet.Automation.Services;
 
-namespace Puppet.Automation
+namespace Puppet.Automation.Integration
 {
     [RunPerDevice]
     [TriggerDevice("Lock.FrontDoorDeadbolt", Capability.Lock)]
     [TriggerDevice("Lock.SmartThingsFrontDoorDeadbolt", Capability.Lock)]
-    public class FrontDoorLockSmartThingsIntegration : AutomationBase
+    public class FrontDoorLockSmartThingsController : AutomationBase
     {
         LockDevice _frontDoorLock;
         LockDevice _smartthingsLock;
         SmartThingsLockService _service;
 
-        public FrontDoorLockSmartThingsIntegration(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public FrontDoorLockSmartThingsController(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             _service = new SmartThingsLockService(_hub.Configuration);
         }

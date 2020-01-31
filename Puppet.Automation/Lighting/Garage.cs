@@ -7,14 +7,14 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Puppet.Automation
+namespace Puppet.Automation.Lighting
 {
     [TriggerDevice("Contact.GarageEntryDoor", Capability.Contact)]
     [TriggerDevice("Contact.GarageDoor1", Capability.Contact)]
     [TriggerDevice("Contact.GarageDoor2", Capability.Contact)]
-    public class GarageLighting : TriggeredLightingAutomationBase
+    public class Garage : TriggeredLightingAutomationBase
     {
-        public GarageLighting(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public Garage(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             DeactivationWait = TimeSpan.FromMinutes(30);
             EnableDeactivation = true;

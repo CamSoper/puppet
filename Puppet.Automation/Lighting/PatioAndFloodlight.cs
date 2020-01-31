@@ -4,13 +4,13 @@ using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
 
-namespace Puppet.Automation
+namespace Puppet.Automation.Lighting
 {
     [TriggerDevice("Switch.PatioLight", Capability.Switch)]
-    public class PatioAndFloodlightAutomation : AutomationBase
+    public class PatioAndFloodlight : AutomationBase
     {
         SwitchRelay _floodlights;
-        public PatioAndFloodlightAutomation(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
+        public PatioAndFloodlight(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         { }
 
         protected override async Task InitDevices()
@@ -21,7 +21,7 @@ namespace Puppet.Automation
 
         protected override async Task Handle()
         {
-            if(_evt.IsOnEvent)
+            if (_evt.IsOnEvent)
             {
                 await _floodlights.On();
             }

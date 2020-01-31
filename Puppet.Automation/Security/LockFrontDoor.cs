@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Puppet.Automation
+namespace Puppet.Automation.Security
 {
     [TriggerDevice("Contact.FrontDoor", Capability.Contact)]
     [TriggerDevice("Lock.FrontDoorDeadbolt", Capability.Lock)]
@@ -41,14 +41,14 @@ namespace Puppet.Automation
 
         protected override async Task Handle()
         {
-            if(_evt.Value.Contains("locking") && _evt.DeviceId == _frontDoorLock.Id)
+            if (_evt.Value.Contains("locking") && _evt.DeviceId == _frontDoorLock.Id)
             {
                 return;
             }
 
-            if(_evt.DeviceId == _frontDoor.Id)
+            if (_evt.DeviceId == _frontDoor.Id)
             {
-                if(_evt.IsClosedEvent)
+                if (_evt.IsClosedEvent)
                 {
                     await WaitForCancellationAsync(TimeSpan.FromSeconds(5));
                 }
@@ -58,7 +58,7 @@ namespace Puppet.Automation
             await WaitForCancellationAsync(TimeSpan.FromMinutes(5));
 
             int attempts = 0;
-            while (_frontDoor.Status == ContactStatus.Closed && 
+            while (_frontDoor.Status == ContactStatus.Closed &&
                     _frontDoorLock.Status != LockStatus.Locked &&
                     attempts < 3)
             {
