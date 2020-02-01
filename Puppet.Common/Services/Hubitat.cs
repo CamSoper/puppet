@@ -157,7 +157,7 @@ namespace Puppet.Common.Services
             }
         }
 
-        public override async Task SendNotification(string notificationText, bool playAudio)
+        protected override async Task AuxEndpointNotification(string notificationText, bool playAudio)
         {
             string endpoint = (playAudio) ? "announcement" : "notify";
             Uri requestUri = new Uri($"{_baseAuxAppAddress}/{endpoint}?access_token={_auxAppAccessToken}");
