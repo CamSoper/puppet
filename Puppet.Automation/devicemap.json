@@ -50,7 +50,9 @@
     "Floodlights": "196",
     "ServerRoomLamp": "229",
     "BasementLamp": "230",
-    "FoyerLight" : "209"
+    "FoyerLight": "209",
+    "RingDoorbell": "838",
+    "RingDoorbellMotion": "1056"
   },
   "Button": {
     "OfficeRemote": "345"

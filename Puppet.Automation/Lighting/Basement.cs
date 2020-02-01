@@ -14,10 +14,7 @@ namespace Puppet.Automation.Lighting
     {
 
         public Basement(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
-        {
-            DeactivationWait = TimeSpan.FromMinutes(20);
-            EnableDeactivation = true;
-        }
+        {}
 
         protected override async Task InitDevices()
         {

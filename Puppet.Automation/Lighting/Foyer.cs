@@ -15,16 +15,20 @@ namespace Puppet.Automation.Lighting
         public Foyer(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             DeactivationWait = TimeSpan.FromMinutes(5);
-            EnableDeactivation = true;
         }
 
         protected override async Task InitDevices()
         {
-            SwitchesToActivate =
-            new List<SwitchRelay>()
+            if (await IsDark(30, -30))
             {
-                await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FoyerLight")
-            };
+                SwitchesToActivate =
+                new List<SwitchRelay>()
+                {
+                    await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FoyerLight")
+                };
+
+                EnableDeactivation = true;
+            }
         }
     }
 }
