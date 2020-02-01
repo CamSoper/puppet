@@ -47,9 +47,15 @@
     "PantryAck": "512",
     "PatioLight": "448",
     "OutdoorPlug": "211",
-    "Floodlights": "196"
+    "Floodlights": "196",
+    "ServerRoomLamp": "229",
+    "BasementLamp": "230",
+    "FoyerLight" : "209"
   },
   "Button": {
     "OfficeRemote": "345"
+  },
+  "Motion": {
+    "Basement" : "228"
   }
 }
