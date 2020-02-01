@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.WebSockets;
+using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
@@ -155,10 +157,18 @@ namespace Puppet.Common.Services
             }
         }
 
-        public override async Task SendNotification(string notificationText)
+        public override async Task SendNotification(string notificationText, bool playAudio)
         {
-            await Task.CompletedTask;
-            throw new NotImplementedException();
+            string endpoint = (playAudio) ? "announcement" : "notify";
+            Uri requestUri = new Uri($"{_baseAuxAppAddress}/{endpoint}?access_token={_auxAppAccessToken}");
+            
+            Console.WriteLine($"{DateTime.Now} Hubitat Device Command: {requestUri.ToString().Split('?')[0]}");
+            string jsonText = $"{{ \"notificationText\" : \"{notificationText}\" }}";
+            var request = new StringContent(jsonText, Encoding.UTF8, "application/json");
+            using (HttpResponseMessage result = await _client.PostAsync(requestUri, request))
+            {
+                result.EnsureSuccessStatusCode();
+            }
         }
         
         public override async Task<SunriseAndSunset> GetSunriseAndSunset()
