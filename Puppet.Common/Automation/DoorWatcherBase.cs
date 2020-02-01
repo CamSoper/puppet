@@ -11,7 +11,8 @@ namespace Puppet.Common.Automation
     public abstract class DoorWatcherBase : AutomationBase
     {
         public TimeSpan HowLong { get; set; }
-        public List<Speaker> NotificationDevices { get; set; }
+        public bool MakeAnnouncement { get; set; }
+        public bool PushNotification { get; set; }
         public string NotificationFormat { get; set; }
         public int NumberOfNotifications { get; set; }
         public bool NotifyOnClose { get; set; }
@@ -21,7 +22,7 @@ namespace Puppet.Common.Automation
 
         protected override async Task Handle()
         {
-            if (NotificationDevices.Count == 0)
+            if (!(PushNotification || MakeAnnouncement))
             {
                 return;
             }
@@ -34,16 +35,21 @@ namespace Puppet.Common.Automation
                 for (int i = 0; i < NumberOfNotifications; i++)
                 {
                     await WaitForCancellationAsync(HowLong);
-                    await NotificationDevices.Speak(String.Format(NotificationFormat,
-                        _evt.DisplayName, HowLong.TotalMinutes * (i + 1), HowLong.TotalSeconds * (i + 1)));
+                    var textToSend = String.Format(NotificationFormat,
+                        _evt.DisplayName, HowLong.TotalMinutes * (i + 1), HowLong.TotalSeconds * (i + 1));
                     // There's an unused string parameter being passed into String.Format.
                     // That way the deriving class can set the NotificationFormat to mention
                     // either "seconds" or "minutes."
+
+                    if (MakeAnnouncement) await _hub.Announce(textToSend);
+                    if (PushNotification) await _hub.Push(textToSend);
                 }
             }
             else if (_evt.IsClosedEvent && NotifyOnClose)
             {
-                await NotificationDevices.Speak($"{_evt.DisplayName} is closed.");
+                var textToSend = $"{_evt.DisplayName} is closed.";
+                if (MakeAnnouncement) await _hub.Announce(textToSend);
+                if (PushNotification) await _hub.Push(textToSend);
             }
         }
     }
