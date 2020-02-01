@@ -27,8 +27,18 @@ namespace Puppet.Common.Services
         public ConcurrentDictionary<string, object> StateBag { get; set; }
         public IConfiguration Configuration { get; set; }
         public abstract Task DoAction(IDevice device, string action, string[] args = null);
-        public abstract Task SendNotification(string notificationText, bool audioAnnouncement);
+        protected abstract Task AuxEndpointNotification(string notificationText, bool audioAnnouncement);
         
+        public virtual Task Push(string notificationText)
+        {
+            return AuxEndpointNotification(notificationText, false);
+        }
+
+        public virtual Task Announce(string notificationText)
+        {
+            return AuxEndpointNotification(notificationText, true);
+        }
+
         public abstract Task StartAutomationEventWatcher();
 
         public event EventHandler<AutomationEventEventArgs> AutomationEvent;
