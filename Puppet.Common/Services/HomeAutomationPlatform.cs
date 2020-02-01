@@ -27,7 +27,7 @@ namespace Puppet.Common.Services
         public ConcurrentDictionary<string, object> StateBag { get; set; }
         public IConfiguration Configuration { get; set; }
         public abstract Task DoAction(IDevice device, string action, string[] args = null);
-        public abstract Task SendNotification(string notificationText);
+        public abstract Task SendNotification(string notificationText, bool audioAnnouncement);
         
         public abstract Task StartAutomationEventWatcher();
 
@@ -58,7 +58,7 @@ namespace Puppet.Common.Services
         string ParseAndLookupMappedDeviceName(JsonElement map, string mappedDeviceName)
         {
             string[] tokens = mappedDeviceName.Split('.');
-            JsonElement deviceElement = map;
+            JsonElement deviceElement = map.Clone();
             if (tokens.Length > 1)
             { 
                 for (int i = 0; i < tokens.Length; i++)
