@@ -17,15 +17,13 @@ namespace Puppet.Automation.Notification
         {
             HowLong = TimeSpan.FromMinutes(5);
             NumberOfNotifications = 2;
+            MakeAnnouncement = true;
+            PushNotification = true;
         }
 
-        protected override async Task InitDevices()
+        protected override Task InitDevices()
         {
-            NotificationDevices =
-                new List<Speaker>() {
-                    await _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
-                    await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
-                };
+            return Task.CompletedTask;
         }
     }
 }

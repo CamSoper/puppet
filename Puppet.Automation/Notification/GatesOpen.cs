@@ -19,15 +19,13 @@ namespace Puppet.Automation.Notification
             HowLong = TimeSpan.Zero;
             NotifyOnClose = true;
             NotificationFormat = @"{0} is open.";
+            MakeAnnouncement = true;
+            PushNotification = true;
         }
 
-        protected override async Task InitDevices()
+        protected override Task InitDevices()
         {
-            NotificationDevices =
-                new List<Speaker>() {
-                    await _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
-                    await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
-                };
+            return Task.CompletedTask;
         }
     }
 }
