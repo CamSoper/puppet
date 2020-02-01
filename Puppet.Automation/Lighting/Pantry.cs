@@ -12,7 +12,6 @@ namespace Puppet.Automation.Lighting
     {
         readonly TimeSpan _interval = TimeSpan.FromMinutes(5);
         SwitchRelay _pantryLight;
-        Speaker _kitchenSpeaker;
         const string _timeOpenedKey = "PantryOpenedTime";
 
         public Pantry(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
@@ -22,8 +21,6 @@ namespace Puppet.Automation.Lighting
         {
             _pantryLight =
                 await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.PantryLight");
-            _kitchenSpeaker =
-                await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker");
         }
 
         /// <summary>
@@ -43,15 +40,15 @@ namespace Puppet.Automation.Lighting
 
                 // Wait a bit...
                 await WaitForCancellationAsync(_interval);
-                await _kitchenSpeaker.Speak("Please close the pantry door");
+                await _hub.Announce("Please close the pantry door");
 
                 // Wait a bit more...
                 await WaitForCancellationAsync(_interval);
-                await _kitchenSpeaker.Speak("I said, please close the pantry door");
+                await _hub.Announce("I said, please close the pantry door");
 
                 // Wait a bit longer and then give up...
                 await WaitForCancellationAsync(_interval);
-                await _kitchenSpeaker.Speak("Fine, I'll turn off the light myself.");
+                await _hub.Announce("Fine, I'll turn off the light myself.");
                 await _pantryLight.Off();
             }
             else
@@ -63,7 +60,7 @@ namespace Puppet.Automation.Lighting
                 {
                     // It's been open five minutes, so we've nagged by now.
                     // It's only polite to thank them for doing what we've asked!
-                    await _kitchenSpeaker.Speak("Thank you for closing the pantry door");
+                    await _hub.Announce("Thank you for closing the pantry door");
                 }
                 await _pantryLight.Off();
             }

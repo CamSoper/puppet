@@ -17,7 +17,6 @@ namespace Puppet.Automation.Notification
     {
         List<ContactSensor> _gates;
         ContactSensor _slidingDoor;
-        List<Speaker> _notificationDevices;
 
         public SlidingDoorAndGatesOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
@@ -29,7 +28,10 @@ namespace Puppet.Automation.Notification
             {
                 if (_slidingDoor.Status == ContactStatus.Open && _gates.IsAnyOpen())
                 {
-                    await _notificationDevices.Speak("A gate is open while the sliding door is open. Please account for the pets.");
+                    var text = "A gate is open while the sliding door is open.Please account for the pets.";
+
+                    await _hub.Announce(text);
+                    await _hub.Push(text);
                 }
             }
         }
@@ -43,11 +45,6 @@ namespace Puppet.Automation.Notification
                 };
 
             _slidingDoor = await _hub.GetDeviceByMappedName<ContactSensor>("Contact.SlidingDoor");
-
-            _notificationDevices = new List<Speaker>() {
-                    await _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
-                    await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
-                };
         }
     }
 }

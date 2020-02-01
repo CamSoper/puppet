@@ -54,12 +54,9 @@ namespace Puppet.Automation.Notification
                 _hub.StateBag.AddOrUpdate(_mailboxNotifyKey, DateTime.Now,
                     (key, oldvalue) => DateTime.Now);
 
-                List<Speaker> notificationDevices =
-                    new List<Speaker>() {
-                        await _hub.GetDeviceByMappedName<Speaker>("Speaker.WebhookNotifier"),
-                        await _hub.GetDeviceByMappedName<Speaker>("Speaker.KitchenSpeaker")
-                    };
-                await notificationDevices.Speak("There is activity at the mailbox.");
+                var text = "There is activity at the mailbox.";
+                await _hub.Announce(text);
+                await _hub.Push(text);
 
             }
         }
