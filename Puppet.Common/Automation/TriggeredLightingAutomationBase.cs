@@ -31,7 +31,7 @@ namespace Puppet.Common.Automation
 
             string timeActivatedKey = this.GetType().ToString();
             TimeSpan timeToWait = TimeSpan.MinValue;
-            if (_evt.IsOpenEvent || _evt.IsOnEvent)
+            if (_evt.IsOpenEvent || _evt.IsOnEvent || _evt.IsActiveEvent)
             {
                 foreach (var s in SwitchesToActivate)
                 {
@@ -41,7 +41,7 @@ namespace Puppet.Common.Automation
                     (key, oldvalue) => DateTime.Now);
                 timeToWait = DeactivationWait;
             }
-            else if (_evt.IsClosedEvent || _evt.IsOffEvent)
+            else if (_evt.IsClosedEvent || _evt.IsOffEvent || _evt.IsInactiveEvent)
             {
 
                 DateTime LightActivatedTime =

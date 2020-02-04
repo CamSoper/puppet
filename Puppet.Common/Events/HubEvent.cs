@@ -27,6 +27,8 @@ namespace Puppet.Common.Events
         public bool IsOffEvent => Value == "off";
         public bool IsButtonPushedEvent => Name == "pushed";
         public bool IsButtonHeldEvent => Name == "held";
+        public bool IsActiveEvent => Name == "active";
+        public bool IsInactiveEvent => Name == "inactive";
 
         public Dictionary<string, string> GetDictionary()
         {

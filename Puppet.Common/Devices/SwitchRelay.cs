@@ -10,6 +10,7 @@ namespace Puppet.Common.Devices
         Off,
         Unknown
     }
+
     public class SwitchRelay : DeviceBase
     {
 
@@ -33,6 +34,14 @@ namespace Puppet.Common.Devices
                         return SwitchStatus.Unknown;
                 }
 
+            }
+        }
+
+        public bool IsOn
+        {
+            get
+            {
+                return this.Status == SwitchStatus.On;
             }
         }
 
