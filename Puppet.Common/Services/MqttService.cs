@@ -25,52 +25,52 @@ namespace Puppet.Common.Services
 
         public MqttService(IManagedMqttClient mqttClient, MqttOptions mqttOptions, HomeAutomationPlatform hub)
         {
+            
             _telemetryClient = hub.TelemetryClient;
             _mqttClient = mqttClient;
             _hub = hub;
             _topicRoot = mqttOptions.TopicRoot;
             _commandTopic = $"{mqttOptions.TopicRoot}/command";
-            _mqttClient.ApplicationMessageReceived += OnMqttMessageReceived;
-        }
-
-        private async void OnMqttMessageReceived(object sender, MQTTnet.MqttApplicationMessageReceivedEventArgs e)
-        {
-            Console.WriteLine($"{DateTime.Now} Received MQTT message. Topic: {e.ApplicationMessage.Topic} Payload: {e.ApplicationMessage.ConvertPayloadToString()}");
-            using (var operation =
-                _telemetryClient.StartOperation<RequestTelemetry>($"{this.ToString()}: Message Received"))
+            _mqttClient.UseApplicationMessageReceivedHandler(async e =>
             {
-                _telemetryClient.TrackEvent("MQTT Message Received",
-                    new Dictionary<string, string>()
-                    {
+                Console.WriteLine($"{DateTime.Now} Received MQTT message. Topic: {e.ApplicationMessage.Topic} Payload: {e.ApplicationMessage.ConvertPayloadToString()}");
+
+                using (var operation =
+                _telemetryClient.StartOperation<RequestTelemetry>($"{this.ToString()}: Message Received"))
+                {
+                    _telemetryClient.TrackEvent("MQTT Message Received",
+                        new Dictionary<string, string>()
+                        {
                         {"Topic", e.ApplicationMessage.Topic },
                         {"Payload", e.ApplicationMessage.ConvertPayloadToString()},
-                    });
-                try
-                {
-                    string parm = null;
-                    string[] tokens = e.ApplicationMessage.Topic.Split('/');
-                    string payload = e.ApplicationMessage.ConvertPayloadToString();
-
-                    if (tokens.Length != 4)
+                        });
+                    try
                     {
-                        throw new InvalidMqttTopicException();
-                    }
+                        string parm = null;
+                        string[] tokens = e.ApplicationMessage.Topic.Split('/');
+                        string payload = e.ApplicationMessage.ConvertPayloadToString();
 
-                    GenericDevice device = await _hub.GetDeviceByLabel<GenericDevice>(tokens[2]);
-                    if (!string.IsNullOrEmpty(payload))
+                        if (tokens.Length != 4)
+                        {
+                            throw new InvalidMqttTopicException();
+                        }
+
+                        GenericDevice device = await _hub.GetDeviceByLabel<GenericDevice>(tokens[2]);
+                        if (!string.IsNullOrEmpty(payload))
+                        {
+                            parm = payload;
+                        }
+
+                        await device.DoAction(tokens[3], parm);
+                    }
+                    catch (Exception ex)
                     {
-                        parm = payload;
+                        operation.Telemetry.Success = false;
+                        _telemetryClient.TrackException(ex);
+                        Console.WriteLine($"{DateTime.Now} {ex}");
                     }
-
-                    await device.DoAction(tokens[3], parm);
                 }
-                catch (Exception ex)
-                {
-                    operation.Telemetry.Success = false;
-                    _telemetryClient.TrackException(ex);
-                    Console.WriteLine($"{DateTime.Now} {ex}");
-                }
-            }
+            });
         }
 
         public async Task SendEventToMqttAsync(HubEvent evt)
@@ -81,7 +81,7 @@ namespace Puppet.Common.Services
         public async Task Start()
         {
             await _mqttClient.SubscribeAsync(
-                new TopicFilterBuilder()
+                new MqttTopicFilterBuilder()
                 .WithTopic($"{_commandTopic}/#")
                 .Build());
         }

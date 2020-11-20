@@ -33,6 +33,7 @@ namespace Puppet.Executive
             IConfiguration configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory()) // Directory where the json files are located
                 .AddJsonFile(APPSETTINGS_FILENAME, optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
                 .Build();
 
             // Create an HttpClient that doesn't validate the server certificate
