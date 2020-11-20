@@ -1,5 +1,6 @@
 ﻿using MQTTnet;
 using MQTTnet.Client;
+using MQTTnet.Client.Options;
 using MQTTnet.Extensions.ManagedClient;
 using Puppet.Common.Configuration;
 using System;
@@ -31,9 +32,9 @@ namespace Puppet.Executive.Mqtt
             }
 
             var managedClientOptions = new ManagedMqttClientOptionsBuilder()
-            .WithAutoReconnectDelay(TimeSpan.FromSeconds(5))
-            .WithClientOptions(clientConnectionOptionsBuilder.Build())
-            .Build();
+                .WithAutoReconnectDelay(TimeSpan.FromSeconds(5))
+                .WithClientOptions(clientConnectionOptionsBuilder.Build())
+                .Build();
 
             var mqttClient = new MqttFactory().CreateManagedMqttClient();
             await mqttClient.StartAsync(managedClientOptions);

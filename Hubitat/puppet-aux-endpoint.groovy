@@ -20,9 +20,12 @@ def setupScreen(){
        section ("Notify these phones...") {
             input "phones", "capability.notification", multiple: true, required: true
       }
-       section(){ 
+        section("Where are we speaking?") {
+            input "speakers", "capability.speechSynthesis", multiple:true, required: true
+        }
+        section(){ 
            paragraph("Access token: ${state.accessToken}")
-       }
+        }
    }
 }
 
@@ -36,7 +39,12 @@ mappings {
     action: [
       GET: "getSunTimes"
     ]
-  }  
+  }
+  path("/announcement") {
+    action: [
+      POST: "announcement"
+    ]
+  } 
 }
 
 def getSunTimes() {
@@ -47,6 +55,12 @@ void notifyPhones() {
     def notificationtext = request.JSON?.notificationText
     phones.deviceNotification(notificationtext)
 }
+
+void announcement() {
+    def notificationtext = request.JSON?.notificationText
+    speakers.speak(notificationtext)
+}
+
 def installed() {}
 
 def updated() {}
