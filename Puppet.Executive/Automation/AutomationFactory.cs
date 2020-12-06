@@ -1,4 +1,5 @@
-﻿using Puppet.Common.Automation;
+﻿using Microsoft.Extensions.Configuration;
+using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Services;
@@ -12,6 +13,11 @@ namespace Puppet.Executive.Automation
     public class AutomationFactory
     {
         private const string _automationAssembly = "Puppet.Automation.dll";
+        private IConfiguration _config;
+
+        public AutomationFactory(IConfiguration configuration ) {
+            _config = configuration;
+        }
 
         /// <summary>
         /// Figures out the appropriate implementation of IAutomation based on the data in the event and returns it.
@@ -19,7 +25,7 @@ namespace Puppet.Executive.Automation
         /// <param name="evt"></param>
         /// <param name="hub"></param>
         /// <returns>An IEnumerable&lt;IAutomation&gt; containing the automations to be run for this event.</returns>
-        public static IEnumerable<IAutomation> GetAutomations(HubEvent evt, HomeAutomationPlatform hub)
+        public IEnumerable<IAutomation> GetAutomations(HubEvent evt, HomeAutomationPlatform hub)
         {
             /*
              *  Get the types from the assembly
