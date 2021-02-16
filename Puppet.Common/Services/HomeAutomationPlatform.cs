@@ -2,11 +2,15 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
+
 using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Configuration;
+
 using Newtonsoft.Json.Linq;
+
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Models;
@@ -28,7 +32,7 @@ namespace Puppet.Common.Services
         public IConfiguration Configuration { get; set; }
         public abstract Task DoAction(IDevice device, string action, string[] args = null);
         protected abstract Task AuxEndpointNotification(string notificationText, bool audioAnnouncement);
-        
+
         public virtual Task Push(string notificationText)
         {
             return AuxEndpointNotification(notificationText, false);
@@ -45,8 +49,17 @@ namespace Puppet.Common.Services
 
         public HomeAutomationPlatform(IConfiguration configuration)
         {
+
+            string cwd = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            string deviceMapPath = Path.Combine(cwd, DEVICE_FILENAME);
+
+            if (!File.Exists(deviceMapPath))
+            {
+                throw new FileNotFoundException($"Can't find {DEVICE_FILENAME}!");
+            }
+
             this.DeviceMap = JsonDocument
-                                .Parse(File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), DEVICE_FILENAME)))
+                                .Parse(File.ReadAllText(deviceMapPath))
                                 .RootElement;
 
             Configuration = configuration;
@@ -70,7 +83,7 @@ namespace Puppet.Common.Services
             string[] tokens = mappedDeviceName.Split('.');
             JsonElement deviceElement = map.Clone();
             if (tokens.Length > 1)
-            { 
+            {
                 for (int i = 0; i < tokens.Length; i++)
                 {
                     deviceElement = deviceElement.GetProperty(tokens[i]);

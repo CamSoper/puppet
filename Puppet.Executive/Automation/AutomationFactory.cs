@@ -4,6 +4,7 @@ using Puppet.Common.Events;
 using Puppet.Common.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -11,8 +12,9 @@ namespace Puppet.Executive.Automation
 {
     public class AutomationFactory
     {
-        private const string _automationAssembly = "Puppet.Automation.dll";
-
+        static string _cwd = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        static string _automationAssembly = Path.Combine(_cwd, "Puppet.Automation.dll");
+        
         /// <summary>
         /// Figures out the appropriate implementation of IAutomation based on the data in the event and returns it.
         /// </summary>
