@@ -16,7 +16,7 @@ namespace Puppet.Automation.PowerAllowance
     {
         public Basement(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            HowLong = TimeSpan.FromMinutes(20);
+            HowLong = TimeSpan.FromMinutes(60);
         }
 
         protected override Task InitDevices()

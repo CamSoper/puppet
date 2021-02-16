@@ -10,7 +10,6 @@ namespace Puppet.Automation.Lighting
     [TriggerDevice("Contact.PantryDoor", Capability.Contact)]
     public class Pantry : AutomationBase
     {
-        readonly TimeSpan _interval = TimeSpan.FromMinutes(5);
         SwitchRelay _pantryLight;
         const string _timeOpenedKey = "PantryOpenedTime";
 
@@ -34,34 +33,16 @@ namespace Puppet.Automation.Lighting
                 // Turn on the light
                 await _pantryLight.On();
 
-                // Remember when we turned on the light for later (when we respond to an off event)
-                _hub.StateBag.AddOrUpdate(_timeOpenedKey, DateTime.Now,
-                    (key, oldvalue) => DateTime.Now); // This is the lambda to just update an existing value with the current DateTime
-
                 // Wait a bit...
-                await WaitForCancellationAsync(_interval);
-                await _hub.Announce("Please close the pantry door");
-
-                // Wait a bit more...
-                await WaitForCancellationAsync(_interval);
-                await _hub.Announce("I said, please close the pantry door");
+                await WaitForCancellationAsync(TimeSpan.FromMinutes(10));
+                await _hub.Announce("I'm turning off the pantry lights in one minute.");
 
                 // Wait a bit longer and then give up...
-                await WaitForCancellationAsync(_interval);
-                await _hub.Announce("Fine, I'll turn off the light myself.");
+                await WaitForCancellationAsync(TimeSpan.FromMinutes(1));
                 await _pantryLight.Off();
             }
             else
             {
-                // Has the door been open five minutes?
-                DateTime PantryOpenTime =
-                    _hub.StateBag.ContainsKey(_timeOpenedKey) ? (DateTime)_hub.StateBag[_timeOpenedKey] : DateTime.Now;
-                if (DateTime.Now - PantryOpenTime > _interval)
-                {
-                    // It's been open five minutes, so we've nagged by now.
-                    // It's only polite to thank them for doing what we've asked!
-                    await _hub.Announce("Thank you for closing the pantry door");
-                }
                 await _pantryLight.Off();
             }
         }
