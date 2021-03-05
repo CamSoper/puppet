@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace Puppet.Automation.Lighting
 {
     [TriggerDevice("Contact.BasementDoor", Capability.Contact)]
+    [TriggerDevice("Motion.Basement", Capability.Motion)]
     public class BasementStair : TriggeredLightingAutomationBase
     {
         public BasementStair(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
