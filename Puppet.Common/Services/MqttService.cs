@@ -61,7 +61,9 @@ namespace Puppet.Common.Services
                             parm = payload;
                         }
 
-                        await device.DoAction(tokens[3], parm);
+                        // await device.DoAction(tokens[3], parm);
+                        // Nope. Let's revisit this part.
+                        Console.WriteLine($"No! No MQTT Commands allowed!");
                     }
                     catch (Exception ex)
                     {
