@@ -20,14 +20,16 @@ using Microsoft.ApplicationInsights.DataContracts;
 
 namespace Puppet.Executive.Services
 {
-    public class Executive : Puppet.Executive.Interfaces.IExecutive
+    public class Executive : Puppet.Executive.Interfaces.IExecutive, IDisposable
     {
         const string APPSETTINGS_FILENAME = "appsettings.json";
 
-        static AutomationTaskManager _taskManager;
-        static HomeAutomationPlatform _hub;
-        static IMqttService _mqtt;
-        static TelemetryClient _telemetryClient;
+        AutomationTaskManager _taskManager;
+        HomeAutomationPlatform _hub;
+        IMqttService _mqtt;
+        TelemetryClient _telemetryClient;
+        HttpClient _httpClient;
+        private bool disposedValue;
 
         public Executive()
         {
@@ -48,9 +50,10 @@ namespace Puppet.Executive.Services
 
             using (AppInsights.InitializeDependencyTracking(telemetryConfig))
             using (AppInsights.InitializePerformanceTracking(telemetryConfig))
-            using (HttpClient _httpClient = new HttpClient(customHttpClientHandler))
             {
                 _telemetryClient = new TelemetryClient(telemetryConfig);
+
+                _httpClient = new HttpClient(customHttpClientHandler);
 
                 // Abstraction representing the home automation system
                 _hub = new Hubitat(configuration, _httpClient);
@@ -82,12 +85,12 @@ namespace Puppet.Executive.Services
             }
         }
 
-        private static void SendEventToMqtt(HubEvent evt)
+        private void SendEventToMqtt(HubEvent evt)
         {
             _mqtt?.SendEventToMqttAsync(evt);
         }
 
-        private static void StartRelevantAutomationHandlers(HubEvent evt)
+        private void StartRelevantAutomationHandlers(HubEvent evt)
         {
             // Get a reference to the automation
             var automations = AutomationFactory.GetAutomations(evt, _hub);
@@ -142,6 +145,35 @@ namespace Puppet.Executive.Services
 
             // Let's take this opportunity to get rid of any completed tasks.
             _taskManager.RemoveCompletedTasks();
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _httpClient.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~Executive()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }
