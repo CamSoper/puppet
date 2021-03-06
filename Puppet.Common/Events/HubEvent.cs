@@ -16,8 +16,12 @@ namespace Puppet.Common.Events
         public string DisplayName { get; set; }
         [JsonProperty(PropertyName = "descriptionText")]
         public string DescriptionText { get; set; }
-        [JsonProperty(PropertyName = "source")]
-        public string Source { get; set; }
+        [JsonProperty(PropertyName = "unit")]
+        public string Unit { get; set; }
+        [JsonProperty(PropertyName = "type")]
+        public string Type { get; set; }
+        [JsonProperty(PropertyName = "data")]
+        public string Data { get; set; }
 
         public bool IsOpenEvent => Value == "open";
         public bool IsClosedEvent => Value == "closed";
@@ -38,7 +42,9 @@ namespace Puppet.Common.Events
                     {"Description", DescriptionText },
                     {"Display Name", DisplayName },
                     {"Name", Name },
-                    {"Source", Source },
+                    {"Data", Data },
+                    {"Unit", Unit },
+                    {"Type", Type },
                     {"Value", Value },
                 };
         }

@@ -1,24 +1,26 @@
-﻿using System;
+﻿using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
+
+using Puppet.Common.Events;
+using Puppet.Common.Services;
+using Puppet.Executive.Automation;
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
-using Puppet.Common.Automation;
 using Puppet.Common.Configuration;
-using Puppet.Common.Events;
-using Puppet.Common.Services;
-using Puppet.Executive.Automation;
 using Puppet.Executive.Mqtt;
 using Puppet.Common.Telemetry;
+using Puppet.Common.Automation;
+using Microsoft.ApplicationInsights.DataContracts;
 
-namespace Puppet.Executive
+namespace Puppet.Executive.Services
 {
-    class Program
+    public class Executive : Puppet.Executive.Interfaces.IExecutive
     {
         const string APPSETTINGS_FILENAME = "appsettings.json";
 
@@ -27,7 +29,7 @@ namespace Puppet.Executive
         static IMqttService _mqtt;
         static TelemetryClient _telemetryClient;
 
-        public static async Task Main(string[] args)
+        public Executive()
         {
             // Read the configuration file
             IConfiguration configuration = new ConfigurationBuilder()
@@ -54,38 +56,30 @@ namespace Puppet.Executive
                 _hub = new Hubitat(configuration, _httpClient);
 
                 // Start the MQTT service, if applicable.
-                MqttOptions mqttOptions = configuration.GetSection("MQTT").Get<MqttOptions>();
-                if (mqttOptions?.Enabled ?? false)
-                {
-                    _mqtt = new MqttService(await MqttClientFactory.GetClient(mqttOptions), mqttOptions, _hub);
-                    await _mqtt.Start();
-                }
+                StartMqttService(configuration);
 
                 // Class to manage long-running tasks
                 _taskManager = new AutomationTaskManager(configuration);
 
-                // Bind a method to handle the events raised
-                // by the Hubitat device
-                _hub.AutomationEvent += Hub_AutomationEvent;
-                var hubTask = _hub.StartAutomationEventWatcher();
-
-                // Wait forever, this is a daemon process
-                await hubTask;
             }
         }
 
-        /// <summary>
-        /// Event handler for AutomationEvents raised by the HomeAutomationPlatform.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void Hub_AutomationEvent(object sender, Common.Events.AutomationEventEventArgs e)
+        public void ProcessEvent(HubEvent evt)
         {
-            var evt = e.HubEvent;
             _telemetryClient.TrackEvent("Hub Event", evt.GetDictionary());
 
             Task.Run(() => StartRelevantAutomationHandlers(evt));
             Task.Run(() => SendEventToMqtt(evt));
+        }
+
+        private async void StartMqttService(IConfiguration configuration)
+        {
+            MqttOptions mqttOptions = configuration.GetSection("MQTT").Get<MqttOptions>();
+            if (mqttOptions?.Enabled ?? false)
+            {
+                _mqtt = new MqttService(await MqttClientFactory.GetClient(mqttOptions), mqttOptions, _hub);
+                await _mqtt.Start();
+            }
         }
 
         private static void SendEventToMqtt(HubEvent evt)
