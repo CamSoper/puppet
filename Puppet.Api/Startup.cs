@@ -1,3 +1,4 @@
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +30,8 @@ namespace Puppet.Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Puppet.Api", Version = "v1" });
             });
-            services.AddSingleton(typeof(IExecutive), new Puppet.Executive.Services.Executive());
+            services.AddSingleton(typeof(IExecutive), new Puppet.Executive.Services.Executive(Configuration));
+            services.AddApplicationInsightsTelemetry();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

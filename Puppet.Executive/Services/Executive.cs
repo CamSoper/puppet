@@ -31,15 +31,8 @@ namespace Puppet.Executive.Services
         HttpClient _httpClient;
         private bool disposedValue;
 
-        public Executive()
+        public Executive(IConfiguration configuration)
         {
-            // Read the configuration file
-            IConfiguration configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory()) // Directory where the json files are located
-                .AddJsonFile(APPSETTINGS_FILENAME, optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables()
-                .Build();
-
             // Create an HttpClient that doesn't validate the server certificate
             HttpClientHandler customHttpClientHandler = new HttpClientHandler
             {
@@ -47,24 +40,18 @@ namespace Puppet.Executive.Services
             };
 
             TelemetryConfiguration telemetryConfig = AppInsights.GetTelemetryConfiguration(configuration);
+            _telemetryClient = new TelemetryClient(telemetryConfig);
 
-            using (AppInsights.InitializeDependencyTracking(telemetryConfig))
-            using (AppInsights.InitializePerformanceTracking(telemetryConfig))
-            {
-                _telemetryClient = new TelemetryClient(telemetryConfig);
+            _httpClient = new HttpClient(customHttpClientHandler);
 
-                _httpClient = new HttpClient(customHttpClientHandler);
+            // Abstraction representing the home automation system
+            _hub = new Hubitat(configuration, _httpClient);
 
-                // Abstraction representing the home automation system
-                _hub = new Hubitat(configuration, _httpClient);
+            // Start the MQTT service, if applicable.
+            StartMqttService(configuration);
 
-                // Start the MQTT service, if applicable.
-                StartMqttService(configuration);
-
-                // Class to manage long-running tasks
-                _taskManager = new AutomationTaskManager(configuration);
-
-            }
+            // Class to manage long-running tasks
+            _taskManager = new AutomationTaskManager(configuration);
         }
 
         public void ProcessEvent(HubEvent evt)
