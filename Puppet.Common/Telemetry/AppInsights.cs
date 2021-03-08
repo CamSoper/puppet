@@ -27,7 +27,7 @@ namespace Puppet.Common.Telemetry
         public static TelemetryConfiguration GetTelemetryConfiguration(IConfiguration configuration)
         {
             TelemetryConfiguration telemetryConfig = TelemetryConfiguration.CreateDefault();
-            telemetryConfig.InstrumentationKey = configuration["InstrumentationKey"];
+            telemetryConfig.InstrumentationKey = configuration["ApplicationInsights:InstrumentationKey"];
             telemetryConfig.TelemetryInitializers.Add(new HttpDependenciesParsingTelemetryInitializer());
             telemetryConfig.TelemetryInitializers.Add(new OperationCorrelationTelemetryInitializer());
             return telemetryConfig;
