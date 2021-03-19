@@ -20,7 +20,7 @@ using Microsoft.ApplicationInsights.DataContracts;
 
 namespace Puppet.Executive.Services
 {
-    public class Executive : Puppet.Executive.Interfaces.IExecutive, IDisposable
+    public class Executive : Interfaces.IExecutive, IDisposable
     {
         const string APPSETTINGS_FILENAME = "appsettings.json";
 

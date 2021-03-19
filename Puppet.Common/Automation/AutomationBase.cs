@@ -63,10 +63,5 @@ namespace Puppet.Common.Automation
                 return true;
             }
         }
-
-        protected bool IsTriggerDevice(IDevice device)
-        {
-            return (device.Id == _evt.DeviceId);
-        }
     }
 }

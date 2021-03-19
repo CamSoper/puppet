@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Puppet.Common.Events;
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +32,11 @@ namespace Puppet.Common.Devices
         public static bool IsAnyOn(this List<SwitchRelay> switches)
         {
             return !switches.TrueForAll((s) => s.Status == SwitchStatus.Off);
+        }
+
+        public static bool IsTriggerDevice(this IDevice device, HubEvent evt)
+        {
+            return (device.Id == evt.DeviceId);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
+using Puppet.Common.Notifiers;
 using Puppet.Common.Services;
 
 namespace Puppet.Common.Automation
@@ -16,6 +17,8 @@ namespace Puppet.Common.Automation
         public string NotificationFormat { get; set; }
         public int NumberOfNotifications { get; set; }
         public bool NotifyOnClose { get; set; }
+        public INotifier AnnouncementNotifier { get; set; }
+        public INotifier PushNotifier { get; set; }
 
         public DoorWatcherBase(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {}
@@ -41,8 +44,29 @@ namespace Puppet.Common.Automation
                     // That way the deriving class can set the NotificationFormat to mention
                     // either "seconds" or "minutes."
 
-                    if (MakeAnnouncement) await _hub.Announce(textToSend);
-                    if (PushNotification) await _hub.Push(textToSend);
+                    if (MakeAnnouncement)
+                    {
+                        if (AnnouncementNotifier is not null)
+                        {
+                            await AnnouncementNotifier.SendNotification(textToSend);
+                        }
+                        else
+                        {
+                            await _hub.Announce(textToSend);
+                        }
+                    }
+
+                    if (PushNotification)
+                    {
+                        if (PushNotifier is not null)
+                        {
+                            await PushNotifier.SendNotification(textToSend);
+                        }
+                        else
+                        {
+                            await _hub.Push(textToSend);
+                        }
+                    }
                 }
             }
             else if (_evt.IsClosedEvent && NotifyOnClose)
