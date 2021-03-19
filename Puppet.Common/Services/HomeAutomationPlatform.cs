@@ -14,6 +14,7 @@ using Newtonsoft.Json.Linq;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
 using Puppet.Common.Models;
+using Puppet.Common.Notifiers;
 using Puppet.Common.Telemetry;
 
 namespace Puppet.Common.Services
@@ -43,9 +44,7 @@ namespace Puppet.Common.Services
             return AuxEndpointNotification(notificationText, true);
         }
 
-        public abstract Task StartAutomationEventWatcher();
 
-        public event EventHandler<AutomationEventEventArgs> AutomationEvent;
 
         public HomeAutomationPlatform(IConfiguration configuration)
         {
@@ -68,11 +67,6 @@ namespace Puppet.Common.Services
         }
 
         public abstract Task<SunriseAndSunset> GetSunriseAndSunset();
-
-        protected virtual void OnAutomationEvent(AutomationEventEventArgs e)
-        {
-            AutomationEvent?.Invoke(this, e);
-        }
 
         public string LookupDeviceId(string mappedDeviceName)
         {
