@@ -1,3 +1,4 @@
+using Puppet.Automation.Services.HomeAssistant;
 using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
@@ -14,15 +15,17 @@ namespace Puppet.Automation.Lighting
     [TriggerDevice("Contact.GarageDoor2", Capability.Contact)]
     [TriggerDevice("Switch.HolidayDisplay", Capability.Switch)]
     [TriggerDevice("Switch.FrontLightsPower", Capability.Switch)]
+    [TriggerDevice("Switch.FrontLightsGroup", Capability.Switch)]
     public class FrontLights : AutomationBase
     {
         SwitchRelay _frontLightsPower;
-        SwitchRelay _frontLightsWarm;
-        SwitchRelay _frontLightsColor;
+        SwitchRelay _frontLightsGroup;
         SwitchRelay _holidayDisplay;
         
         List<ContactSensor> _doors;
-        
+
+        HassSceneService _hassSceneService;
+
         public FrontLights(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {}
 
@@ -37,38 +40,39 @@ namespace Puppet.Automation.Lighting
 
             _frontLightsPower =
                 await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FrontLightsPower");
-            _frontLightsColor =
-                await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FrontLightsColorfulScene");
-            _frontLightsWarm =
-                await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FrontLightsWarmWhiteScene");
+            _frontLightsGroup =
+                await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.FrontLightsGroup");
             _holidayDisplay =
                 await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.HolidayDisplay");
+
+            _hassSceneService = new HassSceneService(_hub.Configuration);
             
         }
 
         protected override async Task Handle()
         {
-            bool ShouldUseLights = await IsDark(30, -30);
+            bool ShouldUseLights = true; //await IsDark(30, -30);
 
             //Power switch was turned off. Turn it back on and make the lights dark.
-            if(_evt.IsOffEvent && IsTriggerDevice(_frontLightsPower))
+            if (_evt.IsOffEvent && _frontLightsPower.IsTriggerDevice(_evt))
             {
                 await WaitForCancellationAsync(TimeSpan.FromSeconds(5));
                 await _frontLightsPower.On();
                 await WaitForCancellationAsync(TimeSpan.FromSeconds(3));
-                await _frontLightsWarm.Off();
-                return;
+                await _frontLightsGroup.Off();
             }
 
             //Before we do anything else, make sure Power switch is on
-            if(!_frontLightsPower.IsOn)
+            if (!_frontLightsPower.IsOn)
             {
                 await _frontLightsPower.On();
                 await WaitForCancellationAsync(TimeSpan.FromSeconds(3));
             }
 
-            if((_evt.IsOnEvent && IsTriggerDevice(_holidayDisplay)) 
-                  || _evt.IsOnEvent && IsTriggerDevice(_frontLightsPower) && _holidayDisplay.IsOn)
+
+            if ((_evt.IsOnEvent && _holidayDisplay.IsTriggerDevice(_evt))
+                    || (_evt.IsOnEvent && _frontLightsPower.IsTriggerDevice(_evt) && _holidayDisplay.IsOn)
+                    || (_evt.IsOffEvent && _frontLightsGroup.IsTriggerDevice(_evt) && _holidayDisplay.IsOn))
             {
                 await DoHolidayStuff();
                 return;
@@ -76,7 +80,7 @@ namespace Puppet.Automation.Lighting
 
             if(_evt.IsOpenEvent && ShouldUseLights)
             {
-                await _frontLightsWarm.On();
+                await _hassSceneService.ApplyScene(Scene.Warm_Front_Lights);
             }
             else if(_evt.IsClosedEvent && ShouldUseLights)
             {
@@ -90,19 +94,20 @@ namespace Puppet.Automation.Lighting
                     else
                     {
                         await WaitForCancellationAsync(TimeSpan.FromMinutes(5));
-                        await _frontLightsWarm.Off();
+                        await _frontLightsGroup.Off();
                     }
                 }
             }
             else
             {
-                await _frontLightsWarm.Off();
+                await _frontLightsGroup.Off();
             }
         }
 
         private async Task DoHolidayStuff()
         {
-            await _frontLightsColor.On();
+            await _frontLightsGroup.On();
+            await _hassSceneService.ApplyScene(Scene.Colorful_Front_Lights);
         }
     }
 }

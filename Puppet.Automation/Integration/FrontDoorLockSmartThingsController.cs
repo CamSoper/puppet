@@ -5,7 +5,7 @@ using Puppet.Common.Services;
 using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Puppet.Automation.Services;
+using Puppet.Automation.Services.SmartThings;
 
 namespace Puppet.Automation.Integration
 {

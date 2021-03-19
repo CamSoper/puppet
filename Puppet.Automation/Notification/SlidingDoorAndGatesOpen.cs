@@ -1,6 +1,8 @@
-﻿using Puppet.Common.Automation;
+﻿using Puppet.Automation.Services.Notifiers;
+using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
+using Puppet.Common.Notifiers;
 using Puppet.Common.Services;
 using System;
 using System.Collections.Generic;
@@ -17,9 +19,14 @@ namespace Puppet.Automation.Notification
     {
         List<ContactSensor> _gates;
         ContactSensor _slidingDoor;
+        private List<INotifier> _notifiers;
 
         public SlidingDoorAndGatesOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
+            _notifiers = new List<INotifier> {
+                new HassAlexaNotifier(_hub.Configuration, new string[] { "Shared_Spaces" }),
+                new HassAppNotifier(_hub.Configuration)
+            };
         }
 
         protected async override Task Handle()
@@ -28,10 +35,7 @@ namespace Puppet.Automation.Notification
             {
                 if (_slidingDoor.Status == ContactStatus.Open && _gates.IsAnyOpen())
                 {
-                    var text = "A gate is open while the sliding door is open.Please account for the pets.";
-
-                    await _hub.Announce(text);
-                    await _hub.Push(text);
+                    await _notifiers.SendMessage("A gate is open while the sliding door is open.Please account for the pets.");
                 }
             }
         }

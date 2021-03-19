@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+
+using Puppet.Automation.Services.Notifiers;
 using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
+using Puppet.Common.Notifiers;
 using Puppet.Common.Services;
 
 namespace Puppet.Automation.Lighting
@@ -11,6 +14,8 @@ namespace Puppet.Automation.Lighting
     public class Pantry : AutomationBase
     {
         SwitchRelay _pantryLight;
+        INotifier _alexaNotifier;
+        
         const string _timeOpenedKey = "PantryOpenedTime";
 
         public Pantry(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
@@ -20,6 +25,8 @@ namespace Puppet.Automation.Lighting
         {
             _pantryLight =
                 await _hub.GetDeviceByMappedName<SwitchRelay>("Switch.PantryLight");
+
+            _alexaNotifier = new HassAlexaNotifier(_hub.Configuration, new string[] { "Kitchen" });
         }
 
         /// <summary>
@@ -35,7 +42,7 @@ namespace Puppet.Automation.Lighting
 
                 // Wait a bit...
                 await WaitForCancellationAsync(TimeSpan.FromMinutes(10));
-                await _hub.Announce("I'm turning off the pantry lights in one minute.");
+                await _alexaNotifier.SendNotification("I'm turning off the pantry lights in one minute.");
 
                 // Wait a bit longer and then give up...
                 await WaitForCancellationAsync(TimeSpan.FromMinutes(1));

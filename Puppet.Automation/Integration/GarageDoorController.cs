@@ -56,6 +56,11 @@ namespace Puppet.Automation.Integration
                 {
                     Console.WriteLine($"{DateTime.Now} Sending signal to cycle garage door {doorIndex + 1}.");
                     await SendCycleCommand(doorIndex + 1);
+
+                    // Wait for this task to be cancelled when the cycling completes and a new event is triggered
+                    await WaitForCancellationAsync(TimeSpan.FromSeconds(30));
+                    await _hub.Push($"Garage door {doorIndex + 1} is in an unknown state! Please check it.");
+                    return;
                 }
             }
         }

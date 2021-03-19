@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Puppet.Automation.Services.Notifiers;
 using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
@@ -23,6 +25,9 @@ namespace Puppet.Automation.Notification
             HowLong = TimeSpan.FromMinutes(2);
             MakeAnnouncement = true;
             PushNotification = true;
+
+            AnnouncementNotifier = new HassAlexaNotifier(_hub.Configuration, new string[] { "Shared_Spaces" });
+            PushNotifier = new HassAppNotifier(_hub.Configuration);
         }
 
         protected override Task InitDevices()

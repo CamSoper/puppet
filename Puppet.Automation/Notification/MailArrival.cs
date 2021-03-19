@@ -1,7 +1,10 @@
-﻿using Puppet.Common.Automation;
+﻿using Puppet.Automation.Services.Notifiers;
+using Puppet.Common.Automation;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
+using Puppet.Common.Notifiers;
 using Puppet.Common.Services;
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,9 +18,15 @@ namespace Puppet.Automation.Notification
         const string _mailboxNotifyKey = "MailboxNotificationTime";
         const string _mailboxLastEventTimeKey = "MailboxLastEventTime";
         const int _debounceTimeoutMs = 1000;
+        private List<INotifier> _notifiers;
+
 
         public MailArrival(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
+            _notifiers = new List<INotifier> {
+                new HassAlexaNotifier(_hub.Configuration, new string[] { "Shared_Spaces" }),
+                new HassAppNotifier(_hub.Configuration)
+            };
         }
 
         protected async override Task Handle()
@@ -54,10 +63,7 @@ namespace Puppet.Automation.Notification
                 _hub.StateBag.AddOrUpdate(_mailboxNotifyKey, DateTime.Now,
                     (key, oldvalue) => DateTime.Now);
 
-                var text = "There is activity at the mailbox.";
-                await _hub.Announce(text);
-                await _hub.Push(text);
-
+                await _notifiers.SendMessage("There is activity at the mailbox.");
             }
         }
 
