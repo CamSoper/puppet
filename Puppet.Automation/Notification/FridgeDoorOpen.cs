@@ -19,8 +19,8 @@ namespace Puppet.Automation.Notification
     {
         public FridgeDoorOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
-            HowLong = TimeSpan.FromMinutes(1);
-            NumberOfNotifications = 2;
+            HowLong = TimeSpan.FromMinutes(5);
+            NumberOfNotifications = 10;
             MakeAnnouncement = true;
             PushNotification = true;
 

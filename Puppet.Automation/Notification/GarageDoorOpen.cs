@@ -18,7 +18,7 @@ namespace Puppet.Automation.Notification
         public GarageDoorOpen(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             HowLong = TimeSpan.FromMinutes(5);
-            NumberOfNotifications = 2;
+            NumberOfNotifications = 1;
             MakeAnnouncement = true;
             PushNotification = true;
 

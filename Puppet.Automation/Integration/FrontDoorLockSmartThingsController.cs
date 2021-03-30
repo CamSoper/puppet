@@ -6,6 +6,10 @@ using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Puppet.Automation.Services.SmartThings;
+using System.Runtime.InteropServices;
+using Puppet.Common.Notifiers;
+using System.Collections.Generic;
+using Puppet.Automation.Services.Notifiers;
 
 namespace Puppet.Automation.Integration
 {
@@ -16,11 +20,17 @@ namespace Puppet.Automation.Integration
     {
         LockDevice _frontDoorLock;
         LockDevice _smartthingsLock;
-        SmartThingsLockService _service;
+        readonly SmartThingsLockService _service;
+        readonly List<INotifier> _notificationDevices;
 
         public FrontDoorLockSmartThingsController(HomeAutomationPlatform hub, HubEvent evt) : base(hub, evt)
         {
             _service = new SmartThingsLockService(_hub.Configuration);
+
+            _notificationDevices = new List<INotifier> {
+                new HassAlexaNotifier(_hub.Configuration, new string[] { "Shared_Spaces" }),
+                new HassAppNotifier(_hub.Configuration)
+                };
         }
 
         protected override async Task InitDevices()
@@ -36,22 +46,30 @@ namespace Puppet.Automation.Integration
 
         protected override async Task Handle()
         {
-            if (_evt.DeviceId == _frontDoorLock.Id)
+            if ( _frontDoorLock.IsTriggerDevice(_evt))
             {
-                if (_evt.Value == "unlocking")
+                switch (_evt.Value)
                 {
-                    await _service.Unlock();
+                    case "unlocking":
+                        await _service.Unlock();
+                        break;
+
+                    case "locking":
+                        await _service.Lock();
+                        break;
+
+                    default:
+                        return;
                 }
-                else if (_evt.Value == "locking")
-                {
-                    await _service.Lock();
-                }
-                else
-                {
-                    return;
-                }
+ 
+                await WaitForCancellationAsync(TimeSpan.FromSeconds(10));
+                await _notificationDevices.SendMessage("The front door lock is in an unknown state! Please check it.");
             }
-            else if (_evt.DeviceId == _hub.LookupDeviceId("Lock.SmartThingsFrontDoorDeadbolt"))
+            else if (
+                    (await 
+                        _hub.GetDeviceByMappedName<LockDevice>("Lock.SmartThingsFrontDoorDeadbolt"))
+                        .IsTriggerDevice(_evt)
+                    )
             {
                 if (_evt.Value == "locked")
                 {

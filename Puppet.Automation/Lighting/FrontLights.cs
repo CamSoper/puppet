@@ -51,7 +51,7 @@ namespace Puppet.Automation.Lighting
 
         protected override async Task Handle()
         {
-            bool ShouldUseLights = true; //await IsDark(30, -30);
+            bool ShouldUseLights = await IsDark(30, -30);
 
             //Power switch was turned off. Turn it back on and make the lights dark.
             if (_evt.IsOffEvent && _frontLightsPower.IsTriggerDevice(_evt))
@@ -97,10 +97,6 @@ namespace Puppet.Automation.Lighting
                         await _frontLightsGroup.Off();
                     }
                 }
-            }
-            else
-            {
-                await _frontLightsGroup.Off();
             }
         }
 

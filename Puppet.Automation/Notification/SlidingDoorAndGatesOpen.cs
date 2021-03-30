@@ -35,7 +35,7 @@ namespace Puppet.Automation.Notification
             {
                 if (_slidingDoor.Status == ContactStatus.Open && _gates.IsAnyOpen())
                 {
-                    await _notifiers.SendMessage("A gate is open while the sliding door is open.Please account for the pets.");
+                    await _notifiers.SendMessage("A gate is open while the sliding door is open. Please account for the pets.");
                 }
             }
         }
