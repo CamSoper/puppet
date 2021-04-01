@@ -57,6 +57,9 @@
     "OfficeRemote": "345"
   },
   "Motion": {
-    "Basement" : "228"
+    "Basement": "228"
+  },
+  "Fan": {
+    "VirtualAtticFan": "1607"
   }
 }
