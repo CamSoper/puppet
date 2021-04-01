@@ -35,22 +35,28 @@ namespace Puppet.Automation.Integration
                 switch(_evt.Value.ToLower())
                 {
                     case "high":
-                        await _atticFanPower.On();
-                        await _atticFanHiLo.On();
+                        await _atticFanPower.Ensure(SwitchStatus.On);
+                        await _atticFanHiLo.Ensure(SwitchStatus.On);
                         break;
 
                     case "off":
-                        await _atticFanPower.Off();
+                        await _atticFanPower.Ensure(SwitchStatus.Off);
                         break;
 
                     default:
-                        await _atticFanPower.On();
-                        await _atticFanHiLo.Off();
+                        await _atticFanPower.Ensure(SwitchStatus.On);
+                        await _atticFanHiLo.Ensure(SwitchStatus.Off);
                         break;
                 }
             }
             else
             {
+                // wait a bit to let statuses shake out if we just turned the attic fan on via the virtual device
+                await WaitForCancellationAsync(TimeSpan.FromSeconds(10));
+
+                var tasks = new Task[]{ _virtualAtticFan.RefreshState(), _atticFanPower.RefreshState(), _atticFanHiLo.RefreshState() };
+                Task.WaitAll(tasks);
+
                 // Make the virtual fan reflect reality
                 var switchesAreOn = Tuple.Create<bool, bool>(_atticFanPower.IsOn, _atticFanHiLo.IsOn);
                 FanSpeed desiredSpeed = FanSpeed.Unknown;
@@ -74,7 +80,7 @@ namespace Puppet.Automation.Integration
                 if (desiredSpeed != FanSpeed.Unknown &&
                     _virtualAtticFan.Status != desiredSpeed)
                 {
-                    await _virtualAtticFan.SetSpeed(desiredSpeed);
+                    await _virtualAtticFan.Ensure(desiredSpeed);
                 }
             }
         } 

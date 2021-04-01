@@ -51,7 +51,9 @@
     "BasementLamp": "230",
     "FoyerLight": "209",
     "RingDoorbell": "838",
-    "RingDoorbellMotion": "1056"
+    "RingDoorbellMotion": "1056",
+    "AtticFanPower": "1527",
+    "AtticFanHiLo": "1606"
   },
   "Button": {
     "OfficeRemote": "345"
