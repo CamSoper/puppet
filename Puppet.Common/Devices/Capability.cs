@@ -12,6 +12,7 @@ namespace Puppet.Common.Devices
         Lock,
         Pushed,
         Held,
-        Door
+        Door,
+        Speed
     }
 }
