@@ -120,6 +120,8 @@ namespace Puppet.Executive.Services
                             _telemetryClient.TrackException(ex);
                             Console.WriteLine($"{DateTime.Now} {automation} {ex} {ex.Message}");
                         }
+
+                        _telemetryClient.StopOperation(operation);
                     }
                 };
 

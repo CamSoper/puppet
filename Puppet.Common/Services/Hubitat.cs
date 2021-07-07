@@ -4,14 +4,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.WebSockets;
+using System.Runtime.Caching;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.ApplicationInsights;
+
 using Microsoft.Extensions.Configuration;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 using Puppet.Common.Configuration;
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
@@ -31,6 +34,8 @@ namespace Puppet.Common.Services
         readonly string _auxAppAccessToken;
         readonly string _websocketUrl;
         readonly HttpClient _client;
+        readonly MemoryCache _cache;
+
         SunriseAndSunset _sunriseAndSunset;
 
         public Hubitat(IConfiguration configuration, HttpClient httpClient)
@@ -42,10 +47,11 @@ namespace Puppet.Common.Services
             _accessToken = hubitatOptions.AccessToken;
             _websocketUrl = $"wss://{hubitatOptions.HubitatHostNameOrIp}/eventsocket";
             _client = httpClient;
+            _cache = MemoryCache.Default;
 
-            _baseAuxAppAddress = $"https://{hubitatOptions.HubitatHostNameOrIp}/apps/api/{hubitatOptions.AuxAppId}"; 
+            _baseAuxAppAddress = $"https://{hubitatOptions.HubitatHostNameOrIp}/apps/api/{hubitatOptions.AuxAppId}";
             _auxAppAccessToken = hubitatOptions.AuxAppAccessToken;
-            
+
             StateBag = new ConcurrentDictionary<string, object>();
         }
 
@@ -90,27 +96,39 @@ namespace Puppet.Common.Services
 
         public override async Task<T> GetDeviceByLabel<T>(string label)
         {
+            var hubitatDevices = await GetHubitatDeviceList();
+            string deviceId = hubitatDevices.Where(x => x.Label == label).FirstOrDefault()?.Id;
+            if (deviceId == null)
+            {
+                throw new DeviceNotFoundException($"No device was found with the label: \"{label}\"");
+            }
+            return await GetDeviceById<T>(deviceId);
+        }
+
+        private async Task<List<HubitatDevice>> GetHubitatDeviceList(bool forceRefresh = false)
+        {
+            string hubitatDeviceListKey = "hubitat-device-list";
+            if(_cache.Contains(hubitatDeviceListKey))
+            {
+                return _cache.Get(hubitatDeviceListKey) as List<HubitatDevice>;
+            }
+
             Uri requestUri = new Uri($"{_baseMakerApiAddress}?access_token={_accessToken}");
             Console.WriteLine($"{DateTime.Now} Hubitat Device Command: {requestUri.ToString().Split('?')[0]}");
+
             using (HttpResponseMessage result = await _client.GetAsync(requestUri))
             {
                 result.EnsureSuccessStatusCode();
                 List<HubitatDevice> hubitatDevices = JsonConvert.DeserializeObject<List<HubitatDevice>>(await result.Content.ReadAsStringAsync());
-
-                string deviceId = hubitatDevices.Where(x => x.Label == label).FirstOrDefault()?.Id;
-                if (deviceId == null)
-                {
-                    throw new DeviceNotFoundException("No device was found with the provided label.");
-                }
-                return await GetDeviceById<T>(deviceId);
+                _cache.Add(hubitatDeviceListKey, hubitatDevices, DateTimeOffset.Now.AddMinutes(1));
+                return hubitatDevices;
             }
         }
-
         protected override async Task AuxEndpointNotification(string notificationText, bool playAudio)
         {
             string endpoint = (playAudio) ? "announcement" : "notify";
             Uri requestUri = new Uri($"{_baseAuxAppAddress}/{endpoint}?access_token={_auxAppAccessToken}");
-            
+
             Console.WriteLine($"{DateTime.Now} Hubitat Device Command: {requestUri.ToString().Split('?')[0]}");
             string jsonText = $"{{ \"notificationText\" : \"{notificationText}\" }}";
             var request = new StringContent(jsonText, Encoding.UTF8, "application/json");
@@ -119,10 +137,10 @@ namespace Puppet.Common.Services
                 result.EnsureSuccessStatusCode();
             }
         }
-        
+
         public override async Task<SunriseAndSunset> GetSunriseAndSunset()
         {
-            if(_sunriseAndSunset == null || 
+            if (_sunriseAndSunset == null ||
                 (_sunriseAndSunset?.Sunrise.Date < DateTime.Now.Date))
             {
                 Uri requestUri = new Uri($"{_baseAuxAppAddress}/suntimes?access_token={_auxAppAccessToken}");
@@ -133,7 +151,7 @@ namespace Puppet.Common.Services
                     _sunriseAndSunset = JsonConvert.DeserializeObject<SunriseAndSunset>(await result.Content.ReadAsStringAsync());
                 }
             }
-            return _sunriseAndSunset;    
+            return _sunriseAndSunset;
         }
 
     }

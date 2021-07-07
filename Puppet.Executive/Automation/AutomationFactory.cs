@@ -35,7 +35,7 @@ namespace Puppet.Executive.Automation
                 .Where(t => typeof(IAutomation).IsAssignableFrom(t) && 
                     (t.GetCustomAttributes<TriggerDeviceAttribute>() 
                         .Where(a => hub.LookupDeviceId(a.DeviceMappedName) == evt.DeviceId &&
-                            a.Capability.ToString().ToLower() == evt.Name))
+                            a.Capability.ToString().ToLower() == evt.Name.ToLower()))
                     .Count() > 0);
             foreach (Type automation in typeCollection)
             {
