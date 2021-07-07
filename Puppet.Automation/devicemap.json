@@ -56,7 +56,9 @@
     "AtticFanHiLo": "1606"
   },
   "Button": {
-    "OfficeRemote": "345"
+    "OfficeRemote": "345",
+    "ArcadeSceneController": "1733",
+    "ArcadeSceneController2": "1798"
   },
   "Motion": {
     "Basement": "228"

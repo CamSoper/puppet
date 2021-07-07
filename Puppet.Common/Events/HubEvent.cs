@@ -31,6 +31,7 @@ namespace Puppet.Common.Events
         public bool IsOffEvent => Value == "off";
         public bool IsButtonPushedEvent => Name == "pushed";
         public bool IsButtonHeldEvent => Name == "held";
+        public bool IsButtonDoubleTappedEvent => Name == "doubleTapped";
         public bool IsActiveEvent => Value == "active";
         public bool IsInactiveEvent => Value == "inactive";
 

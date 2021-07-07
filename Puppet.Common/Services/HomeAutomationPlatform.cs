@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 
 using Puppet.Common.Devices;
 using Puppet.Common.Events;
+using Puppet.Common.Exceptions;
 using Puppet.Common.Models;
 using Puppet.Common.Notifiers;
 using Puppet.Common.Telemetry;
@@ -74,16 +75,24 @@ namespace Puppet.Common.Services
         }
         string ParseAndLookupMappedDeviceName(JsonElement map, string mappedDeviceName)
         {
+            
             string[] tokens = mappedDeviceName.Split('.');
             JsonElement deviceElement = map.Clone();
-            if (tokens.Length > 1)
+
+            try
             {
-                for (int i = 0; i < tokens.Length; i++)
+                if (tokens.Length > 1)
                 {
-                    deviceElement = deviceElement.GetProperty(tokens[i]);
+                    for (int i = 0; i < tokens.Length; i++)
+                    {
+                        deviceElement = deviceElement.GetProperty(tokens[i]);
+                    }
                 }
             }
-
+            catch (System.Collections.Generic.KeyNotFoundException)
+            {
+                throw new DeviceNotFoundException($"devicemap.json has no mapping for {mappedDeviceName}.");
+            }
             return deviceElement.GetString();
         }
 

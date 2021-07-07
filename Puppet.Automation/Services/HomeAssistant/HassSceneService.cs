@@ -23,6 +23,7 @@ namespace Puppet.Automation.Services.HomeAssistant
 
         public async Task ApplyScene(Scene scene)
         {
+            Console.WriteLine($"HASS Scene Service: Activation {scene.ToString()}");
             string bodyText = JsonConvert.SerializeObject(new { entity_id = $"scene.{scene.ToString().ToLower()}" });
             HttpContent contentPost = new StringContent(bodyText, Encoding.UTF8, "application/json");
             using (var client = new HttpClient())
@@ -39,6 +40,11 @@ namespace Puppet.Automation.Services.HomeAssistant
     public enum Scene
     {
         Warm_Front_Lights,
-        Colorful_Front_Lights
+        Colorful_Front_Lights,
+        Arcade_0,
+        Arcade_1,
+        Arcade_2,
+        Arcade_3,
+        Arcade_4
     }
 }
